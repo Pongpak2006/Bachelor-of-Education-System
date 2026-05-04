@@ -758,18 +758,26 @@ const db = firebase.firestore();
             }
         }
 
-        // --- เพิ่มฟังก์ชันคำนวณสถานะไว้ด้านบนสุด ---
-        function calculateStatus(totalCr) {
+function calculateStatus(totalCr) {
             const startYear = 2567; // ปีที่เริ่มเข้าศึกษา
-            const targetYear = 2570; // ปีเป้าหมายที่ต้องจบ
-            const currentYear = new Date().getFullYear() + 543; // ปีปัจจุบัน พ.ศ.
+            const targetYear = 2570; // ปีเป้าหมายที่ต้องจบ 4 ปี
             
-            // 1. ถ้าเลยปีเป้าหมายแล้วหน่วยกิตยังไม่ครบ = ตกค้าง
+            let d = new Date();
+            let currentYear = d.getFullYear() + 543; // ปี พ.ศ. ปัจจุบัน
+            let currentMonth = d.getMonth(); // ดึงค่าเดือน (0 = ม.ค., 4 = พ.ค., 6 = ก.ค.)
+            
+            // 🛑 เช็คปฏิทินมหาวิทยาลัย: เทอม 1 เริ่มเดือนกรกฎาคม (เดือน 6)
+            // ถ้าตอนนี้ยังไม่ถึงเดือนกรกฎาคม (เช่น พฤษภาคม) ให้ถือว่ายังเป็น "ปีการศึกษาเก่า" อยู่
+            if (currentMonth < 6) { 
+                currentYear -= 1; 
+            }
+            
+            // 1. ถ้าเลยปีเป้าหมาย (2570) แล้วหน่วยกิตยังไม่ครบ = ตกค้าง
             if (currentYear > targetYear && totalCr < 141) {
                 return "ตกค้าง";
             }
             
-            // 2. คำนวณชั้นปีปัจจุบัน
+            // 2. คำนวณชั้นปีปัจจุบันตามปีการศึกษาจริง
             let yearOfStudy = currentYear - startYear + 1;
             if (yearOfStudy < 1) yearOfStudy = 1;
             if (yearOfStudy > 4) yearOfStudy = 4; 
@@ -777,7 +785,7 @@ const db = firebase.firestore();
             // 3. คาดหวังว่าควรเก็บได้ปีละ 35.25 หน่วยกิต
             const expectedCredits = yearOfStudy * 35.25;
             
-            // 4. ถ้าตามหลังเป้าหมายเกิน 15 หน่วยกิต = เฝ้าระวัง
+            // 4. เงื่อนไข: ถ้าตามหลังเป้าหมายเกิน 15 หน่วยกิต = เฝ้าระวัง
             if (totalCr < (expectedCredits - 15)) {
                 return "เฝ้าระวัง";
             } else {
