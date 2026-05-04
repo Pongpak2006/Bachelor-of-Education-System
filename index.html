@@ -758,33 +758,34 @@ const db = firebase.firestore();
             }
         }
 
+        // --- เพิ่มฟังก์ชันคำนวณสถานะไว้ด้านบนสุด ---
         function calculateStatus(totalCr) {
-    const startYear = 2567; // ปีที่เริ่มเข้าศึกษา
-    const targetYear = 2570; // ปีเป้าหมายที่ต้องจบ
-    
-    // ดึงปี พ.ศ. ปัจจุบันจากเครื่อง (ตอนนี้ปี 2569)
-    const currentYear = new Date().getFullYear() + 543; 
-    
-    if (currentYear > targetYear && totalCr < 141) {
-        return "ตกค้าง";
-    }
-    
-    // คำนวณชั้นปีปัจจุบัน
-    let yearOfStudy = currentYear - startYear + 1;
-    if (yearOfStudy < 1) yearOfStudy = 1;
-    if (yearOfStudy > 4) yearOfStudy = 4; 
-    
-    // คาดหวังว่าควรเก็บได้ปีละ 35.25 หน่วยกิต
-    const expectedCredits = yearOfStudy * 35.25;
-    
-    // ถ้าหน่วยกิตที่ได้ (totalCr) ตามหลังเป้าหมายเกิน 15 หน่วยกิต = เฝ้าระวัง
-    if (totalCr < (expectedCredits - 15)) {
-        return "เฝ้าระวัง";
-    } else {
-        return "ปกติ";
-    }
-}
-        
+            const startYear = 2567; // ปีที่เริ่มเข้าศึกษา
+            const targetYear = 2570; // ปีเป้าหมายที่ต้องจบ
+            const currentYear = new Date().getFullYear() + 543; // ปีปัจจุบัน พ.ศ.
+            
+            // 1. ถ้าเลยปีเป้าหมายแล้วหน่วยกิตยังไม่ครบ = ตกค้าง
+            if (currentYear > targetYear && totalCr < 141) {
+                return "ตกค้าง";
+            }
+            
+            // 2. คำนวณชั้นปีปัจจุบัน
+            let yearOfStudy = currentYear - startYear + 1;
+            if (yearOfStudy < 1) yearOfStudy = 1;
+            if (yearOfStudy > 4) yearOfStudy = 4; 
+            
+            // 3. คาดหวังว่าควรเก็บได้ปีละ 35.25 หน่วยกิต
+            const expectedCredits = yearOfStudy * 35.25;
+            
+            // 4. ถ้าตามหลังเป้าหมายเกิน 15 หน่วยกิต = เฝ้าระวัง
+            if (totalCr < (expectedCredits - 15)) {
+                return "เฝ้าระวัง";
+            } else {
+                return "ปกติ";
+            }
+        }
+
+        // --- ส่วนที่คุณต้องเอาไปวางทับของเดิม ---
         function renderCourses(data) {
             if(!data || !Array.isArray(data)) data = [];
             let html = ''; let p_html = '';
@@ -865,11 +866,11 @@ const db = firebase.firestore();
             document.getElementById('progressText').innerText = perc.toFixed(1) + '%';
             document.getElementById('progressBar').style.width = perc + '%';
 
-        // --- โค้ดป้ายมุมขวาบนอันใหม่ เริ่มคัดลอกตรงนี้ ---
+            // 🎯 เพิ่มป้ายสถานะมุมขวาบนตรงนี้
             let badge = document.getElementById('honorsBadge');
             badge.classList.remove('hidden'); // แสดงป้ายเสมอ
 
-            let currentStatus = calculateStatus(totalCr); // เรียกใช้ฟังก์ชันที่เราเพิ่มไว้ด้านบน
+            let currentStatus = calculateStatus(totalCr); // เรียกฟังก์ชันคำนวณที่เพิ่งเพิ่มไป
 
             if (currentStatus === "ปกติ") {
                 badge.innerHTML = appLang === 'en' ? '<i class="fa-solid fa-circle-check mr-1"></i> Normal' : '<i class="fa-solid fa-circle-check mr-1"></i> สถานะปกติ';
@@ -881,8 +882,7 @@ const db = firebase.firestore();
                 badge.innerHTML = appLang === 'en' ? '<i class="fa-solid fa-circle-xmark mr-1"></i> Delayed' : '<i class="fa-solid fa-circle-xmark mr-1"></i> สถานะตกค้าง';
                 badge.className = 'px-3 py-1.5 rounded-full text-xs font-bold shadow-sm bg-red-100 text-red-700';
             }
-            // --- สิ้นสุดการคัดลอก ---
-            
+
             let sumTitle = appLang === 'en' ? '4-Year Summary' : 'สรุปการเรียน 4 ปี';
             let sumDesc = appLang === 'en' 
                 ? `Earned <b class="text-theme">${totalCr}</b> CR <br class="md:hidden"> (Need <b class="text-slate-800">${remaining}</b> CR to graduate)`
