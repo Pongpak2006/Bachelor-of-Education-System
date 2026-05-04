@@ -630,48 +630,77 @@ const db = firebase.firestore();
             passedCoursesList = [];
         }
 
-        function login(loginType) {
-    // 1. สั่งให้ตัวหมุนเด้งขึ้นมา "ทันที" โดยไม่มีเงื่อนไข
+       function login(loginType) {
+    // 1. สั่งให้ตัวหมุน Loading ทำงานทันทีที่กดปุ่ม เพื่อลดความรู้สึกหน่วง
     Swal.fire({
         title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...',
         allowOutsideClick: false,
-        showConfirmButton: false, // ปิดปุ่มตกลงเพื่อให้ดูเนียนขึ้น
+        showConfirmButton: false,
         didOpen: () => {
             Swal.showLoading();
         }
     });
 
-    // 2. ค่อยไปดึงค่าจากช่อง Input หลังจากสั่งหมุนแล้ว
+    // 2. ดึงค่าจากช่อง Input
     let u = loginType === 'admin' ? document.getElementById('adminUsername').value : document.getElementById('username').value;
     let p = loginType === 'admin' ? document.getElementById('adminPassword').value : document.getElementById('password').value;
 
     if(!u || !p) {
-        Swal.close(); // ถ้าลืมกรอกให้ปิดตัวหมุนก่อน
+        Swal.close();
         Swal.fire(appLang === 'en' ? 'Warning' : 'เตือน', appLang === 'en' ? 'Please fill in all fields' : 'กรุณากรอกข้อมูลให้ครบ', 'warning');
         return;
     }
 
-    // 3. เริ่มทำงานกับฐานข้อมูล (ที่มีระบบ Security Rules)
+    // 3. เริ่มดึงข้อมูลจาก Firebase
     db.collection("Users").doc(u).get().then((doc) => {
+        Swal.close(); // ปิดตัวหมุนเมื่อได้รับข้อมูลตอบกลับ
+        
         if (doc.exists) {
             let userData = doc.data(); 
             if (userData.password === p) {
-                // ... (โค้ดส่วนเช็ค Role และเข้าหน้า Dashboard เหมือนเดิมของคุณ) ...
-                // อย่าลืมสั่ง Swal.close() ตอนที่เปลี่ยนหน้าเสร็จแล้วด้วยนะครับ
-                Swal.close();
+                let role = userData.role || 'student';
+                
+                // ตรวจสอบสิทธิ์ Admin/Student
+                if(role === 'admin' && loginType !== 'admin') {
+                    return Swal.fire('เตือน', 'กรุณาเข้าสู่ระบบผ่านปุ่มแอดมิน', 'warning');
+                }
+                if(role === 'student' && loginType === 'admin') {
+                    return Swal.fire('เตือน', 'บัญชีนี้ไม่มีสิทธิ์แอดมิน', 'error');
+                }
+
+                // ซ่อนหน้า Login
                 document.getElementById('loginSection').style.display = 'none';
-                // ... (ส่วนที่เหลือ) ...
-            } else {
-                Swal.close();
-                Swal.fire('ข้อผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', 'error');
+                
+                if(role === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                    loadAdmin(); 
+                } else {
+                    // ตั้งค่าข้อมูลผู้ใช้ปัจจุบัน
+                    currentUser = userData; 
+                    currentUser.id = u; 
+                    currentUser.studentId = userData.studentId || u; 
+                    
+                    // แสดงหน้า Dashboard นักศึกษา
+                    document.getElementById('studentSection').style.display = 'block';
+                    document.getElementById('headerName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
+                    document.getElementById('profileName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
+                    document.getElementById('profileId').innerText = appLang === 'en' ? `ID: ${currentUser.studentId} | Year ${currentUser.year}` : `รหัส: ${currentUser.studentId} | ชั้นปีที่ ${currentUser.year}`;
+                    document.getElementById('profileEmail').innerText = currentUser.email || '-';
+                    document.getElementById('greetingText').innerText = getGreeting();
+                    
+                    // โหลดวิชาเรียน
+                    loadCourses();
+                }
+            } else { 
+                Swal.fire('ข้อผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', 'error'); 
             }
-        } else {
-            Swal.close();
-            Swal.fire('ข้อผิดพลาด', 'ไม่พบรหัสผู้ใช้งาน', 'error');
+        } else { 
+            Swal.fire('ข้อผิดพลาด', 'ไม่พบรหัสผู้ใช้งานนี้ในระบบ', 'error'); 
         }
     }).catch((error) => {
         Swal.close();
-        Swal.fire('ข้อผิดพลาด', 'การเชื่อมต่อขัดข้อง', 'error');
+        console.error("Login Error:", error);
+        Swal.fire('ข้อผิดพลาด', 'ระบบเชื่อมต่อฐานข้อมูลล้มเหลว', 'error');
     });
 }
 
