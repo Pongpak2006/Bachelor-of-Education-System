@@ -758,6 +758,33 @@ const db = firebase.firestore();
             }
         }
 
+        function calculateStatus(totalCr) {
+    const startYear = 2567; // ปีที่เริ่มเข้าศึกษา
+    const targetYear = 2570; // ปีเป้าหมายที่ต้องจบ
+    
+    // ดึงปี พ.ศ. ปัจจุบันจากเครื่อง (ตอนนี้ปี 2569)
+    const currentYear = new Date().getFullYear() + 543; 
+    
+    if (currentYear > targetYear && totalCr < 141) {
+        return "ตกค้าง";
+    }
+    
+    // คำนวณชั้นปีปัจจุบัน
+    let yearOfStudy = currentYear - startYear + 1;
+    if (yearOfStudy < 1) yearOfStudy = 1;
+    if (yearOfStudy > 4) yearOfStudy = 4; 
+    
+    // คาดหวังว่าควรเก็บได้ปีละ 35.25 หน่วยกิต
+    const expectedCredits = yearOfStudy * 35.25;
+    
+    // ถ้าหน่วยกิตที่ได้ (totalCr) ตามหลังเป้าหมายเกิน 15 หน่วยกิต = เฝ้าระวัง
+    if (totalCr < (expectedCredits - 15)) {
+        return "เฝ้าระวัง";
+    } else {
+        return "ปกติ";
+    }
+}
+        
         function renderCourses(data) {
             if(!data || !Array.isArray(data)) data = [];
             let html = ''; let p_html = '';
@@ -838,25 +865,24 @@ const db = firebase.firestore();
             document.getElementById('progressText').innerText = perc.toFixed(1) + '%';
             document.getElementById('progressBar').style.width = perc + '%';
 
-            // 🚀 ป้ายสถานะแบบมุมขวาบน (อิงจาก 2570)
+        // --- โค้ดป้ายมุมขวาบนอันใหม่ เริ่มคัดลอกตรงนี้ ---
             let badge = document.getElementById('honorsBadge');
-            badge.classList.remove('hidden');
+            badge.classList.remove('hidden'); // แสดงป้ายเสมอ
 
-            let currentYear = new Date().getFullYear() + 543; // 2569
-            let targetYear = 2570;
-            let yearsLeft = targetYear - currentYear;
-            // คำนวณความคาดหวังว่าควรเหลืออีกกี่หน่วยกิต (สมมติ 42 หน่วยกิต/ปี)
-            let expectedRemaining = Math.max(0, yearsLeft * 42); 
+            let currentStatus = calculateStatus(totalCr); // เรียกใช้ฟังก์ชันที่เราเพิ่มไว้ด้านบน
 
-            // เผื่อความช้าไว้ 15 หน่วยกิต ถ้าเหลือมากกว่านี้แปลว่าผิดปกติ
-            if (remaining > expectedRemaining + 15) { 
-                badge.innerHTML = appLang === 'en' ? '<i class="fa-solid fa-circle-exclamation mr-1"></i> Probation' : '<i class="fa-solid fa-circle-exclamation mr-1"></i> สถานะ เฝ้าระวัง'; 
-                badge.className = 'px-3 py-1.5 rounded-full text-xs font-bold shadow-sm bg-red-100 text-red-700'; 
-            } else { 
-                badge.innerHTML = appLang === 'en' ? '<i class="fa-solid fa-circle-check mr-1"></i> Normal Status' : '<i class="fa-solid fa-circle-check mr-1"></i> สถานะปกติ'; 
-                badge.className = 'px-3 py-1.5 rounded-full text-xs font-bold shadow-sm bg-emerald-100 text-emerald-700'; 
+            if (currentStatus === "ปกติ") {
+                badge.innerHTML = appLang === 'en' ? '<i class="fa-solid fa-circle-check mr-1"></i> Normal' : '<i class="fa-solid fa-circle-check mr-1"></i> สถานะปกติ';
+                badge.className = 'px-3 py-1.5 rounded-full text-xs font-bold shadow-sm bg-emerald-100 text-emerald-700';
+            } else if (currentStatus === "เฝ้าระวัง") {
+                badge.innerHTML = appLang === 'en' ? '<i class="fa-solid fa-circle-exclamation mr-1"></i> Probation' : '<i class="fa-solid fa-circle-exclamation mr-1"></i> สถานะเฝ้าระวัง';
+                badge.className = 'px-3 py-1.5 rounded-full text-xs font-bold shadow-sm bg-red-100 text-red-700';
+            } else {
+                badge.innerHTML = appLang === 'en' ? '<i class="fa-solid fa-circle-xmark mr-1"></i> Delayed' : '<i class="fa-solid fa-circle-xmark mr-1"></i> สถานะตกค้าง';
+                badge.className = 'px-3 py-1.5 rounded-full text-xs font-bold shadow-sm bg-red-100 text-red-700';
             }
-
+            // --- สิ้นสุดการคัดลอก ---
+            
             let sumTitle = appLang === 'en' ? '4-Year Summary' : 'สรุปการเรียน 4 ปี';
             let sumDesc = appLang === 'en' 
                 ? `Earned <b class="text-theme">${totalCr}</b> CR <br class="md:hidden"> (Need <b class="text-slate-800">${remaining}</b> CR to graduate)`
