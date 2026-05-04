@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- เรียกใช้งาน Firebase (เอาไว้วางในหมวด head) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
         
@@ -336,24 +339,20 @@
     </div>
 
     <script>
-        // 🚨 ส่วนสำคัญ: ลิงก์ API ของ Google Apps Script ที่คุณส่งมา 🚨
-        const API_URL = "https://script.google.com/macros/s/AKfycbwjicOsvJDH3QNi0TbcFk5izehEr1yzltOs-23gfXc9-OjHaB04p96H5b6XMYgUBQOerw/exec";
+       // --- 1. กุญแจและระบบฐานข้อมูล Firebase ---
+const firebaseConfig = {
+    apiKey: "AIzaSyDda5v7a1ZlWl6VJ6Te-S8Q6Q0inuCECK0",
+    authDomain: "bachelor-edu-system.firebaseapp.com",
+    projectId: "bachelor-edu-system",
+    storageBucket: "bachelor-edu-system.firebasestorage.app",
+    messagingSenderId: "555108991120",
+    appId: "1:555108991120:web:cf7bfee14a48fdabc25815"
+};
 
-        // 🔄 ฟังก์ชันศูนย์กลางสำหรับคุยกับ Google API
-        async function apiCall(action, payload = {}) {
-            payload.action = action;
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
-                return await response.json();
-            } catch (error) {
-                console.error("API Error:", error);
-                throw error;
-            }
-        }
+// เปิดสวิตช์ Firebase และเชื่อมต่อ Firestore
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+// ---------------------------------------
 
         let currentUser = {};
         const TOTAL_CREDITS = 141;
@@ -555,51 +554,59 @@
             passedCoursesList = [];
         }
 
-        function login(loginType) {
-            let u = loginType === 'admin' ? document.getElementById('adminUsername').value : document.getElementById('username').value;
-            let p = loginType === 'admin' ? document.getElementById('adminPassword').value : document.getElementById('password').value;
-            
-            if(!u || !p) {
-                Swal.fire(appLang === 'en' ? 'Warning' : 'เตือน', appLang === 'en' ? 'Please fill in all fields' : 'กรุณากรอกข้อมูลให้ครบ', 'warning');
-                return;
-            }
-            
-            clearDashboardData();
-            Swal.fire({ title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            // 💡 เรียกใช้ API ฝั่งเช็คล็อกอิน
-            apiCall('checkLogin', { username: u, password: p }).then(res => {
-                Swal.close(); 
-                if(res.status === 'success') {
-                    if(res.role === 'admin' && loginType !== 'admin') return Swal.fire('เตือน', 'กรุณาเข้าสู่ระบบผ่านปุ่มแอดมิน', 'warning');
-                    if(res.role === 'student' && loginType === 'admin') return Swal.fire('เตือน', 'บัญชีนี้ไม่ได้รับสิทธิ์แอดมิน', 'error');
+       function login(loginType) {
+    let u = loginType === 'admin' ? document.getElementById('adminUsername').value : document.getElementById('username').value;
+    let p = loginType === 'admin' ? document.getElementById('adminPassword').value : document.getElementById('password').value;
 
-                    document.getElementById('loginSection').style.display = 'none';
-                    if(res.role === 'admin') {
-                        document.getElementById('adminSection').style.display = 'block';
-                        loadAdmin();
-                    } else {
-                        currentUser = res;
-                        currentUser.username = u; // เก็บข้อมูลชั่วคราวเพื่อใช้ดึงข้อมูลภายหลัง
-                        currentUser.password = p;
-                        
-                        document.getElementById('studentSection').style.display = 'block';
-                        document.getElementById('greetingText').innerText = getGreeting();
-                        document.getElementById('headerName').innerText = res.name.split(' ')[0] || res.name;
-                        document.getElementById('profileName').innerText = res.name;
-                        document.getElementById('profileId').innerText = appLang === 'en' ? `ID: ${res.studentId} | Year ${res.year}` : `รหัส: ${res.studentId} | ชั้นปีที่ ${res.year}`;
-                        document.getElementById('profileEmail').innerText = res.email;
-                        window.scrollTo(0,0);
-                        renderCourses(res.courseData || []);
-                    }
+    if(!u || !p) {
+        Swal.fire(appLang === 'en' ? 'Warning' : 'เตือน', appLang === 'en' ? 'Please fill in all fields' : 'กรุณากรอกข้อมูลให้ครบ', 'warning');
+        return;
+    }
+
+    clearDashboardData();
+    Swal.fire({ title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    // 🚀 --- เปลี่ยนมาใช้ Firebase ล้วงข้อมูลแทน Google Sheets ตรงนี้ ---
+    db.collection("Users").doc(u).get().then((doc) => {
+        Swal.close();
+        if (doc.exists) {
+            let userData = doc.data(); // ดึงแฟ้มข้อมูลนักศึกษาออกมา
+            
+            // ตรวจสอบรหัสผ่าน
+            if (userData.password === p) {
+                // เช็คสิทธิ์ว่าเป็น admin หรือ student (ถ้าไม่มีฟิลด์ role ถือว่าเป็น student)
+                let role = userData.role || 'student';
+
+                if(role === 'admin' && loginType !== 'admin') return Swal.fire('เตือน', 'กรุณาเข้าสู่ระบบผ่านปุ่มแอดมิน', 'warning');
+                if(role === 'student' && loginType === 'admin') return Swal.fire('เตือน', 'บัญชีนี้ไม่มีสิทธิ์แอดมิน', 'error');
+
+                document.getElementById('loginSection').style.display = 'none';
+                
+                if(role === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                    if(typeof loadAdmin === 'function') loadAdmin(); 
                 } else {
-                    Swal.fire(appLang === 'en' ? 'Login Failed' : 'ล็อกอินล้มเหลว', appLang === 'en' ? 'Invalid Username or Password' : 'รหัสไม่ถูกต้อง', 'error');
+                    currentUser = userData; // เก็บข้อมูลลงระบบ
+                    currentUser.id = u; // เซ็ตรหัสให้ตรงกับชื่อแฟ้ม
+                    
+                    document.getElementById('mainApp').style.display = 'block';
+                    document.getElementById('studentNameDisplay').innerText = currentUser.name || 'ไม่ระบุชื่อ';
+                    document.getElementById('studentIdDisplay').innerText = currentUser.id;
+                    
+                    if(typeof updateDashboard === 'function') updateDashboard();
                 }
-            }).catch(err => {
-                Swal.close();
-                Swal.fire(appLang === 'en' ? 'Error' : 'ข้อผิดพลาด', appLang === 'en' ? 'Connection failed. Please try again.' : 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่', 'error');
-            });
+            } else {
+                Swal.fire('ข้อผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', 'error');
+            }
+        } else {
+            Swal.fire('ข้อผิดพลาด', 'ไม่พบรหัสผู้ใช้งานนี้ในระบบ', 'error');
         }
+    }).catch((error) => {
+        Swal.close();
+        console.error("Login Error: ", error);
+        Swal.fire('ข้อผิดพลาด', 'ระบบเชื่อมต่อฐานข้อมูลล้มเหลว', 'error');
+    });
+}
 
         function logout(s) {
             document.getElementById(s).style.display = 'none';
