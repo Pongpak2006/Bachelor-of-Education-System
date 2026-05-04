@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- เรียกใช้งาน Firebase (เอาไว้วางในหมวด head) -->
+    <!-- เรียกใช้งาน Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
@@ -94,7 +94,6 @@
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-200/40 rounded-full blur-[80px] pointer-events-none"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/40 rounded-full blur-[80px] pointer-events-none"></div>
 
-        <!-- จัดกลุ่มปุ่มด้านบนใหม่ ให้อยู่ระนาบเดียวกันและเว้นขอบซ้ายขวาสวยๆ -->
         <div class="absolute top-6 w-full px-4 md:px-8 z-20 flex justify-between items-center max-w-5xl">
             <button onclick="showManual()" class="bg-white/80 backdrop-blur-md text-slate-600 text-[10px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2">
                 <i class="fa-solid fa-book-open text-theme"></i>
@@ -107,7 +106,6 @@
             </div>
         </div>
 
-        <!-- เปลี่ยน mt-4 เป็น mt-12 เพื่อดันกล่องลงมาให้บาลานซ์กับสายตา -->
         <div id="studentLoginBox" class="relative bg-white/80 backdrop-blur-2xl p-10 md:p-14 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-full max-w-[420px] md:max-w-[480px] border border-white z-10 text-center transition-all mt-12 md:mt-8">
             <div class="w-24 h-24 gradient-theme rounded-[1.5rem] shadow-theme flex items-center justify-center mx-auto mb-8 animate-float">
                 <i class="fa-solid fa-graduation-cap text-4xl text-white"></i>
@@ -247,6 +245,10 @@
                     <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 tracking-widest lang-txt" data-th="อีเมลติดต่อ" data-en="Contact Email">Contact Email</p>
                     <p id="profileEmail" class="text-sm md:text-base text-slate-700 font-semibold">-</p>
                 </div>
+                <div>
+                     <p class="text-[10px] text-slate-400 font-bold uppercase mb-1 tracking-widest text-right">สถานะ</p>
+                     <p id="studentStatus" class="text-sm md:text-base font-semibold text-emerald-600 text-right">ปกติ</p>
+                </div>
                 <button onclick="logout('studentSection')" class="text-red-500 bg-red-50 hover:bg-red-500 hover:text-white w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition active:scale-90 shadow-sm border border-red-100"><i class="fa-solid fa-power-off text-lg md:text-xl"></i></button>
             </div>
         </div>
@@ -302,7 +304,7 @@
             <div class="mt-8 mb-12 max-w-2xl mx-auto">
                 <button onclick="promptAddFreeElective()" class="w-full text-theme font-semibold text-sm md:text-base border-2 border-dashed border-slate-300 p-6 md:p-8 rounded-[2rem] bg-slate-50/50 hover:bg-slate-50 hover-border-theme transition-all flex flex-col items-center gap-2 active:scale-95">
                     <i class="fa-solid fa-circle-plus text-2xl md:text-3xl"></i>
-                    <span class="lang-txt" data-th="เพิ่มวิชาเรียนนอกหลักสูตร (เลือกเสรี)" data-en="Add Free Elective Course">เพิ่มวิชาเรียนนอกหลักสูตร (เลือกเสรี)</span>
+                    <span class="lang-txt" data-th="เพิ่มวิชาเรียนนอกหลักสูตร (เลือก 6 หน่วยกิต)" data-en="Add Free Elective Course">เพิ่มวิชาเรียนนอกหลักสูตร (เลือก 6 หน่วยกิต)</span>
                 </button>
             </div>
         </div>
@@ -339,7 +341,6 @@
     </div>
 
     <script>
-        // --- 1. กุญแจและระบบฐานข้อมูล Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyDda5v7a1ZlWl6VJ6Te-S8Q6Q0inuCECK0",
             authDomain: "bachelor-edu-system.firebaseapp.com",
@@ -348,107 +349,28 @@
             messagingSenderId: "555108991120",
             appId: "1:555108991120:web:cf7bfee14a48fdabc25815"
         };
-
-        // เปิดสวิตช์ Firebase และเชื่อมต่อ Firestore
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         let currentUser = {};
         const TOTAL_CREDITS = 141;
-        
-        // กำหนดรายวิชาทั้งหมดตามเงื่อนไข (อิงตามไฟล์ edu_6.txt)
-        const BASE_COURSES = [
-            // ศึกษาทั่วไป
-            { code: 'RAM1111', name: 'ภาษาอังกฤษในชีวิตประจำวัน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาอังกฤษ บังคับ)' },
-            { code: 'RAM1101', name: 'ทักษะการใช้ภาษาไทย', credit: 3, category: 'ศึกษาทั่วไป (ภาษาไทย เลือก 1 วิชา)' },
-            { code: 'RAM1103', name: 'ภาษาไทยเพื่อการสื่อสารในการทำงาน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาไทย เลือก 1 วิชา)' },
-            { code: 'RAM1112', name: 'ภาษาและวัฒนธรรมอังกฤษ', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
-            { code: 'RAM1113', name: 'ภาษาและวัฒนธรรมจีน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
-            { code: 'RAM1122', name: 'ภาษาและวัฒนธรรมอาหรับ', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
-            { code: 'RAM1124', name: 'ภาษาและวัฒนธรรมฝรั่งเศส', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
-            { code: 'RAM1126', name: 'ภาษาและวัฒนธรรมสเปน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
-            { code: 'RAM1127', name: 'ภาษาและวัฒนธรรมรัสเซีย', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
-            { code: 'RAM1131', name: 'ทักษะการเข้าใจดิจิทัล', credit: 3, category: 'ศึกษาทั่วไป (เทคโนโลยี เลือก 1 วิชา)' },
-            { code: 'RAM1132', name: 'ทักษะทางสารสนเทศ', credit: 3, category: 'ศึกษาทั่วไป (เทคโนโลยี เลือก 1 วิชา)' },
-            { code: 'RAM1201', name: 'ความคิดสร้างสรรค์เพื่อการพัฒนานวัตกรรม', credit: 3, category: 'ศึกษาทั่วไป (ทักษะการคิด เลือก 1 วิชา)' },
-            { code: 'RAM1203', name: 'ศาสตร์การคิดเปลี่ยนโลก', credit: 3, category: 'ศึกษาทั่วไป (ทักษะการคิด เลือก 1 วิชา)' },
-            { code: 'RAM1301', name: 'คุณธรรมคู่ความรู้', credit: 3, category: 'ศึกษาทั่วไป (พลเมือง/จิตอาสา บังคับ)' },
-            { code: 'RAM1213', name: 'ภูมิปัญญาท้องถิ่นกับการพัฒนานวัตกรรมเพื่อสังคม', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
-            { code: 'RAM1302', name: 'การเมืองและกฎหมายในชีวิตประจำวัน', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
-            { code: 'RAM1303', name: 'วิทยาศาสตร์เพื่อการพัฒนาที่ยั่งยืน', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
-            { code: 'RAM1312', name: 'วัฒนธรรมร่วมสมัยในการเปลี่ยนฉับพลันทางดิจิทัล', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
-            { code: 'RAM1141', name: 'ศาสตร์แห่งบุคลิกภาพ', credit: 3, category: 'ศึกษาทั่วไป (บุคลิกภาพ เลือก 1 วิชา)' },
-            { code: 'RAM1211', name: 'ศาสตร์แห่งการเป็นผู้ประกอบการ', credit: 3, category: 'ศึกษาทั่วไป (บุคลิกภาพ เลือก 1 วิชา)' },
-
-            // วิชาชีพครู
-            { code: 'EDU1202', name: 'นวัตกรรมและเทคโนโลยีดิจิทัลเพื่อการศึกษา', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU1401', name: 'ค่านิยมและคุณลักษณะความเป็นครู', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU2103', name: 'จิตวิทยาเพื่อการเรียนรู้', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU2505', name: 'การวัดผล การประเมินผล และการวิจัยทางการศึกษา', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU2604', name: 'ศาสตร์หลักสูตรและการจัดการเรียนรู้', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU2606', name: 'ภาษาไทยเพื่อการสื่อสารสำหรับครู', credit: 2, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU3308', name: 'การประกันคุณภาพการศึกษาสำหรับครู', credit: 2, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU3607', name: 'ภาษาอังกฤษเพื่อการสื่อสารสำหรับครู', credit: 2, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU4309', name: 'ความสัมพันธ์ของผู้ปกครองและชุมชน', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU4000', name: 'สัมมนาการปฏิบัติการสอนในสถานศึกษาเบื้องต้น', credit: 1, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU4001', name: 'การปฏิบัติการสอนในสถานศึกษา 1', credit: 6, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU4002', name: 'สัมมนาการปฏิบัติการสอนในสถานศึกษา', credit: 1, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'EDU4003', name: 'การปฏิบัติการสอนในสถานศึกษา 2', credit: 6, category: 'วิชาชีพครู (บังคับ)' },
-            { code: 'CEE3210', name: 'การจัดการเรียนการสอนระดับประถมศึกษา', credit: 3, category: 'วิชาชีพครู (บังคับสาขาวิชาเอก)' },
-            { code: 'CEE3000', name: 'การฝึกปฏิบัติวิชาชีพครูระหว่างเรียนวิชาเอกการประถมศึกษา', credit: 1, category: 'วิชาชีพครู (บังคับสาขาวิชาเอก)' },
-
-            // วิชาเอกบังคับ
-            { code: 'CEE2301', name: 'หลักสูตรและการเรียนการสอนในระดับประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE2302', name: 'เทคนิคการสอน', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE2304', name: 'การพัฒนาหลักสูตรสถานศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE2305', name: 'สุขศึกษาและพลศึกษาสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE2307', name: 'ภาษาไทยสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE2308', name: 'ความคิดสร้างสรรค์สำหรับเด็ก', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE2309', name: 'พัฒนาการและพฤติกรรมการเรียนรู้ของเด็กประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3301', name: 'คณิตศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3302', name: 'ศิลปะสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3303', name: 'สังคมศึกษา ศาสนา และวัฒนธรรมสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3304', name: 'วิทยาศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3305', name: 'ภาษาต่างประเทศสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3401', name: 'การจัดการเรียนรู้แบบบูรณาการ', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3501', name: 'นวัตกรรมและเทคโนโลยีการจัดการเรียนรู้สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'CEE3502', name: 'การสอนทักษะชีวิตสำหรับเด็ก', credit: 3, category: 'วิชาเอกบังคับ' },
-            { code: 'MER3906', name: 'การวิจัยในชั้นเรียน', credit: 3, category: 'วิชาเอกบังคับ' },
-
-            // วิชาเอกเลือก
-            { code: 'CCE3110', name: 'เทคโนโลยีดิจิทัลสำหรับครู', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CCH2107', name: 'ภาษาจีนและการสอนภาษาจีนระดับประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CEE2303', name: 'การสอนเพื่อพัฒนาศักยภาพเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CEE2310', name: 'กิจกรรมการสอนภาษาไทยระดับประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CEE3306', name: 'การจัดกิจกรรมการเรียนรู้นอกห้องเรียนสำหรับเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CEE3402', name: 'การจัดกิจกรรมเสริมหลักสูตร', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CEE3403', name: 'กิจกรรมการสอนคณิตศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CEE3404', name: 'การจัดกิจกรรมเตรียมความพร้อมสำหรับเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CEE3503', name: 'วรรณกรรมสำหรับเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CMA3215', name: 'เทคโนโลยีและการสืบค้นสำหรับครูคณิตศาสตร์', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CTH2101', name: 'วาทการสำหรับครู', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'CTL3002', name: 'การสอนเด็กพิเศษ', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'MER3006', name: 'การวัดและประเมินผลในระดับประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'PSY3214', name: 'จิตวิทยาเด็กและวัยรุ่น', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
-            { code: 'RAM3099', name: 'เศรษฐกิจพอเพียงกับการพัฒนาชีวิต', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' }
-        ];
-
+        const TARGET_YEAR = 2570;
         let passedCoursesList = []; 
         let appLang = localStorage.getItem('appLang') || 'th'; 
 
         const monthlyThemes = {
-            0: { primary: '#2563eb', gradient: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' }, // Jan
-            1: { primary: '#db2777', gradient: 'linear-gradient(135deg, #f472b6 0%, #db2777 100%)' }, // Feb
-            2: { primary: '#059669', gradient: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' }, // Mar
-            3: { primary: '#c2410c', gradient: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)' }, // Apr
-            4: { primary: '#7c3aed', gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' }, // May
-            5: { primary: '#4f46e5', gradient: 'linear-gradient(135deg, #818cf8 0%, #4f46e5 100%)' }, // Jun
-            6: { primary: '#b45309', gradient: 'linear-gradient(135deg, #fbbf24 0%, #b45309 100%)' }, // Jul
-            7: { primary: '#0284c7', gradient: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' }, // Aug
-            8: { primary: '#0f766e', gradient: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)' }, // Sep
-            9: { primary: '#d97706', gradient: 'linear-gradient(135deg, #fcd34d 0%, #d97706 100%)' }, // Oct
-            10:{ primary: '#334155', gradient: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' }, // Nov
-            11:{ primary: '#b91c1c', gradient: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' }  // Dec
+            0: { primary: '#2563eb', gradient: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
+            1: { primary: '#db2777', gradient: 'linear-gradient(135deg, #f472b6 0%, #db2777 100%)' },
+            2: { primary: '#059669', gradient: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' },
+            3: { primary: '#c2410c', gradient: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)' },
+            4: { primary: '#7c3aed', gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
+            5: { primary: '#4f46e5', gradient: 'linear-gradient(135deg, #818cf8 0%, #4f46e5 100%)' },
+            6: { primary: '#b45309', gradient: 'linear-gradient(135deg, #fbbf24 0%, #b45309 100%)' },
+            7: { primary: '#0284c7', gradient: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' },
+            8: { primary: '#0f766e', gradient: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)' },
+            9: { primary: '#d97706', gradient: 'linear-gradient(135deg, #fcd34d 0%, #d97706 100%)' },
+            10:{ primary: '#334155', gradient: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' },
+            11:{ primary: '#b91c1c', gradient: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' }
         };
 
         const festivalThemes = [
@@ -544,7 +466,7 @@
                 document.getElementById('profileId').innerText = appLang === 'en' 
                     ? `ID: ${currentUser.studentId} | Year ${currentUser.year}` 
                     : `รหัส: ${currentUser.studentId} | ชั้นปีที่ ${currentUser.year}`;
-                if(document.getElementById('courseContainer').innerHTML !== '') updateDashboard();
+                if(document.getElementById('courseContainer').innerHTML !== '') loadCourses();
             }
         }
 
@@ -627,10 +549,31 @@
             document.getElementById('progressBar').style.width = '0%';
             document.getElementById('honorsBadge').classList.add('hidden');
             document.getElementById('passedSummary').innerHTML = '';
+            document.getElementById('studentStatus').innerText = 'ปกติ';
+            document.getElementById('studentStatus').className = 'text-sm md:text-base font-semibold text-emerald-600 text-right';
             passedCoursesList = [];
         }
 
-        // --- ส่วนที่ปรับเปลี่ยน: Login ด้วย Firebase ---
+        function calculateStatus(remainingCredits) {
+            const currentYear = new Date().getFullYear();
+            const yearStr = currentYear + 543; // ปีปัจจุบัน พ.ศ.
+            const yearsLeft = TARGET_YEAR - yearStr; // ปีที่เหลือ
+            const currentMonth = new Date().getMonth();
+
+            // สมมติว่านักศึกษาเรียนเทอมละ 21 หน่วยกิต และมี 2 เทอมต่อปี
+            const creditsPerYear = 42; 
+            const expectedRemaining = Math.max(0, yearsLeft * creditsPerYear);
+
+            // ปรับ logic ตามความเหมาะสม: ถ้านักศึกษาเหลือหน่วยกิตมากกว่าที่ควรจะเป็น ถือว่าเริ่มเสี่ยง
+            if (yearsLeft < 0 && remainingCredits > 0) {
+                 return {text: "ตกค้าง", color: "text-red-600"};
+            } else if (remainingCredits > expectedRemaining + 15) { // เผื่อให้ช้ากว่าแผน 15 หน่วยกิต
+                 return {text: "เฝ้าระวัง", color: "text-orange-600"};
+            } else {
+                 return {text: "ปกติ", color: "text-emerald-600"};
+            }
+        }
+
         function login(loginType) {
             let u = loginType === 'admin' ? document.getElementById('adminUsername').value : document.getElementById('username').value;
             let p = loginType === 'admin' ? document.getElementById('adminPassword').value : document.getElementById('password').value;
@@ -643,6 +586,7 @@
             clearDashboardData();
             Swal.fire({ title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
+            // ใช้ Firebase เข้าสู่ระบบ
             db.collection("Users").doc(u).get().then((doc) => {
                 Swal.close();
                 if (doc.exists) {
@@ -662,15 +606,16 @@
                         } else {
                             currentUser = userData; 
                             currentUser.id = u; 
-                            // ใช้ username เป็น studentId ในกรณีที่ไม่ได้สร้างฟิลด์ไว้ตอนแรก
                             currentUser.studentId = userData.studentId || u; 
                             
                             document.getElementById('studentSection').style.display = 'block';
                             document.getElementById('headerName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
                             document.getElementById('profileName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
-                            document.getElementById('profileId').innerText = `รหัส: ${currentUser.studentId}`;
-                            
-                            if(typeof updateDashboard === 'function') updateDashboard();
+                            document.getElementById('profileId').innerText = appLang === 'en' ? `ID: ${currentUser.studentId} | Year ${currentUser.year}` : `รหัส: ${currentUser.studentId} | ชั้นปีที่ ${currentUser.year}`;
+                            document.getElementById('profileEmail').innerText = currentUser.email || '-';
+                            document.getElementById('greetingText').innerText = getGreeting();
+
+                            if(typeof loadCourses === 'function') loadCourses();
                         }
                     } else {
                         Swal.fire('ข้อผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', 'error');
@@ -728,8 +673,83 @@
             });
         }
 
-        // --- ส่วนที่ปรับเปลี่ยน: ดึงรายวิชาและคำนวณเกรดด้วยเงื่อนไข ---
-        async function updateDashboard() {
+        const BASE_COURSES = [
+            // ศึกษาทั่วไป
+            { code: 'RAM1111', name: 'ภาษาอังกฤษในชีวิตประจำวัน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาอังกฤษ บังคับ)' },
+            { code: 'RAM1101', name: 'ทักษะการใช้ภาษาไทย', credit: 3, category: 'ศึกษาทั่วไป (ภาษาไทย เลือก 1 วิชา)' },
+            { code: 'RAM1103', name: 'ภาษาไทยเพื่อการสื่อสารในการทำงาน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาไทย เลือก 1 วิชา)' },
+            { code: 'RAM1112', name: 'ภาษาและวัฒนธรรมอังกฤษ', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
+            { code: 'RAM1113', name: 'ภาษาและวัฒนธรรมจีน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
+            { code: 'RAM1122', name: 'ภาษาและวัฒนธรรมอาหรับ', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
+            { code: 'RAM1124', name: 'ภาษาและวัฒนธรรมฝรั่งเศส', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
+            { code: 'RAM1126', name: 'ภาษาและวัฒนธรรมสเปน', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
+            { code: 'RAM1127', name: 'ภาษาและวัฒนธรรมรัสเซีย', credit: 3, category: 'ศึกษาทั่วไป (ภาษาทางเลือก เลือก 1 วิชา)' },
+            { code: 'RAM1131', name: 'ทักษะการเข้าใจดิจิทัล', credit: 3, category: 'ศึกษาทั่วไป (เทคโนโลยี เลือก 1 วิชา)' },
+            { code: 'RAM1132', name: 'ทักษะทางสารสนเทศ', credit: 3, category: 'ศึกษาทั่วไป (เทคโนโลยี เลือก 1 วิชา)' },
+            { code: 'RAM1201', name: 'ความคิดสร้างสรรค์เพื่อการพัฒนานวัตกรรม', credit: 3, category: 'ศึกษาทั่วไป (ทักษะการคิด เลือก 1 วิชา)' },
+            { code: 'RAM1203', name: 'ศาสตร์การคิดเปลี่ยนโลก', credit: 3, category: 'ศึกษาทั่วไป (ทักษะการคิด เลือก 1 วิชา)' },
+            { code: 'RAM1301', name: 'คุณธรรมคู่ความรู้', credit: 3, category: 'ศึกษาทั่วไป (พลเมือง/จิตอาสา บังคับ)' },
+            { code: 'RAM1213', name: 'ภูมิปัญญาท้องถิ่นกับการพัฒนานวัตกรรมเพื่อสังคม', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
+            { code: 'RAM1302', name: 'การเมืองและกฎหมายในชีวิตประจำวัน', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
+            { code: 'RAM1303', name: 'วิทยาศาสตร์เพื่อการพัฒนาที่ยั่งยืน', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
+            { code: 'RAM1312', name: 'วัฒนธรรมร่วมสมัยในการเปลี่ยนฉับพลันทางดิจิทัล', credit: 3, category: 'ศึกษาทั่วไป (วิทย์/ศิลป์/กฎหมาย เลือก 1 วิชา)' },
+            { code: 'RAM1141', name: 'ศาสตร์แห่งบุคลิกภาพ', credit: 3, category: 'ศึกษาทั่วไป (บุคลิกภาพ เลือก 1 วิชา)' },
+            { code: 'RAM1211', name: 'ศาสตร์แห่งการเป็นผู้ประกอบการ', credit: 3, category: 'ศึกษาทั่วไป (บุคลิกภาพ เลือก 1 วิชา)' },
+
+            // วิชาชีพครู
+            { code: 'EDU1202', name: 'นวัตกรรมและเทคโนโลยีดิจิทัลเพื่อการศึกษา', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU1401', name: 'ค่านิยมและคุณลักษณะความเป็นครู', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU2103', name: 'จิตวิทยาเพื่อการเรียนรู้', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU2505', name: 'การวัดผล การประเมินผล และการวิจัยทางการศึกษา', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU2604', name: 'ศาสตร์หลักสูตรและการจัดการเรียนรู้', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU2606', name: 'ภาษาไทยเพื่อการสื่อสารสำหรับครู', credit: 2, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU3308', name: 'การประกันคุณภาพการศึกษาสำหรับครู', credit: 2, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU3607', name: 'ภาษาอังกฤษเพื่อการสื่อสารสำหรับครู', credit: 2, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU4309', name: 'ความสัมพันธ์ของผู้ปกครองและชุมชน', credit: 3, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU4000', name: 'สัมมนาการปฏิบัติการสอนในสถานศึกษาเบื้องต้น', credit: 1, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU4001', name: 'การปฏิบัติการสอนในสถานศึกษา 1', credit: 6, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU4002', name: 'สัมมนาการปฏิบัติการสอนในสถานศึกษา', credit: 1, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'EDU4003', name: 'การปฏิบัติการสอนในสถานศึกษา 2', credit: 6, category: 'วิชาชีพครู (บังคับ)' },
+            { code: 'CEE3210', name: 'การจัดการเรียนการสอนระดับประถมศึกษา', credit: 3, category: 'วิชาชีพครู (บังคับสาขาวิชาเอก)' },
+            { code: 'CEE3000', name: 'การฝึกปฏิบัติวิชาชีพครูระหว่างเรียนวิชาเอกการประถมศึกษา', credit: 1, category: 'วิชาชีพครู (บังคับสาขาวิชาเอก)' },
+
+            // วิชาเอกบังคับ
+            { code: 'CEE2301', name: 'หลักสูตรและการเรียนการสอนในระดับประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE2302', name: 'เทคนิคการสอน', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE2304', name: 'การพัฒนาหลักสูตรสถานศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE2305', name: 'สุขศึกษาและพลศึกษาสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE2307', name: 'ภาษาไทยสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE2308', name: 'ความคิดสร้างสรรค์สำหรับเด็ก', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE2309', name: 'พัฒนาการและพฤติกรรมการเรียนรู้ของเด็กประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3301', name: 'คณิตศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3302', name: 'ศิลปะสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3303', name: 'สังคมศึกษา ศาสนา และวัฒนธรรมสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3304', name: 'วิทยาศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3305', name: 'ภาษาต่างประเทศสำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3401', name: 'การจัดการเรียนรู้แบบบูรณาการ', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3501', name: 'นวัตกรรมและเทคโนโลยีการจัดการเรียนรู้สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'CEE3502', name: 'การสอนทักษะชีวิตสำหรับเด็ก', credit: 3, category: 'วิชาเอกบังคับ' },
+            { code: 'MER3906', name: 'การวิจัยในชั้นเรียน', credit: 3, category: 'วิชาเอกบังคับ' },
+
+            // วิชาเอกเลือก
+            { code: 'CCE3110', name: 'เทคโนโลยีดิจิทัลสำหรับครู', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CCH2107', name: 'ภาษาจีนและการสอนภาษาจีนระดับประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CEE2303', name: 'การสอนเพื่อพัฒนาศักยภาพเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CEE2310', name: 'กิจกรรมการสอนภาษาไทยระดับประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CEE3306', name: 'การจัดกิจกรรมการเรียนรู้นอกห้องเรียนสำหรับเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CEE3402', name: 'การจัดกิจกรรมเสริมหลักสูตร', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CEE3403', name: 'กิจกรรมการสอนคณิตศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CEE3404', name: 'การจัดกิจกรรมเตรียมความพร้อมสำหรับเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CEE3503', name: 'วรรณกรรมสำหรับเด็ก', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CMA3215', name: 'เทคโนโลยีและการสืบค้นสำหรับครูคณิตศาสตร์', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CTH2101', name: 'วาทการสำหรับครู', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'CTL3002', name: 'การสอนเด็กพิเศษ', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'MER3006', name: 'การวัดและประเมินผลในระดับประถมศึกษา', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'PSY3214', name: 'จิตวิทยาเด็กและวัยรุ่น', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' },
+            { code: 'RAM3099', name: 'เศรษฐกิจพอเพียงกับการพัฒนาชีวิต', credit: 3, category: 'วิชาเอกเลือก (เลือก 21 หน่วยกิต)' }
+        ];
+
+        async function loadCourses() {
             if (!currentUser.id) return;
             try {
                 const gradeSnap = await db.collection("StudentGrades").where("studentId", "==", currentUser.id).get();
@@ -778,7 +798,6 @@
 
             for(let cat in cats) {
                 let items = cats[cat];
-                // 🛑 ลอจิกการล็อกตามวงเล็บ[cite: 5, 6]
                 let limit = cat.includes('เลือก 1 วิชา') ? 1 : 
                            (cat.includes('เลือก 6 หน่วยกิต') ? 2 : 
                            (cat.includes('เลือก 21 หน่วยกิต') ? 7 : 0));
@@ -791,7 +810,7 @@
                 
                 items.forEach(i => {
                     let ok = i.grade !== '-' && i.grade !== 'F';
-                    let isCustom = cat.includes('เลือก 6 หน่วยกิต');
+                    let isCustom = cat.includes('เลือก 6 หน่วยกิต') && !BASE_COURSES.find(bc => bc.code === i.code);
                     let cr = parseFloat(i.credit) || 3; 
 
                     if(ok) { 
@@ -867,9 +886,15 @@
                     <p class="text-sm text-slate-500 mt-1">${sumDesc}</p>
                 </div>
             </div>`;
+
+            let statusData = calculateStatus(remaining);
+            let statusEl = document.getElementById('studentStatus');
+            if (statusEl) {
+                statusEl.innerText = statusData.text;
+                statusEl.className = `text-sm md:text-base font-semibold ${statusData.color} text-right`;
+            }
         }
 
-        // --- ส่วนที่ปรับเปลี่ยน: บันทึกด้วย Firebase ---
         async function updateGrade(code, grade) {
             let msgLoading = appLang === 'en' ? `Saving ${code}...` : `กำลังบันทึกเกรดวิชา ${code}...`;
             let msgErr = appLang === 'en' ? 'Failed to save. Try again.' : 'บันทึกไม่สำเร็จ กรุณาลองใหม่';
@@ -888,7 +913,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                updateDashboard();
+                loadCourses();
                 Toast.fire({ icon: 'success', title: msgSuccess });
             } catch (error) {
                 console.error("Error saving grade:", error);
@@ -907,7 +932,7 @@
                     try {
                         await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).delete();
                         Swal.close(); 
-                        updateDashboard();
+                        loadCourses();
                     } catch(e) {
                         Swal.fire('Error', 'ลบไม่สำเร็จ', 'error');
                     }
@@ -926,7 +951,7 @@
                     try {
                         await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).delete();
                         Swal.close(); 
-                        updateDashboard();
+                        loadCourses();
                     } catch(e) {
                         Swal.fire('Error', 'ลบไม่สำเร็จ', 'error');
                     }
@@ -991,68 +1016,6 @@
             });
         }
 
-        function exportToPDF() {
-            if(passedCoursesList.length === 0) {
-                let msg = appLang === 'en' ? 'No academic records to print.' : 'คุณยังไม่มีประวัติการเรียนที่ผ่านเกณฑ์เลยค่ะ';
-                return Swal.fire(appLang === 'en' ? 'Cannot Print' : 'ไม่สามารถพิมพ์ได้', msg, 'info');
-            }
-            
-            let printWin = window.open('', '', 'width=900,height=1000');
-            let d = new Date();
-            let dateStr = d.toLocaleDateString(appLang === 'en' ? 'en-US' : 'th-TH', {year: 'numeric', month: 'long', day: 'numeric'});
-
-            let docTitle = appLang === 'en' ? 'Transcript of Records' : 'ประวัติผลการเรียน (Transcript of Records)';
-            let docSub = appLang === 'en' ? 'Bachelor of Education' : 'หลักสูตรศึกษาศาสตรบัณฑิต (Bachelor of Education)';
-            let nameLbl = appLang === 'en' ? 'Name:' : 'ชื่อ-สกุล:';
-            let idLbl = appLang === 'en' ? 'Student ID:' : 'รหัสนักศึกษา:';
-            let dateLbl = appLang === 'en' ? 'Print Date:' : 'วันที่พิมพ์:';
-            let col1 = appLang === 'en' ? 'Course Code' : 'รหัสวิชา';
-            let col2 = appLang === 'en' ? 'Course Name' : 'ชื่อวิชา';
-            let col3 = appLang === 'en' ? 'Credits' : 'หน่วยกิต';
-            let col4 = appLang === 'en' ? 'Grade' : 'เกรดที่ได้';
-
-            let html = `
-            <!DOCTYPE html>
-            <html><head><title>Transcript - ${currentUser.studentId}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-            <style>
-                body { font-family: 'Sarabun', sans-serif; padding: 30px; color: #1e293b; }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h2 { margin: 0 0 5px 0; font-size: 24px; font-weight: bold; }
-                .header p { margin: 0; font-size: 16px; color: #64748b; }
-                .info { margin-bottom: 20px; font-size: 16px; display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
-                table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
-                th, td { border: 1px solid #cbd5e1; padding: 10px 15px; text-align: left; }
-                th { background-color: #f1f5f9; text-align: center; font-weight: bold; }
-                .text-center { text-align: center; }
-                .grade-col { font-weight: bold; text-align: center; width: 15%; color: #4f46e5; }
-                @media print { body { padding: 0; } }
-            </style>
-            </head><body>
-            <div class="header">
-                <h2>${docTitle}</h2>
-                <p>${docSub}</p>
-            </div>
-            <div class="info">
-                <div><b>${nameLbl}</b> ${currentUser.name} <br><b>${idLbl}</b> ${currentUser.studentId}</div>
-                <div style="text-align: right;"><b>${dateLbl}</b> ${dateStr}</div>
-            </div>
-            <table>
-                <thead><tr><th>${col1}</th><th>${col2}</th><th>${col3}</th><th>${col4}</th></tr></thead>
-                <tbody>
-                    ${passedCoursesList.map(c => `<tr><td class="text-center">${c.code}</td><td>${c.name}</td><td class="text-center">${parseFloat(c.credit) || 3}</td><td class="grade-col">${c.grade}</td></tr>`).join('')}
-                </tbody>
-            </table>
-            <script>
-                setTimeout(() => { window.print(); window.close(); }, 500);
-            <\/script>
-            </body></html>`;
-            
-            printWin.document.write(html);
-            printWin.document.close();
-        }
-
-        // --- ส่วนที่ปรับเปลี่ยน: แอดมินและผู้ใช้ ---
         function loadAdmin() {
             db.collection("Users").get().then((querySnapshot) => {
                 let users = [];
@@ -1063,11 +1026,11 @@
                 });
 
                 let html = '';
-                let accTxt = appLang === 'en' ? ' Accounts' : ' บัญชี';
-                document.getElementById('adminTotalUsers').innerHTML = `${users.length} <span class="text-sm font-medium text-slate-400">${accTxt}</span>`;
+                let count = 0;
 
                 users.forEach(u => {
-                    if (u.role === 'admin') return; // ซ่อนแอดมินจากรายการ
+                    if (u.role === 'admin') return; 
+                    count++;
                     let name = u.name || 'ไม่ระบุชื่อ';
                     let year = u.year || '-';
                     let email = u.email || '-';
@@ -1098,6 +1061,7 @@
                         </div>`;
                 });
 
+                document.getElementById('adminTotalUsers').innerHTML = `${count} <span class="text-sm font-medium text-slate-400">${appLang === 'en' ? 'Accounts' : 'บัญชี'}</span>`;
                 document.getElementById('userContainer').innerHTML = html || `<p class="text-center py-20 text-slate-400 text-sm">${appLang === 'en' ? 'No users found' : 'ไม่มีข้อมูลนักศึกษาในระบบ'}</p>`;
                 Swal.close(); 
             }).catch((error) => {
