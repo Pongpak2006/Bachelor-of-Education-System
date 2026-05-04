@@ -630,60 +630,50 @@ const db = firebase.firestore();
             passedCoursesList = [];
         }
 
-        // 🚀 เปลี่ยนมาใช้ Firebase แบบ 100%
         function login(loginType) {
-            let u = loginType === 'admin' ? document.getElementById('adminUsername').value : document.getElementById('username').value;
-            let p = loginType === 'admin' ? document.getElementById('adminPassword').value : document.getElementById('password').value;
-
-            if(!u || !p) {
-                Swal.fire(appLang === 'en' ? 'Warning' : 'เตือน', appLang === 'en' ? 'Please fill in all fields' : 'กรุณากรอกข้อมูลให้ครบ', 'warning');
-                return;
-            }
-
-            clearDashboardData();
-            Swal.fire({ title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            db.collection("Users").doc(u).get().then((doc) => {
-                Swal.close();
-                if (doc.exists) {
-                    let userData = doc.data(); 
-                    
-                    if (userData.password === p) {
-                        let role = userData.role || 'student';
-
-                        if(role === 'admin' && loginType !== 'admin') return Swal.fire('เตือน', 'กรุณาเข้าสู่ระบบผ่านปุ่มแอดมิน', 'warning');
-                        if(role === 'student' && loginType === 'admin') return Swal.fire('เตือน', 'บัญชีนี้ไม่มีสิทธิ์แอดมิน', 'error');
-
-                        document.getElementById('loginSection').style.display = 'none';
-                        
-                        if(role === 'admin') {
-                            document.getElementById('adminSection').style.display = 'block';
-                            if(typeof loadAdmin === 'function') loadAdmin(); 
-                        } else {
-                            currentUser = userData; 
-                            currentUser.id = u; 
-                            // เซ็ตข้อมูลที่ให้โชว์ตามต้นฉบับ 100%
-                            document.getElementById('studentSection').style.display = 'block';
-                            document.getElementById('greetingText').innerText = getGreeting();
-                            document.getElementById('headerName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
-                            document.getElementById('profileName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
-                            document.getElementById('profileId').innerText = appLang === 'en' ? `ID: ${currentUser.studentId || u} | Year ${currentUser.year}` : `รหัส: ${currentUser.studentId || u} | ชั้นปีที่ ${currentUser.year}`;
-                            document.getElementById('profileEmail').innerText = currentUser.email || '-';
-                            
-                            if(typeof loadCourses === 'function') loadCourses();
-                        }
-                    } else {
-                        Swal.fire('ข้อผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', 'error');
-                    }
-                } else {
-                    Swal.fire('ข้อผิดพลาด', 'ไม่พบรหัสผู้ใช้งานนี้ในระบบ', 'error');
-                }
-            }).catch((error) => {
-                Swal.close();
-                console.error("Login Error: ", error);
-                Swal.fire('ข้อผิดพลาด', 'ระบบเชื่อมต่อฐานข้อมูลล้มเหลว', 'error');
-            });
+    // 1. สั่งให้ตัวหมุนเด้งขึ้นมา "ทันที" โดยไม่มีเงื่อนไข
+    Swal.fire({
+        title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...',
+        allowOutsideClick: false,
+        showConfirmButton: false, // ปิดปุ่มตกลงเพื่อให้ดูเนียนขึ้น
+        didOpen: () => {
+            Swal.showLoading();
         }
+    });
+
+    // 2. ค่อยไปดึงค่าจากช่อง Input หลังจากสั่งหมุนแล้ว
+    let u = loginType === 'admin' ? document.getElementById('adminUsername').value : document.getElementById('username').value;
+    let p = loginType === 'admin' ? document.getElementById('adminPassword').value : document.getElementById('password').value;
+
+    if(!u || !p) {
+        Swal.close(); // ถ้าลืมกรอกให้ปิดตัวหมุนก่อน
+        Swal.fire(appLang === 'en' ? 'Warning' : 'เตือน', appLang === 'en' ? 'Please fill in all fields' : 'กรุณากรอกข้อมูลให้ครบ', 'warning');
+        return;
+    }
+
+    // 3. เริ่มทำงานกับฐานข้อมูล (ที่มีระบบ Security Rules)
+    db.collection("Users").doc(u).get().then((doc) => {
+        if (doc.exists) {
+            let userData = doc.data(); 
+            if (userData.password === p) {
+                // ... (โค้ดส่วนเช็ค Role และเข้าหน้า Dashboard เหมือนเดิมของคุณ) ...
+                // อย่าลืมสั่ง Swal.close() ตอนที่เปลี่ยนหน้าเสร็จแล้วด้วยนะครับ
+                Swal.close();
+                document.getElementById('loginSection').style.display = 'none';
+                // ... (ส่วนที่เหลือ) ...
+            } else {
+                Swal.close();
+                Swal.fire('ข้อผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', 'error');
+            }
+        } else {
+            Swal.close();
+            Swal.fire('ข้อผิดพลาด', 'ไม่พบรหัสผู้ใช้งาน', 'error');
+        }
+    }).catch((error) => {
+        Swal.close();
+        Swal.fire('ข้อผิดพลาด', 'การเชื่อมต่อขัดข้อง', 'error');
+    });
+}
 
         function logout(s) {
             document.getElementById(s).style.display = 'none';
