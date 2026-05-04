@@ -959,38 +959,65 @@ const db = firebase.firestore();
             printWin.document.write(html);
             printWin.document.close();
         }
-        
+
         function loadAdmin() {
-            apiCall('getAllUsers').then(res => {
-                let users = res.data || [];
-                let html = '';
-                let accTxt = appLang === 'en' ? 'Accounts' : 'บัญชี';
-                document.getElementById('adminTotalUsers').innerHTML = `${users.length} <span class="text-sm font-medium text-slate-400">${accTxt}</span>`;
-                
-                users.forEach(u => {
-                    let yrTxt = appLang === 'en' ? `Year ${u.year}` : `ปี ${u.year}`;
-                    let editBtn = appLang === 'en' ? 'Edit Year' : 'ปี';
-                    let delBtn = appLang === 'en' ? 'Delete' : 'ลบ';
-                    
-                    html += `
-                    <div class="bg-white p-6 rounded-[1.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:shadow-md border border-slate-100">
-                        <div class="text-left w-full">
-                            <div class="flex items-center gap-2 mb-1">
-                                <p class="font-bold text-slate-800 text-lg">${u.studentId}</p>
-                                <span class="text-[10px] bg-emerald-50 admin-text-theme px-2 py-0.5 rounded-full font-bold border border-emerald-100">${yrTxt}</span>
-                            </div>
-                            <p class="font-medium text-slate-600 text-sm">${u.name}</p>
-                            <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-envelope mr-1"></i>${u.email || '-'}</p>
+    // 🚀 เปลี่ยนมาดึงข้อมูลจาก Firebase แทน apiCall เดิม
+    db.collection("Users").get().then((querySnapshot) => {
+        let users = [];
+        querySnapshot.forEach((doc) => {
+            let data = doc.data();
+            // เก็บ ID ของเอกสารไว้ใช้เป็น username ในการแก้ไขหรือลบ
+            data.username = doc.id; 
+            users.push(data);
+        });
+
+        let html = '';
+        let accTxt = appLang === 'en' ? ' Accounts' : ' บัญชี';
+        // อัปเดตตัวเลขจำนวนบัญชีทั้งหมด
+        document.getElementById('adminTotalUsers').innerHTML = `${users.length} <span class="text-sm font-medium text-slate-400">${accTxt}</span>`;
+
+        users.forEach(u => {
+            // ดึงข้อมูลมาเตรียมแสดงผล (เผื่อกรณีฟิลด์ว่างให้ใส่ - แทน)
+            let name = u.name || 'ไม่ระบุชื่อ';
+            let year = u.year || '-';
+            let email = u.email || '-';
+            let studentId = u.username; // ใช้รหัสนักศึกษาที่เป็นชื่อแฟ้ม
+
+            let yrTxt = appLang === 'en' ? `Year ${year}` : `ปี ${year}`;
+            let editBtn = appLang === 'en' ? 'Edit Year' : 'ปี';
+            let delBtn = appLang === 'en' ? 'Delete' : 'ลบ';
+
+            // สร้างการ์ดแสดงรายชื่อนักศึกษา (ใช้ดีไซน์เดิมที่คุณทำไว้)
+            html += `
+                <div class="bg-white p-6 rounded-[1.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:shadow-lg">
+                    <div class="text-left w-full">
+                        <div class="flex items-center gap-2 mb-1">
+                            <p class="font-bold text-slate-800 text-lg">${studentId}</p>
+                            <span class="text-[10px] bg-emerald-50 admin-text-theme px-2 py-0.5 rounded-full font-bold border border-emerald-100">${yrTxt}</span>
                         </div>
-                        <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
-                            <button onclick="promptEditYear('${u.username}', '${u.year}')" class="flex-1 md:flex-none bg-slate-50 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-200 transition shadow-sm"><i class="fa-solid fa-pen"></i> ${editBtn}</button>
-                            <button onclick="confirmDelUser('${u.username}')" class="flex-1 md:flex-none bg-red-50 text-red-500 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-red-100 transition shadow-sm"><i class="fa-solid fa-trash"></i> ${delBtn}</button>
-                        </div>
-                    </div>`;
-                });
-                document.getElementById('userContainer').innerHTML = html || `<p class="text-center py-20 text-slate-400 text-sm">${appLang === 'en' ? 'No users found' : 'ไม่มีข้อมูลนักศึกษาในระบบ'}</p>`;
-            });
-        }
+                        <p class="font-medium text-slate-600 text-sm">${name}</p>
+                        <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-envelope mr-1"></i>${email}</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
+                        <button onclick="promptEditYear('${u.username}', '${year}')" class="flex-1 md:flex-none bg-slate-50 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-semibold">
+                            ${editBtn}
+                        </button>
+                        <button onclick="confirmDelUser('${u.username}')" class="flex-1 md:flex-none bg-red-50 text-red-500 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-red-100">
+                            ${delBtn}
+                        </button>
+                    </div>
+                </div>`;
+        });
+
+        // เอา HTML ที่สร้างเสร็จไปแปะในหน้าเว็บ
+        document.getElementById('userContainer').innerHTML = html || `<p class="text-center py-20 text-slate-400 text-sm">${appLang === 'en' ? 'No users found' : 'ไม่มีข้อมูลนักศึกษาในระบบ'}</p>`;
+        
+        Swal.close(); // ปิด Loading เมื่อข้อมูลมาครบแล้ว
+    }).catch((error) => {
+        console.error("Error loading users: ", error);
+        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลนักศึกษาได้', 'error');
+    });
+}
         
         function promptEditYear(username, currentYear) {
             let titleText = appLang === 'en' ? 'Update Year' : 'อัปเดตชั้นปี';
