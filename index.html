@@ -85,16 +85,6 @@
         <i class="fa-solid fa-globe text-lg"></i> <span id="langIndicator">EN</span>
     </button>
 
-    <div id="inAppBrowserWarning" class="fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md hidden flex-col items-center justify-center p-6 text-center transition-all">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full animate-float border border-slate-100">
-            <div class="w-20 h-20 bg-slate-50 text-theme rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </div>
-            <h2 class="text-xl font-bold text-slate-800 mb-2 lang-txt" data-th="ไม่รองรับเบราว์เซอร์นี้" data-en="Browser Not Supported">ไม่รองรับเบราว์เซอร์นี้</h2>
-            <p class="text-sm text-slate-500 mb-6 leading-relaxed lang-txt" data-th="เพื่อการใช้งานที่สมบูรณ์ กรุณากดปุ่ม <br><b class='text-slate-800'>จุด 3 จุด (...)</b> ที่มุมขวาบน <br>แล้วเลือก <b class='text-theme'>'เปิดในเบราว์เซอร์'</b>" data-en="For full experience, please tap <br><b class='text-slate-800'>the 3 dots (...)</b> at the top right <br>and select <b class='text-theme'>'Open in Browser'</b>">เพื่อการใช้งานที่สมบูรณ์ กรุณากดปุ่ม <br><b class="text-slate-800">จุด 3 จุด (...)</b> ที่มุมขวาบน <br>แล้วเลือก <b class="text-theme">"เปิดในเบราว์เซอร์"</b></p>
-        </div>
-    </div>
-
     <div id="loginSection" class="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-[#f4f7fb] relative overflow-hidden">
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-200/40 rounded-full blur-[80px] pointer-events-none"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/40 rounded-full blur-[80px] pointer-events-none"></div>
@@ -572,11 +562,6 @@ const db = firebase.firestore();
         window.onload = function() {
             applyDynamicTheme(); 
             updateLanguageUI(); 
-            var ua = navigator.userAgent || navigator.vendor || window.opera;
-            if (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1 || ua.indexOf("Instagram") > -1 || ua.indexOf("Line") > -1) {
-                document.getElementById('inAppBrowserWarning').classList.remove('hidden');
-                document.getElementById('inAppBrowserWarning').classList.add('flex');
-            }
         };
 
         setInterval(() => {
