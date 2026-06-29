@@ -351,7 +351,7 @@
                         <i class="fa-solid fa-star absolute left-4 top-3.5 text-slate-400 text-sm"></i>
                         <input type="number" id="predictGrade" step="0.01" class="lang-placeholder w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 transition text-sm text-slate-700 placeholder-slate-400 font-medium" placeholder="เกรดที่คาดหวัง (เช่น 3.50)" data-th="เกรดที่คาดหวัง (เช่น 3.50)" data-en="Expected GPA (e.g. 3.50)">
                     </div>
-                    <button class="bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white border border-indigo-100 font-bold py-3 px-6 rounded-xl transition shadow-sm active:scale-95 text-sm whitespace-nowrap flex items-center justify-center gap-2">
+                    <button onclick="calculatePrediction()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white border border-indigo-100 font-bold py-3 px-6 rounded-xl transition shadow-sm active:scale-95 text-sm whitespace-nowrap flex items-center justify-center gap-2">
                         <i class="fa-solid fa-calculator"></i> <span class="lang-txt" data-th="คำนวณ" data-en="Calculate">คำนวณ</span>
                     </button>
                 </div>
@@ -428,6 +428,8 @@ const db = firebase.firestore();
 
         let currentUser = {};
         const TOTAL_CREDITS = 141;
+        let currentTotalCredits = 0; // 🌟 ตัวแปรกลางเก็บหน่วยกิตปัจจุบัน
+        let currentTotalPoints = 0;  // 🌟 ตัวแปรกลางเก็บแต้มคะแนนปัจจุบัน
         
         // 🚀 รายวิชาครบถ้วนตามลิสต์ของคุณ
         let BASE_COURSES = [
@@ -1171,6 +1173,10 @@ function calculateStatus(totalCr) {
             let currentGpax = totalCr > 0 ? (totalPt / totalCr).toFixed(2) : '0.00';
             document.getElementById('gpax').innerText = currentGpax;
             
+            // 🌟 ส่งแต้มและหน่วยกิตจริงไปเก็บในตัวแปรกลาง เพื่อให้ระบบจำลองเรียกใช้ 🌟
+            currentTotalCredits = totalCr;
+            currentTotalPoints = totalPt;
+            
             let remaining = Math.max(0, TOTAL_CREDITS - totalCr);
             document.getElementById('remainingCredits').innerText = remaining;
             document.getElementById('totalCredits').innerText = totalCr;
@@ -1605,6 +1611,71 @@ function toggleAdminDarkMode() {
         });
         icon.classList.replace('fa-sun', 'fa-moon');
     }
+}
+        // ==========================================
+// 🧠 ระบบจำลองเกรดอนาคต (GPAX Predictor)
+// ==========================================
+function calculatePrediction() {
+    let pCredits = parseFloat(document.getElementById('predictCredits').value);
+    let pGrade = parseFloat(document.getElementById('predictGrade').value);
+
+    // ดักจับข้อมูลว่างหรือกรอกผิดสเปค
+    if (isNaN(pCredits) || isNaN(pGrade) || pCredits <= 0 || pGrade < 0 || pGrade > 4) {
+        return Swal.fire({
+            title: appLang === 'en' ? 'Invalid Input' : 'ข้อมูลไม่ถูกต้อง',
+            text: appLang === 'en' ? 'Please enter valid credits and expected GPA (0.00 - 4.00)' : 'กรุณากรอกหน่วยกิตและเกรดเฉลี่ยที่คาดหวังให้ถูกต้อง (0.00 - 4.00)',
+            icon: 'warning',
+            confirmButtonColor: 'var(--primary-theme)',
+            customClass: { popup: 'rounded-[2rem]' }
+        });
+    }
+
+    // สูตรคำนวณเกรดเฉลี่ยสะสมในอนาคต
+    let newTotalCredits = currentTotalCredits + pCredits;
+    let newTotalPoints = currentTotalPoints + (pCredits * pGrade);
+    let predictedGpax = (newTotalPoints / newTotalCredits).toFixed(2);
+
+    // จำลองการประเมินสิทธิ์เกียรตินิยมเบื้องต้น
+    let honorsText = '';
+    if (predictedGpax >= 3.50) {
+        honorsText = appLang === 'en' 
+            ? '<br><span class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full font-bold border border-emerald-100 inline-block mt-2">🏆 Potential 1st Class Honors</span>' 
+            : '<br><span class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full font-bold border border-emerald-100 inline-block mt-2">🏆 มีโอกาสได้เกียรตินิยมอันดับ 1</span>';
+    } else if (predictedGpax >= 3.25) {
+        honorsText = appLang === 'en' 
+            ? '<br><span class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold border border-indigo-100 inline-block mt-2">🥈 Potential 2nd Class Honors</span>' 
+            : '<br><span class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold border border-indigo-100 inline-block mt-2">🥈 有โอกาสได้เกียรตินิยมอันดับ 2</span>';
+    }
+
+    // กำหนดข้อความแสดงผลสองภาษา
+    let msgTitle = appLang === 'en' ? 'GPAX Prediction' : 'ผลการจำลองเกรดเฉลี่ย';
+    let msgHtml = appLang === 'en' 
+        ? `<div class="text-left text-sm space-y-3 text-slate-600">
+            <p>If you register <b class="text-slate-800">${pCredits}</b> credits and get a term GPA of <b class="text-slate-800">${pGrade.toFixed(2)}</b>:</p>
+            <div class="bg-slate-50 p-4 rounded-2xl text-center border border-slate-100 my-2">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Predicted GPAX</p>
+                <p class="text-3xl font-black text-theme mt-1">${predictedGpax}</p>
+            </div>
+            <p class="text-xs text-slate-400 text-center">Total Earned Credits will be ${newTotalCredits} / ${TOTAL_CREDITS} CR</p>
+            <div class="text-center">${honorsText}</div>
+           </div>`
+        : `<div class="text-left text-sm text-slate-600">
+            <p>หากแผนการเรียนเทอมหน้าลงทะเบียน <b class="text-slate-800">${pCredits}</b> หน่วยกิต และทำเกรดเฉลี่ยได้ <b class="text-slate-800">${pGrade.toFixed(2)}</b>:</p>
+            <div class="bg-slate-50 p-4 rounded-2xl text-center border border-slate-100 my-3">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">เกรดเฉลี่ยสะสม (GPAX) คาดการณ์</p>
+                <p class="text-3xl font-black text-theme mt-1">${predictedGpax}</p>
+            </div>
+            <p class="text-xs text-slate-400 text-center">หน่วยกิตสะสมรวมจะเพิ่มเป็น ${newTotalCredits} จากทั้งหมด ${TOTAL_CREDITS} หน่วยกิต</p>
+            <div class="text-center">${honorsText}</div>
+           </div>`;
+
+    Swal.fire({
+        title: `<i class="fa-solid fa-wand-magic-sparkles text-theme text-3xl mb-2"></i><br><span class="text-xl font-bold text-slate-800">${msgTitle}</span>`,
+        html: msgHtml,
+        confirmButtonText: appLang === 'en' ? 'Close' : 'ปิดหน้าต่าง',
+        confirmButtonColor: 'var(--primary-theme)',
+        customClass: { popup: 'rounded-[2rem]' }
+    });
 }
     </script>
 </body>
