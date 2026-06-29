@@ -888,16 +888,15 @@ function loginWithUsername() {
 }
 
 // ==========================================
-// 3. ระบบเข้าสู่ระบบด้วย Google (รองรับคนสมัครสมาชิกไว้แล้ว)
+// 3. ระบบเข้าสู่ระบบด้วย Google (เวอร์ชันดักจับ Error)
 // ==========================================
 function loginWithGoogle() {
     let provider = new firebase.auth.GoogleAuthProvider();
-    Swal.fire({ title: 'กำลังเชื่อมต่อบัญชี Google...', didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'กำลังเชื่อมต่อบัญชี Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     
     firebase.auth().signInWithPopup(provider).then((result) => {
         let userEmail = result.user.email;
         
-        // เช็กฐานข้อมูลว่าอีเมลนี้สมัครสมาชิกไว้หรือยัง
         db.collection("Users").where("email", "==", userEmail).get().then((snapshot) => {
             if (!snapshot.empty) {
                 let doc = snapshot.docs[0];
@@ -912,8 +911,14 @@ function loginWithGoogle() {
         });
     }).catch((error) => {
         Swal.close();
+        // 🌟 ถ้าผู้ใช้ไม่ได้กดกากบาทปิดเอง ให้มันโชว์สาเหตุที่แท้จริงออกมาเลย! 🌟
         if (error.code !== 'auth/popup-closed-by-user') {
-            Swal.fire('ข้อผิดพลาด', 'เข้าสู่ระบบด้วย Google ไม่สำเร็จ', 'error');
+            console.error("Google Error: ", error);
+            Swal.fire({
+                title: 'Google ปฏิเสธการเข้าถึง',
+                html: `<p class="text-sm text-red-500 text-left"><b>สาเหตุ:</b> ${error.message}</p>`,
+                icon: 'error'
+            });
         }
     });
 }
