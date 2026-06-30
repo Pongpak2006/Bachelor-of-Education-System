@@ -145,28 +145,32 @@
                     เข้าสู่ระบบ
                 </button>
                 
-                <!-- 📍 ปรับสีเส้นคั่น และคำว่า "หรือ" ให้ชัดเจนขึ้น -->
-                <div class="flex items-center justify-center space-x-3 my-5 sm:my-6">
+                <!-- 📍 ปรับสีเส้นคั่นให้ระยะห่างแคบลง ลดขอบขาว -->
+                <div class="flex items-center justify-center space-x-3 my-4 sm:my-5">
                     <div class="h-px bg-slate-300 w-full"></div>
                     <span class="text-slate-500 font-semibold text-xs sm:text-sm" lang="th">หรือ</span>
                     <div class="h-px bg-slate-300 w-full"></div>
                 </div>
 
-                <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-white border border-slate-200 text-slate-600 font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-slate-50 active:scale-95 text-xs md:text-sm shadow-sm">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4 md:w-5 md:h-5" alt="Google">
-                    เข้าสู่ระบบด้วย Google
-                </button>
-                
-                <button type="button" onclick="showRegisterPopup()" class="w-full bg-slate-50 text-slate-600 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm transition hover:bg-slate-100 active:scale-95 border border-slate-200 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-user-plus text-slate-400"></i> สมัครสมาชิกใหม่
-                </button>
-                
-                <div class="mt-6 sm:mt-8 text-center w-full">
-                    <a href="#" onclick="toggleLoginView('admin')" class="text-sm text-slate-600 font-bold hover:text-slate-900 hover:underline transition" lang="th">เข้าสู่ระบบผู้ดูแล (Admin)</a>
+                <!-- 📍 จัดกลุ่ม 2 ปุ่มให้หน้าตาเหมือนกันเป๊ะ -->
+                <div class="flex flex-col gap-2.5">
+                    <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-white border border-slate-200 text-slate-600 font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-slate-50 active:scale-95 text-xs md:text-sm shadow-sm">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4 md:w-5 md:h-5" alt="Google">
+                        เข้าสู่ระบบด้วย Google
+                    </button>
+                    
+                    <button type="button" onclick="showRegisterPopup()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-white border border-slate-200 text-slate-600 font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-slate-50 active:scale-95 text-xs md:text-sm shadow-sm">
+                        <i class="fa-solid fa-user-plus text-slate-400 text-sm md:text-base"></i>
+                        สมัครสมาชิกใหม่
+                    </button>
                 </div>
                 
+                <!-- 📍 ลิงก์แอดมิน: เปลี่ยนเป็นสีเทา ตัวเล็ก และไม่หนา -->
+                <div class="mt-5 text-center w-full">
+                    <a href="#" onclick="toggleLoginView('admin')" class="text-xs text-slate-400 font-medium hover:text-slate-600 hover:underline transition" lang="th">เข้าสู่ระบบผู้ดูแล (Admin)</a>
+                </div>
             </form>
-            <p class="mt-6 md:mt-8 text-[9px] text-slate-400 font-light tracking-widest uppercase opacity-80">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</p>
+            <p class="mt-5 md:mt-6 text-[9px] text-slate-400 font-light tracking-widest uppercase opacity-80">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</p>
         </div>
 
 <div id="adminLoginBox" class="hidden relative bg-white/80 backdrop-blur-2xl p-8 sm:p-12 md:p-14 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all my-auto flex flex-col justify-center mx-auto">
@@ -290,7 +294,21 @@
         </div>
     </div>
 
-    <div id="studentSection" class="hidden-section max-w-6xl mx-auto p-4 md:p-8 pt-6 md:pt-10 pb-24">
+        <div id="studentSection" class="hidden-section max-w-6xl mx-auto p-4 md:p-8 pt-6 md:pt-10 pb-24">
+        
+        <div class="flex justify-between items-center mb-6 px-2">
+            <button onclick="showManual()" class="bg-white text-slate-600 text-[10px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-slate-200 shadow-sm hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2">
+                <i class="fa-solid fa-book-open text-theme"></i>
+                <span class="lang-txt" data-th="คู่มือการใช้งาน" data-en="User Manual">คู่มือการใช้งาน</span>
+            </button>
+
+            <button onclick="toggleLanguage()" class="bg-white px-3 py-2 md:px-4 md:py-2 rounded-full shadow-sm text-theme flex items-center justify-center gap-1.5 md:gap-2 border border-slate-200 hover:bg-slate-50 transition active:scale-95" title="เปลี่ยนภาษา / Change Language">
+                <i class="fa-solid fa-globe text-[10px] md:text-xs"></i>
+                <span class="text-[9px] md:text-xs font-bold font-sans lang-btn-text">EN</span>
+            </button>
+        </div>
+
+        <div class="flex justify-between items-end mb-5 px-2">
         
         <div class="flex justify-between items-end mb-5 px-2">
             <div>
@@ -653,7 +671,10 @@ const db = firebase.firestore();
         }
 
         function updateLanguageUI() {
-            document.getElementById('langIndicator').innerText = appLang === 'th' ? 'EN' : 'TH';
+            // 🌟 อัปเดตข้อความปุ่มภาษาทุกปุ่มในเว็บ (ทั้งหน้าล็อกอินและหน้าโครงสร้าง)
+            document.querySelectorAll('.lang-btn-text').forEach(el => {
+                el.innerText = appLang === 'th' ? 'EN' : 'TH';
+            });
             
             document.querySelectorAll('.lang-txt').forEach(el => {
                 if(el.hasAttribute(`data-${appLang}`)) el.innerHTML = el.getAttribute(`data-${appLang}`);
@@ -662,7 +683,7 @@ const db = firebase.firestore();
                 if(el.hasAttribute(`data-${appLang}`)) el.placeholder = el.getAttribute(`data-${appLang}`);
             });
         }
-
+        
         const Toast = Swal.mixin({
             toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true,
             didOpen: (toast) => { toast.onmouseenter = Swal.stopTimer; toast.onmouseleave = Swal.resumeTimer; }
@@ -1467,10 +1488,14 @@ function calculateStatus(totalCr) {
                                 <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-envelope mr-1"></i>${email}</p>
                             </div>
                             <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
-                                <button onclick="promptEditYear('${u.username}', '${year}')" class="flex-1 md:flex-none bg-slate-50 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-semibold">
+                                <!-- 📍 เพิ่มปุ่มกุญแจตรงนี้ -->
+                                <button onclick="promptResetPassword('${u.username}')" class="flex-1 md:flex-none bg-indigo-50 text-indigo-600 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-indigo-100 transition" title="เปลี่ยนรหัสผ่าน">
+                                    <i class="fa-solid fa-key"></i>
+                                </button>
+                                <button onclick="promptEditYear('${u.username}', '${year}')" class="flex-1 md:flex-none bg-slate-50 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-100 transition">
                                     ${editBtn}
                                 </button>
-                                <button onclick="confirmDelUser('${u.username}')" class="flex-1 md:flex-none bg-red-50 text-red-500 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-red-100">
+                                <button onclick="confirmDelUser('${u.username}')" class="flex-1 md:flex-none bg-red-50 text-red-500 px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-red-100 transition">
                                     ${delBtn}
                                 </button>
                             </div>
@@ -1501,6 +1526,48 @@ function calculateStatus(totalCr) {
                             Swal.fire({icon:'success',title: appLang==='en'?'Updated':'อัปเดตแล้ว',timer:1000,showConfirmButton:false}); 
                             loadAdmin(); 
                         }).catch(err => Swal.fire(appLang==='en'?'Error':'ผิดพลาด', err.message, 'error'));
+                }
+            });
+        }
+        
+        // ==========================================
+        // ฟังก์ชันแอดมิน: เปลี่ยนรหัสผ่านให้นักศึกษา
+        // ==========================================
+        function promptResetPassword(username) {
+            let titleText = appLang === 'en' ? 'Reset Password' : 'ตั้งรหัสผ่านใหม่';
+            let btnText = appLang === 'en' ? 'Save Password' : 'บันทึกรหัสผ่าน';
+            
+            Swal.fire({
+                title: `<i class="fa-solid fa-key text-indigo-500 mb-2 text-3xl"></i><br>${titleText}`,
+                html: `<p class="text-sm text-slate-500 mb-3">ตั้งรหัสผ่านใหม่สำหรับผู้ใช้ <b>${username}</b></p>`,
+                input: 'text',
+                inputPlaceholder: 'พิมพ์รหัสผ่านใหม่ที่นี่...',
+                showCancelButton: true,
+                confirmButtonText: btnText,
+                cancelButtonText: appLang === 'en' ? 'Cancel' : 'ยกเลิก',
+                confirmButtonColor: 'var(--primary-theme)',
+                customClass: { popup: 'rounded-[2rem]' },
+                preConfirm: (newPassword) => {
+                    if (!newPassword || newPassword.trim() === '') {
+                        Swal.showValidationMessage('กรุณากรอกรหัสผ่านใหม่ครับ');
+                        return false;
+                    }
+                    return newPassword;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    // บันทึกรหัสผ่านใหม่ทับลงไปในฐานข้อมูล
+                    db.collection("Users").doc(username).update({ password: result.value })
+                        .then(() => {
+                            Swal.fire({
+                                icon: 'success', 
+                                title: 'สำเร็จ!', 
+                                text: 'รหัสผ่านถูกเปลี่ยนเรียบร้อยแล้ว',
+                                confirmButtonColor: 'var(--primary-theme)',
+                                customClass: { popup: 'rounded-[2rem]' }
+                            });
+                        }).catch(err => Swal.fire('ผิดพลาด', err.message, 'error'));
                 }
             });
         }
@@ -1710,12 +1777,14 @@ function calculatePrediction() {
 // 🧠 ระบบ UX/UI ใหม่ (จำรหัส, ลืมรหัส, แจ้งเตือนสีแดง)
 // ==========================================
 
-// 1. ฟังก์ชันลืมรหัสผ่าน (เด้งป๊อปอัปให้คำแนะนำ)
+// 1. ฟังก์ชันลืมรหัสผ่าน (เด้งป๊อปอัปให้คำแนะนำ + อีเมลแอดมิน)
 function forgotPassword(e) {
     e.preventDefault(); // ป้องกันหน้าเว็บเด้งกลับไปบนสุด
     Swal.fire({
         title: appLang === 'en' ? 'Forgot Password?' : 'ลืมรหัสผ่าน?',
-        text: appLang === 'en' ? 'Please contact the administrator or your faculty advisor to reset your password.' : 'กรุณาติดต่อผู้ดูแลระบบ หรืออาจารย์ประจำสาขาเพื่อขอรีเซ็ตรหัสผ่านใหม่ครับ',
+        html: appLang === 'en' 
+            ? 'Please contact the administrator to reset your password.<br><br><b class="text-theme">Email: 6704001889@rumail.ru.ac.th</b>' 
+            : 'กรุณาติดต่อผู้ดูแลระบบเพื่อขอรีเซ็ตรหัสผ่านใหม่ครับ<br><br><b class="text-theme text-base">Gmail : 6704001889@rumail.ru.ac.th</b>',
         icon: 'info',
         confirmButtonColor: 'var(--primary-theme)',
         customClass: { popup: 'rounded-[2rem]' }
