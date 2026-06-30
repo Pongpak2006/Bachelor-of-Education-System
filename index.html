@@ -698,10 +698,11 @@ const db = firebase.firestore();
             didOpen: (toast) => { toast.onmouseenter = Swal.stopTimer; toast.onmouseleave = Swal.resumeTimer; }
         });
 
-        window.onload = function() {
-            applyDynamicTheme(); 
-            updateLanguageUI(); 
-        };
+        
+applyDynamicTheme(); 
+window.onload = function() {
+    updateLanguageUI(); // ส่วนนี้ปล่อยให้ทำงานตอนโหลดเสร็จเหมือนเดิมครับ
+};
 
         setInterval(() => {
             let d = new Date();
