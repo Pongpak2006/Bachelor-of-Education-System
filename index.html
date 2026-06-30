@@ -120,16 +120,15 @@
             
             <form onsubmit="event.preventDefault(); loginWithUsername();" class="space-y-3.5 md:space-y-4 text-left w-full">
                 <div class="relative">
-                    <i class="fa-solid fa-user absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
-                    <input type="text" id="username" name="username" class="lang-placeholder w-full pl-10 md:pl-12 pr-4 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="ชื่อผู้ใช้งาน (Username)">
-                </div>
-                
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
-                    <input type="password" id="password" name="password" class="lang-placeholder w-full pl-10 md:pl-12 pr-10 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="รหัสผ่าน">
-                    <i class="fa-solid fa-eye-slash absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base cursor-pointer hover:text-green-600 transition" onclick="togglePassword('password', this)"></i>
-                </div>
+    <i class="fa-solid fa-user absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
+    <input type="text" id="username" name="username" autocomplete="username" class="lang-placeholder w-full pl-10 md:pl-12 pr-4 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="ชื่อผู้ใช้งาน (Username)">
+</div>
 
+<div class="relative">
+    <i class="fa-solid fa-lock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
+    <input type="password" id="password" name="password" autocomplete="current-password" class="lang-placeholder w-full pl-10 md:pl-12 pr-10 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="รหัสผ่าน">
+    <i class="fa-solid fa-eye-slash absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base cursor-pointer hover:text-green-600 transition" onclick="togglePassword('password', this)"></i>
+</div>
                 <div class="flex items-center justify-between mt-4 mb-4 px-1">
                     <label class="flex items-center text-sm text-slate-600 cursor-pointer hover:text-slate-800 transition">
                         <input type="checkbox" id="rememberMe" class="mr-2 w-4 h-4 rounded border-slate-300 text-theme focus:ring-theme focus:ring-2">
