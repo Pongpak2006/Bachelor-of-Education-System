@@ -159,12 +159,11 @@
                         เข้าสู่ระบบด้วย Google
                     </button>
                     
-                    <!-- 📍 ปุ่มสมัครสมาชิกใหม่: เปลี่ยนเป็นโทนสีฟ้า/น้ำเงิน และเปลี่ยนไอคอนให้มีสี -->
-                    <button type="button" onclick="showRegisterPopup()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-indigo-100 active:scale-95 text-xs md:text-sm shadow-sm">
-                        <i class="fa-solid fa-user-plus text-indigo-500 text-sm md:text-base"></i>
+                    <!-- 📍 ปุ่มสมัครสมาชิกใหม่: ดึงสีธีมประจำเดือนมาทำเป็นสีอ่อนแบบอัตโนมัติ -->
+                    <button type="button" onclick="showRegisterPopup()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-[rgba(var(--primary-theme-rgb),0.05)] border border-[rgba(var(--primary-theme-rgb),0.2)] text-theme font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-[rgba(var(--primary-theme-rgb),0.1)] active:scale-95 text-xs md:text-sm shadow-sm">
+                        <i class="fa-solid fa-user-plus text-theme text-sm md:text-base"></i>
                         สมัครสมาชิกใหม่
                     </button>
-                </div>
                 
                 <!-- 📍 ลิงก์แอดมิน: เปลี่ยนเป็นสีเทา ตัวเล็ก และไม่หนา -->
                 <div class="mt-5 text-center w-full">
@@ -842,9 +841,6 @@ function showRegisterPopup() {
         confirmButtonText: 'ยืนยันการสมัคร',
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: '#16a34a',
-        // 🌟 เพิ่ม 2 บรรทัดนี้เพื่อปิดเอฟเฟกต์หน่วงเวลา ทำให้ป๊อปอัปโผล่ทันที 🌟
-        showClass: { popup: '', backdrop: 'swal2-backdrop-show' }, 
-        hideClass: { popup: '', backdrop: 'swal2-backdrop-hide' },
         preConfirm: () => {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
