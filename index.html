@@ -935,39 +935,55 @@ function loginWithUsername() {
 }
 
 // ==========================================
-// 3. ระบบเข้าสู่ระบบด้วย Google (เสถียร 100% + Auto Login)
+// 3. ระบบเข้าสู่ระบบด้วย Google (อัปเกรดตาข่ายดักจับ Catcher)
 // ==========================================
 function loginWithGoogle() {
-    Swal.fire({ title: 'กำลังพาไปหน้า Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     let provider = new firebase.auth.GoogleAuthProvider();
-    // ใช้ระบบ Redirect เพื่อหลบการบล็อก Pop-up ของเบราว์เซอร์
+    Swal.fire({ title: 'กำลังพาไปหน้า Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     firebase.auth().signInWithRedirect(provider);
 }
 
-// 🌟 สมองกลดักจับ: ทำงานอัตโนมัติเมื่อผู้ใช้เด้งกลับมาจาก Google หรือเปิดเว็บใหม่
+// 🌟 ตาข่ายที่ 1: ดักจับทันทีที่เด้งกลับมาจากหน้า Google
+firebase.auth().getRedirectResult().then((result) => {
+    if (result && result.user) {
+        processGoogleUser(result.user.email);
+    }
+}).catch((error) => {
+    console.error("Google Redirect Error:", error);
+});
+
+// 🌟 ตาข่ายที่ 2: ดักจับกรณีผู้ใช้เข้าเว็บมาใหม่แล้วเคยล็อกอิน Google ค้างไว้
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-        // ถ้ามี user แปลว่าล็อกอิน Google ผ่านแล้ว
-        Swal.fire({ title: 'กำลังโหลดข้อมูลนักศึกษา...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-        
-        db.collection("Users").where("email", "==", user.email).get().then((snapshot) => {
-            if (!snapshot.empty) {
-                let doc = snapshot.docs[0];
-                currentUser = doc.data();
-                currentUser.id = doc.id;
-                currentUser.studentId = currentUser.studentId || doc.id;
-                showStudentDashboard(); // พาเข้าหน้าแดชบอร์ด
-            } else {
-                // ถ้าใช้อีเมลอื่นที่ไม่เคยสมัครสมาชิก
-                firebase.auth().signOut();
-                Swal.fire('ไม่พบข้อมูล', 'คุณยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครสมาชิกก่อนครับ', 'warning');
-            }
-        }).catch((error) => {
-            console.error("Fetch Data Error:", error);
-            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-        });
+        // เช็คให้ชัวร์ว่าเป็นการล็อกอินด้วย Google (จะได้ไม่ชนกับระบบ Username/Password)
+        let isGoogle = user.providerData.some(p => p.providerId === 'google.com');
+        if (isGoogle) {
+            processGoogleUser(user.email);
+        }
     }
 });
+
+// 🌟 ฟังก์ชันหลักสำหรับดึงข้อมูลและพาเข้าหน้าแดชบอร์ด
+function processGoogleUser(userEmail) {
+    Swal.fire({ title: 'กำลังเชื่อมต่อข้อมูลนักศึกษา...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    
+    db.collection("Users").where("email", "==", userEmail).get().then((snapshot) => {
+        if (!snapshot.empty) {
+            let doc = snapshot.docs[0];
+            currentUser = doc.data();
+            currentUser.id = doc.id;
+            currentUser.studentId = currentUser.studentId || doc.id;
+            showStudentDashboard(); // พาทะลุเข้าหน้าโครงสร้างเลย!
+        } else {
+            // กรณีใช้อีเมลอื่นที่ไม่เคยสมัครสมาชิก
+            firebase.auth().signOut();
+            Swal.fire('ไม่พบข้อมูล', 'อีเมลนี้ยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครก่อนครับ', 'warning');
+        }
+    }).catch((error) => {
+        console.error("Database Fetch Error:", error);
+        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+    });
+}
 
 // ----------------------------------------------------
 // ฟังก์ชันโชว์หน้าแอดมินแบบเล็กๆ
