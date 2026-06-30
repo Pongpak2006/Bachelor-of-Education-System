@@ -98,11 +98,18 @@
                 <span class="lang-txt" data-th="คู่มือการใช้งาน" data-en="User Manual">คู่มือการใช้งาน</span>
             </button>
 
-            <div class="bg-white/80 backdrop-blur-md text-slate-600 text-[9px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] flex items-center gap-1.5 md:gap-2">
+            <div class="flex items-center gap-2 md:gap-3">
+            <div class="bg-white/80 backdrop-blur-md text-slate-600 text-[9px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-white flex items-center gap-1.5 md:gap-2">
                 <i class="fa-solid fa-bullhorn text-theme"></i>
                 <span class="lang-txt" data-th="สาขาวิชาเอกการประถมศึกษา" data-en="Major in Elementary Education">สาขาวิชาเอกการประถมศึกษา</span>
             </div>
+            
+            <button onclick="toggleLanguage()" class="bg-white/80 backdrop-blur-md px-3 py-2 md:px-4 md:py-2 rounded-full shadow-sm text-theme flex items-center justify-center gap-1.5 md:gap-2 border border-white hover:bg-slate-50 transition active:scale-95" title="เปลี่ยนภาษา / Change Language">
+                <i class="fa-solid fa-globe text-[10px] md:text-xs"></i>
+                <span class="text-[9px] md:text-xs font-bold font-sans" id="langBtnText">EN</span>
+            </button>
         </div>
+    </div>
 
 <div id="studentLoginBox" class="relative bg-white/80 backdrop-blur-2xl p-8 sm:p-12 md:p-14 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all my-auto flex flex-col justify-center mx-auto">
     
@@ -124,13 +131,29 @@
                     <input type="password" id="password" name="password" class="lang-placeholder w-full pl-10 md:pl-12 pr-10 py-3 md:py-3.5 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="รหัสผ่าน">
                     <i class="fa-solid fa-eye-slash absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base cursor-pointer hover:text-green-600 transition" onclick="togglePassword('password', this)"></i>
                 </div>
+                <!-- 📍 ก้อนที่ 1: ฟังก์ชันจดจำการเข้าระบบ & ลืมรหัสผ่าน -->
+                <div class="flex items-center justify-between mt-4 mb-4 px-1">
+                    <label class="flex items-center text-sm text-slate-600 cursor-pointer hover:text-slate-800 transition">
+                        <input type="checkbox" id="rememberMe" class="mr-2 w-4 h-4 rounded border-slate-300 text-theme focus:ring-theme focus:ring-2">
+                        <span lang="th">จดจำการเข้าระบบ</span>
+                    </label>
+                    <a href="#" onclick="forgotPassword(event)" class="text-sm font-bold text-theme hover:opacity-80 hover:underline transition" lang="th">ลืมรหัสผ่าน?</a>
+                </div>
+
+                <!-- 📍 ก้อนที่ 2: กล่องข้อความแจ้งเตือนสีแดง (ซ่อนไว้เป็นค่าเริ่มต้น) -->
+                <div id="loginErrorMsg" class="hidden bg-red-50 text-red-600 text-sm text-left mb-4 p-3 rounded-xl border border-red-100 transition-all">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> <span id="errorText" lang="th">ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง</span>
+                </div>
                 
                 <button type="submit" class="w-full gradient-theme text-white py-3 md:py-3.5 rounded-xl md:rounded-2xl font-bold text-sm md:text-base mt-2 transition active:scale-95 shadow-theme">
                     เข้าสู่ระบบ
                 </button>
                 
-                <div class="flex items-center my-3 md:my-4 before:flex-1 before:border-t before:border-slate-200 after:flex-1 after:border-t after:border-slate-200">
-                    <p class="text-center text-[10px] md:text-xs font-semibold mx-3 md:mx-4 mb-0 text-slate-400">หรือ</p>
+                <!-- 📍 ปรับสีเส้นคั่น และคำว่า "หรือ" ให้ชัดเจนขึ้น -->
+                <div class="flex items-center justify-center space-x-3 my-5 sm:my-6">
+                    <div class="h-px bg-slate-300 w-full"></div>
+                    <span class="text-slate-500 font-semibold text-xs sm:text-sm" lang="th">หรือ</span>
+                    <div class="h-px bg-slate-300 w-full"></div>
                 </div>
 
                 <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-white border border-slate-200 text-slate-600 font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-slate-50 active:scale-95 text-xs md:text-sm shadow-sm">
@@ -142,11 +165,9 @@
                     <i class="fa-solid fa-user-plus text-slate-400"></i> สมัครสมาชิกใหม่
                 </button>
                 
-                <div class="mt-4 md:mt-6 text-center">
-                    <a href="#" onclick="event.preventDefault(); toggleLoginView('admin');" class="text-[10px] md:text-xs font-semibold text-slate-400 hover:text-green-600 transition underline-offset-4 hover:underline">
-                        เข้าสู่ระบบผู้ดูแล (Admin)
-                    </a>
-                </div>
+                <div class="mt-8">
+    <a href="#" onclick="toggleAdminLogin()" class="text-sm text-slate-500 hover:text-slate-800 transition" lang="th">เข้าสู่ระบบผู้ดูแล (Admin)</a>
+</div>
             </form>
             <p class="mt-6 md:mt-8 text-[9px] text-slate-400 font-light tracking-widest uppercase opacity-80">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</p>
         </div>
@@ -1677,6 +1698,55 @@ function calculatePrediction() {
         customClass: { popup: 'rounded-[2rem]' }
     });
 }
+        // ==========================================
+// 🧠 ระบบ UX/UI ใหม่ (จำรหัส, ลืมรหัส, แจ้งเตือนสีแดง)
+// ==========================================
+
+// 1. ฟังก์ชันลืมรหัสผ่าน (เด้งป๊อปอัปให้คำแนะนำ)
+function forgotPassword(e) {
+    e.preventDefault(); // ป้องกันหน้าเว็บเด้งกลับไปบนสุด
+    Swal.fire({
+        title: appLang === 'en' ? 'Forgot Password?' : 'ลืมรหัสผ่าน?',
+        text: appLang === 'en' ? 'Please contact the administrator or your faculty advisor to reset your password.' : 'กรุณาติดต่อผู้ดูแลระบบ หรืออาจารย์ประจำสาขาเพื่อขอรีเซ็ตรหัสผ่านใหม่ครับ',
+        icon: 'info',
+        confirmButtonColor: 'var(--primary-theme)',
+        customClass: { popup: 'rounded-[2rem]' }
+    });
+}
+
+// 2. โหลดชื่อผู้ใช้ที่จำไว้ตอนเปิดเว็บ (Remember Me)
+window.addEventListener('DOMContentLoaded', (event) => {
+    let savedUser = localStorage.getItem("rememberedUsername");
+    if (savedUser) {
+        let userField = document.getElementById('username');
+        let rememberBox = document.getElementById('rememberMe');
+        if(userField && rememberBox) {
+            userField.value = savedUser;
+            rememberBox.checked = true;
+        }
+    }
+});
+
+// 3. ฟังก์ชันเรียกโชว์ Error สีแดงหน้าล็อกอิน
+function showInlineError(message) {
+    let errorBox = document.getElementById('loginErrorMsg');
+    let errorText = document.getElementById('errorText');
+    if(errorBox && errorText) {
+        errorText.innerText = message;
+        errorBox.classList.remove('hidden');
+        
+        // ลูกเล่นทำให้กล่องกระตุกนิดๆ (Shake) ดึงดูดสายตา
+        errorBox.classList.add('animate-bounce');
+        setTimeout(() => errorBox.classList.remove('animate-bounce'), 800);
+    }
+}
+
+// 4. ซ่อน Error อัตโนมัติทันทีที่ผู้ใช้เริ่มพิมพ์แก้รหัสใหม่
+['username', 'password'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => {
+        document.getElementById('loginErrorMsg')?.classList.add('hidden');
+    });
+});
     </script>
 </body>
 </html>
