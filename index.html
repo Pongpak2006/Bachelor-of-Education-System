@@ -945,12 +945,13 @@ function loginWithGoogle() {
         let userEmail = result.user.email;
         
         db.collection("Users").where("email", "==", userEmail).get().then((snapshot) => {
+            Swal.close();
             if (!snapshot.empty) {
                 let doc = snapshot.docs[0];
                 currentUser = doc.data();
                 currentUser.id = doc.id;
                 currentUser.studentId = currentUser.studentId || doc.id;
-                showStudentDashboard(); // พาเข้าหน้าแดชบอร์ด
+                showStudentDashboard(); // พาเข้าหน้าโครงสร้างทันที
             } else {
                 firebase.auth().signOut();
                 Swal.fire('ไม่พบข้อมูล', 'คุณยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครสมาชิกก่อนครับ', 'warning');
@@ -958,44 +959,12 @@ function loginWithGoogle() {
         });
     }).catch((error) => {
         Swal.close();
-        // ถ้าผู้ใช้กดกากบาทปิดหน้าต่าง Google ไปเอง จะไม่แสดง Error อะไรให้รำคาญใจ
-        if (error.code !== 'auth/popup-closed-by-user') {
+        // ดักจับกรณีเบราว์เซอร์ในมือถือบล็อกหน้าต่างเด้ง
+        if (error.code === 'auth/popup-blocked') {
+            Swal.fire('ป๊อปอัปถูกบล็อก', 'เบราว์เซอร์ของคุณบล็อกหน้าต่างล็อกอิน กรุณาเปิดสิทธิ์อนุญาตป๊อปอัป หรือลองเปิดลิงก์ในแอป Chrome/Safari โดยตรงครับ', 'warning');
+        } else if (error.code !== 'auth/popup-closed-by-user') {
             console.error("Google Error: ", error);
-            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้', 'error');
-        }
-    });
-}
-
-// ----------------------------------------------------
-// ฟังก์ชันโชว์หน้าแอดมินแบบเล็กๆ
-function showAdminLogin() {
-    Swal.fire({
-        title: 'ผู้ดูแลระบบ',
-        html: `
-            <input id="adminEmail" class="swal2-input text-sm !w-full !mx-0" placeholder="อีเมลผู้ดูแล">
-            <input id="adminPassword" type="password" class="swal2-input text-sm !w-full !mx-0 !mt-3" placeholder="รหัสผ่าน">
-        `,
-        confirmButtonText: 'เข้าสู่ระบบ',
-        confirmButtonColor: '#16a34a',
-        preConfirm: () => {
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
-            if(!email || !password) { Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบ'); return false; }
-            return {email, password};
-        }
-    }).then((result) => {
-        if(result.isConfirmed) {
-            Swal.fire({ title: 'ตรวจสอบข้อมูล...', didOpen: () => Swal.showLoading() });
-            firebase.auth().signInWithEmailAndPassword(result.value.email, result.value.password)
-                .then((userCredential) => {
-                    Swal.close();
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('adminSection').style.display = 'block';
-                    loadAllStudents(); // โหลดข้อมูลแอดมิน
-                })
-                .catch((error) => {
-                    Swal.fire('เข้าไม่ได้', 'อีเมลหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
-                });
+            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้: ' + error.message, 'error');
         }
     });
 }
