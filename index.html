@@ -1797,9 +1797,50 @@ function showInlineError(message) {
         card.style.display = card.innerText.toUpperCase().includes(input) ? '' : 'none';
     });
 }
-        // เอามาวางไว้ในโซน <script> แบบนี้ครับ
+        // ==========================================
+// ระบบส่งออกข้อมูล Excel (Backup) สำหรับแอดมิน
+// ==========================================
 function exportToExcel() {
-    Swal.fire('Coming Soon', 'ระบบส่งออก Excel จะเปิดให้ใช้งานในอัปเดตถัดไปครับ!', 'info');
+    Swal.fire({ title: 'กำลังเตรียมไฟล์ข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    
+    db.collection("Users").get().then((querySnapshot) => {
+        // 1. สร้างหัวตาราง Excel (รองรับภาษาไทยด้วย \uFEFF)
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+        csvContent += "รหัสนักศึกษา,ชื่อ-นามสกุล,อีเมล,ชั้นปี,Username,Password\n"; 
+
+        // 2. ดึงข้อมูลนักศึกษาทุกคนมาเรียงเป็นแถวๆ
+        querySnapshot.forEach((doc) => {
+            let u = doc.data();
+            if(u.role !== 'admin') { // ไม่ต้องดึงข้อมูลแอดมินออกมา
+                // ใส่เครื่องหมายฟันหนู ("") คล่อมไว้ ป้องกันปัญหาเวลามีเครื่องหมายลูกน้ำในชื่อ
+                let row = `"${u.studentId || '-'}","${u.name || '-'}","${u.email || '-'}","${u.year || '-'}","${u.username || '-'}","${u.password || '-'}"`;
+                csvContent += row + "\n";
+            }
+        });
+
+        // 3. สั่งให้เบราว์เซอร์ดาวน์โหลดไฟล์ลงเครื่องคอมพิวเตอร์
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        
+        // ตั้งชื่อไฟล์ที่จะดาวน์โหลด (จะเปลี่ยนชื่อตรงนี้ก็ได้นะครับ)
+        link.setAttribute("download", "backup_student_data.csv"); 
+        
+        document.body.appendChild(link);
+        link.click(); 
+        link.remove();
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'สำเร็จ!',
+            text: 'ดาวน์โหลดไฟล์สำรองข้อมูลนักศึกษาเรียบร้อยแล้ว',
+            confirmButtonColor: 'var(--primary-theme)',
+            customClass: { popup: 'rounded-[2rem]' }
+        });
+    }).catch(err => {
+        console.error("Export Error:", err);
+        Swal.fire('ผิดพลาด', 'ไม่สามารถดึงข้อมูลเพื่อสำรองไฟล์ได้', 'error');
+    });
 }
     </script>
 </body>
