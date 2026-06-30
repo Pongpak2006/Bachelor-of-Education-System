@@ -127,7 +127,7 @@
                     <input type="password" id="password" name="password" class="lang-placeholder w-full pl-10 md:pl-12 pr-10 py-3 md:py-3.5 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="รหัสผ่าน">
                     <i class="fa-solid fa-eye-slash absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base cursor-pointer hover:text-green-600 transition" onclick="togglePassword('password', this)"></i>
                 </div>
-                <!-- 📍 ก้อนที่ 1: ฟังก์ชันจดจำการเข้าระบบ & ลืมรหัสผ่าน -->
+
                 <div class="flex items-center justify-between mt-4 mb-4 px-1">
                     <label class="flex items-center text-sm text-slate-600 cursor-pointer hover:text-slate-800 transition">
                         <input type="checkbox" id="rememberMe" class="mr-2 w-4 h-4 rounded border-slate-300 text-theme focus:ring-theme focus:ring-2">
@@ -136,7 +136,6 @@
                     <a href="#" onclick="forgotPassword(event)" class="text-sm font-bold text-theme hover:opacity-80 hover:underline transition" lang="th">ลืมรหัสผ่าน?</a>
                 </div>
 
-                <!-- 📍 ก้อนที่ 2: กล่องข้อความแจ้งเตือนสีแดง (ซ่อนไว้เป็นค่าเริ่มต้น) -->
                 <div id="loginErrorMsg" class="hidden bg-red-50 text-red-600 text-sm text-left mb-4 p-3 rounded-xl border border-red-100 transition-all">
                     <i class="fa-solid fa-circle-exclamation mr-1"></i> <span id="errorText" lang="th">ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง</span>
                 </div>
@@ -145,27 +144,25 @@
                     เข้าสู่ระบบ
                 </button>
                 
-                <!-- 📍 ปรับสีเส้นคั่นให้ระยะห่างแคบลง ลดขอบขาว -->
                 <div class="flex items-center justify-center space-x-3 my-4 sm:my-5">
                     <div class="h-px bg-slate-300 w-full"></div>
                     <span class="text-slate-500 font-semibold text-xs sm:text-sm" lang="th">หรือ</span>
                     <div class="h-px bg-slate-300 w-full"></div>
                 </div>
 
-                <!-- 📍 จัดกลุ่ม 2 ปุ่มให้หน้าตาเหมือนกันเป๊ะ -->
                 <div class="flex flex-col gap-2.5">
                     <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-white border border-slate-200 text-slate-600 font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-slate-50 active:scale-95 text-xs md:text-sm shadow-sm">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4 md:w-5 md:h-5" alt="Google">
                         เข้าสู่ระบบด้วย Google
                     </button>
                     
-                    <!-- 📍 ปุ่มสมัครสมาชิกใหม่: ดึงสีธีมประจำเดือนมาทำเป็นสีอ่อนแบบอัตโนมัติ -->
-                    <button type="button" onclick="showRegisterPopup()" class="w-full flex items-center justify-center gap-2 md:gap-3 bg-[rgba(var(--primary-theme-rgb),0.05)] border border-[rgba(var(--primary-theme-rgb),0.2)] text-theme font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:bg-[rgba(var(--primary-theme-rgb),0.1)] active:scale-95 text-xs md:text-sm shadow-sm">
-                        <i class="fa-solid fa-user-plus text-theme text-sm md:text-base"></i>
+                    <!-- 📍 ปุ่มสมัครใช้สีประจำเดือนแบบโปร่งใส -->
+                    <button type="button" onclick="showRegisterPopup()" style="background-color: rgba(var(--primary-theme-rgb), 0.08); color: var(--primary-theme); border-color: rgba(var(--primary-theme-rgb), 0.2);" class="w-full flex items-center justify-center gap-2 md:gap-3 font-bold py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl transition hover:opacity-80 active:scale-95 text-xs md:text-sm shadow-sm border">
+                        <i class="fa-solid fa-user-plus text-sm md:text-base"></i>
                         สมัครสมาชิกใหม่
                     </button>
+                </div> <!-- 📍 บรรทัดนี้แหละครับที่หายไป ทำให้หน้าจอขาว! -->
                 
-                <!-- 📍 ลิงก์แอดมิน: เปลี่ยนเป็นสีเทา ตัวเล็ก และไม่หนา -->
                 <div class="mt-5 text-center w-full">
                     <a href="#" onclick="toggleLoginView('admin')" class="text-xs text-slate-400 font-medium hover:text-slate-600 hover:underline transition" lang="th">เข้าสู่ระบบผู้ดูแล (Admin)</a>
                 </div>
@@ -312,7 +309,6 @@
         <!-- 📍 2. หัวข้อทักทายและเวลา (ลบคำซ้ำออกให้หมดแล้ว!) -->
         <div class="flex justify-between items-end mb-5 px-2">
             <div>
-                <p id="greetingText" class="text-sm font-semibold text-theme mb-0.5"></p>
                 <h2 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight" id="headerName">-</h2>
                 <p id="liveClock" class="text-[10px] md:text-xs text-slate-400 font-medium mt-1.5 flex items-center gap-1.5"><i class="fa-regular fa-clock"></i> <span>...</span></p>
             </div>
@@ -1013,13 +1009,15 @@ function showStudentDashboard() {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('studentSection').style.display = 'block';
     
-    document.getElementById('headerName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
-    document.getElementById('profileName').innerText = currentUser.name || 'ไม่ระบุชื่อ';
+    // 📍 เอาคำทักทายมารวมกับชื่อในบรรทัดเดียวเลย (เช่น "สวัสดีตอนบ่าย ☀️ พงศ์ภัค")
+    let fullName = currentUser.name || 'ไม่ระบุชื่อ';
+    document.getElementById('headerName').innerText = getGreeting() + ' ' + fullName;
+    
+    document.getElementById('profileName').innerText = fullName;
     document.getElementById('profileId').innerText = appLang === 'en' ? `ID: ${currentUser.studentId} | Year ${currentUser.year}` : `รหัส: ${currentUser.studentId} | ชั้นปีที่ ${currentUser.year}`;
     document.getElementById('profileEmail').innerText = currentUser.email || '-';
-    document.getElementById('greetingText').innerText = getGreeting();
     
-    loadCourses(); // โหลดเกรด (รวมถึงระบบคำนวณเกียรตินิยมจะอยู่ในนี้ครับ ไม่ลืมแน่นอน!)
+    loadCourses(); 
 }
         
         function logout(s) {
