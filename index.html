@@ -935,38 +935,38 @@ function loginWithUsername() {
 }
 
 // ==========================================
-// 3. ระบบเข้าสู่ระบบด้วย Google (แก้ปัญหาจอขาว COOP Error)
+// 3. ระบบเข้าสู่ระบบด้วย Google (เสถียร 100% + Auto Login)
 // ==========================================
 function loginWithGoogle() {
-    let provider = new firebase.auth.GoogleAuthProvider();
     Swal.fire({ title: 'กำลังพาไปหน้า Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    
-    // 🌟 เปลี่ยนจาก Popup เป็น Redirect เพื่อแก้ปัญหาเบราว์เซอร์บล็อกหน้าจอ
+    let provider = new firebase.auth.GoogleAuthProvider();
+    // ใช้ระบบ Redirect เพื่อหลบการบล็อก Pop-up ของเบราว์เซอร์
     firebase.auth().signInWithRedirect(provider);
 }
 
-// 🌟 ดักจับผลลัพธ์ตอนเด้งกลับมาจากหน้าเว็บ Google (วางต่อจาก loginWithGoogle ได้เลย)
-firebase.auth().getRedirectResult().then((result) => {
-    if (result.credential && result.user) {
-        Swal.fire({ title: 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-        let userEmail = result.user.email;
+// 🌟 สมองกลดักจับ: ทำงานอัตโนมัติเมื่อผู้ใช้เด้งกลับมาจาก Google หรือเปิดเว็บใหม่
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        // ถ้ามี user แปลว่าล็อกอิน Google ผ่านแล้ว
+        Swal.fire({ title: 'กำลังโหลดข้อมูลนักศึกษา...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         
-        db.collection("Users").where("email", "==", userEmail).get().then((snapshot) => {
+        db.collection("Users").where("email", "==", user.email).get().then((snapshot) => {
             if (!snapshot.empty) {
                 let doc = snapshot.docs[0];
                 currentUser = doc.data();
                 currentUser.id = doc.id;
                 currentUser.studentId = currentUser.studentId || doc.id;
-                showStudentDashboard();
+                showStudentDashboard(); // พาเข้าหน้าแดชบอร์ด
             } else {
+                // ถ้าใช้อีเมลอื่นที่ไม่เคยสมัครสมาชิก
                 firebase.auth().signOut();
                 Swal.fire('ไม่พบข้อมูล', 'คุณยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครสมาชิกก่อนครับ', 'warning');
             }
+        }).catch((error) => {
+            console.error("Fetch Data Error:", error);
+            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
         });
     }
-}).catch((error) => {
-    console.error("Google Redirect Error: ", error);
-    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้', 'error');
 });
 
 // ----------------------------------------------------
