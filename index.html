@@ -102,12 +102,12 @@
             
             <button onclick="toggleLanguage()" class="bg-white/80 backdrop-blur-md px-3 py-2 md:px-4 md:py-2 rounded-full shadow-sm text-theme flex items-center justify-center gap-1.5 md:gap-2 border border-white hover:bg-slate-50 transition active:scale-95" title="เปลี่ยนภาษา / Change Language">
                 <i class="fa-solid fa-globe text-[10px] md:text-xs"></i>
-                <span class="text-[9px] md:text-xs font-bold font-sans" id="langBtnText">EN</span>
+                <span class="text-[9px] md:text-xs font-bold font-sans lang-btn-text">EN</span>
             </button>
         </div>
     </div>
 
-<div id="studentLoginBox" class="relative bg-white/80 backdrop-blur-2xl p-8 sm:p-12 md:p-14 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all my-auto flex flex-col justify-center mx-auto">
+<div id="studentLoginBox" class="relative bg-white/80 backdrop-blur-2xl px-6 py-8 sm:p-10 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all my-auto flex flex-col justify-center mx-auto">
     
             <div class="w-16 h-16 md:w-20 md:h-20 gradient-theme rounded-[1rem] md:rounded-[1.5rem] shadow-theme flex items-center justify-center mx-auto mb-4 md:mb-6 animate-float">
                 <i class="fa-solid fa-graduation-cap text-3xl md:text-4xl text-white"></i>
@@ -170,7 +170,7 @@
                     <a href="#" onclick="toggleLoginView('admin')" class="text-xs text-slate-400 font-medium hover:text-slate-600 hover:underline transition" lang="th">เข้าสู่ระบบผู้ดูแล (Admin)</a>
                 </div>
             </form>
-            <p class="mt-5 md:mt-6 text-[9px] text-slate-400 font-light tracking-widest uppercase opacity-80">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</p>
+    <p class="mt-4 text-[9px] text-slate-400 font-light tracking-widest uppercase opacity-80">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</p>
         </div>
 
 <div id="adminLoginBox" class="hidden relative bg-white/80 backdrop-blur-2xl p-8 sm:p-12 md:p-14 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all my-auto flex flex-col justify-center mx-auto">
@@ -307,11 +307,10 @@
                 <span class="text-[9px] md:text-xs font-bold font-sans lang-btn-text">EN</span>
             </button>
         </div>
-
-        <div class="flex justify-between items-end mb-5 px-2">
         
         <div class="flex justify-between items-end mb-5 px-2">
             <div>
+                <p id="greetingText" class="text-sm font-semibold text-theme mb-0.5">สวัสดี,</p>
                 <p id="greetingText" class="text-sm font-semibold text-theme mb-0.5">สวัสดี,</p>
                 <h2 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight" id="headerName">-</h2>
                 <p id="liveClock" class="text-[10px] md:text-xs text-slate-400 font-medium mt-1.5 flex items-center gap-1.5"><i class="fa-regular fa-clock"></i> <span>...</span></p>
