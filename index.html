@@ -743,23 +743,35 @@ window.onload = function() {
         }
 
         function clearDashboardData() {
-            let loadingTxt = appLang === 'en' ? 'Loading data... 🚀' : 'กำลังดึงข้อมูลรายวิชา... รอสักครู่นะครับ 🚀';
-            document.getElementById('courseContainer').innerHTML = `<div class="text-center py-24 text-slate-400 text-sm font-light"><i class="fa-solid fa-spinner fa-spin text-2xl text-theme mb-3"></i><br>${loadingTxt}</div>`;
-            document.getElementById('passedContainer').innerHTML = '';
-            document.getElementById('profileName').innerText = '-';
-            document.getElementById('headerName').innerText = '-';
-            document.getElementById('profileId').innerText = '-';
-            document.getElementById('profileEmail').innerText = '-';
-            document.getElementById('totalCredits').innerText = '0';
-            document.getElementById('remainingCredits').innerText = '141';
-            document.getElementById('passedCount').innerText = '0';
-            document.getElementById('gpax').innerText = '0.00';
-            document.getElementById('progressText').innerText = '0%';
-            document.getElementById('progressBar').style.width = '0%';
-            document.getElementById('honorsBadge').classList.add('hidden');
-            document.getElementById('passedSummary').innerHTML = '';
-            passedCoursesList = [];
-        }
+    let loadingTxt = appLang === 'en' ? 'Loading data... 🚀' : 'กำลังดึงข้อมูลรายวิชา... รอสักครู่นะครับ 🚀';
+    
+    // 🛠️ ฟังก์ชันตัวช่วย: เช็คก่อนว่ามีกล่องอยู่จริงไหม ถึงจะเปลี่ยนค่า (ป้องกัน Error สีแดง)
+    const updateHTML = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    const updateText = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
+
+    // ใช้ฟังก์ชันตัวช่วยจัดการข้อมูลทั้งหมด
+    updateHTML('courseContainer', `<div class="text-center py-24 text-slate-400 text-sm font-light"><i class="fa-solid fa-spinner fa-spin text-2xl text-theme mb-3"></i><br>${loadingTxt}</div>`);
+    updateHTML('passedContainer', '');
+    updateText('profileName', '-');
+    updateText('headerName', '-');
+    updateText('profileId', '-');
+    updateText('profileEmail', '-');
+    updateText('totalCredits', '0');
+    updateText('remainingCredits', '141');
+    updateText('passedCount', '0');
+    updateText('gpax', '0.00');
+    updateText('progressText', '0%');
+    
+    // สำหรับ Style และ Class ก็ต้องเช็คก่อนทำเหมือนกัน
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) progressBar.style.width = '0%';
+    
+    const honorsBadge = document.getElementById('honorsBadge');
+    if (honorsBadge) honorsBadge.classList.add('hidden');
+    
+    updateHTML('passedSummary', '');
+    passedCoursesList = [];
+}
 
        function login(loginType) {
     Swal.fire({ title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
