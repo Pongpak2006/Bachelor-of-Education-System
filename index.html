@@ -935,53 +935,34 @@ function loginWithUsername() {
 }
 
 // ==========================================
-// 3. ระบบเข้าสู่ระบบด้วย Google (อัปเกรดตาข่ายดักจับ Catcher)
+// 3. ระบบเข้าสู่ระบบด้วย Google (แบบ Pop-up ดั้งเดิมที่เสถียรที่สุด)
 // ==========================================
 function loginWithGoogle() {
     let provider = new firebase.auth.GoogleAuthProvider();
-    Swal.fire({ title: 'กำลังพาไปหน้า Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    firebase.auth().signInWithRedirect(provider);
-}
-
-// 🌟 ตาข่ายที่ 1: ดักจับทันทีที่เด้งกลับมาจากหน้า Google
-firebase.auth().getRedirectResult().then((result) => {
-    if (result && result.user) {
-        processGoogleUser(result.user.email);
-    }
-}).catch((error) => {
-    console.error("Google Redirect Error:", error);
-});
-
-// 🌟 ตาข่ายที่ 2: ดักจับกรณีผู้ใช้เข้าเว็บมาใหม่แล้วเคยล็อกอิน Google ค้างไว้
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        // เช็คให้ชัวร์ว่าเป็นการล็อกอินด้วย Google (จะได้ไม่ชนกับระบบ Username/Password)
-        let isGoogle = user.providerData.some(p => p.providerId === 'google.com');
-        if (isGoogle) {
-            processGoogleUser(user.email);
-        }
-    }
-});
-
-// 🌟 ฟังก์ชันหลักสำหรับดึงข้อมูลและพาเข้าหน้าแดชบอร์ด
-function processGoogleUser(userEmail) {
-    Swal.fire({ title: 'กำลังเชื่อมต่อข้อมูลนักศึกษา...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'กำลังเชื่อมต่อบัญชี Google...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     
-    db.collection("Users").where("email", "==", userEmail).get().then((snapshot) => {
-        if (!snapshot.empty) {
-            let doc = snapshot.docs[0];
-            currentUser = doc.data();
-            currentUser.id = doc.id;
-            currentUser.studentId = currentUser.studentId || doc.id;
-            showStudentDashboard(); // พาทะลุเข้าหน้าโครงสร้างเลย!
-        } else {
-            // กรณีใช้อีเมลอื่นที่ไม่เคยสมัครสมาชิก
-            firebase.auth().signOut();
-            Swal.fire('ไม่พบข้อมูล', 'อีเมลนี้ยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครก่อนครับ', 'warning');
-        }
+    firebase.auth().signInWithPopup(provider).then((result) => {
+        let userEmail = result.user.email;
+        
+        db.collection("Users").where("email", "==", userEmail).get().then((snapshot) => {
+            if (!snapshot.empty) {
+                let doc = snapshot.docs[0];
+                currentUser = doc.data();
+                currentUser.id = doc.id;
+                currentUser.studentId = currentUser.studentId || doc.id;
+                showStudentDashboard(); // พาเข้าหน้าแดชบอร์ด
+            } else {
+                firebase.auth().signOut();
+                Swal.fire('ไม่พบข้อมูล', 'คุณยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครสมาชิกก่อนครับ', 'warning');
+            }
+        });
     }).catch((error) => {
-        console.error("Database Fetch Error:", error);
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+        Swal.close();
+        // ถ้าผู้ใช้กดกากบาทปิดหน้าต่าง Google ไปเอง จะไม่แสดง Error อะไรให้รำคาญใจ
+        if (error.code !== 'auth/popup-closed-by-user') {
+            console.error("Google Error: ", error);
+            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้', 'error');
+        }
     });
 }
 
