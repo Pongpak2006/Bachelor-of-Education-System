@@ -1349,7 +1349,8 @@ let targetCr = REQUIRED_CREDITS[currentUser.curriculumYear] || 141;
                 badge.className = 'px-3 py-1.5 rounded-full text-xs font-bold shadow-sm bg-red-100 text-red-700';
             }
 
-            let sumTitle = appLang === 'en' ? '4-Year Summary' : 'สรุปการเรียน 4 ปี';
+            // 👇 1. เอาป้าย (span) ฝังเข้าไปในชื่อ sumTitle
+            let sumTitle = appLang === 'en' ? '4-Year Summary <span id="honorsBadgeContainer"></span>' : 'สรุปการเรียน 4 ปี <span id="honorsBadgeContainer"></span>';
             let sumDesc = appLang === 'en' 
                 ? `Earned <b class="text-theme">${totalCr}</b> CR <br class="md:hidden"> (Need <b class="text-slate-800">${remaining}</b> CR to graduate)`
                 : `เก็บไปแล้ว <b class="text-theme">${totalCr}</b> นก. <br class="md:hidden"> (ขาดอีก <b class="text-slate-800">${remaining}</b> นก. จะสำเร็จการศึกษา)`;
@@ -1364,7 +1365,32 @@ let targetCr = REQUIRED_CREDITS[currentUser.curriculumYear] || 141;
                     <p class="text-sm text-slate-500 mt-1">${sumDesc}</p>
                 </div>
             </div>`;
+            
+            // 👇 2. สั่งให้ฟังก์ชันป้ายเกียรตินิยมทำงาน ทันทีที่สร้างกล่องเสร็จ!
+            updateHonorsBadge(); 
         }
+
+        // 👇 3. วางฟังก์ชันคำนวณเกรด ไว้ก่อนฟังก์ชันอัปเดตเกรด
+        function updateHonorsBadge() {
+            let honorsBadge = document.getElementById('honorsBadgeContainer');
+            // เช็คว่ามีกล่องป้าย และนักศึกษาต้องมีหน่วยกิตมากกว่า 0 ถึงจะเริ่มคำนวณ
+            if (honorsBadge && currentTotalCredits > 0) {
+                let currentGpaValue = currentTotalPoints / currentTotalCredits; 
+                
+                if (currentGpaValue >= 3.60) {
+                    honorsBadge.innerHTML = `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-yellow-50 to-amber-100 text-amber-700 border border-amber-300 shadow-sm transition-all duration-300 hover:scale-105"><i class="fa-solid fa-trophy mr-1 text-amber-500"></i> เกียรตินิยมอันดับ 1</span>`;
+                } else if (currentGpaValue >= 3.25) {
+                    honorsBadge.innerHTML = `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-slate-50 to-gray-200 text-slate-700 border border-slate-300 shadow-sm transition-all duration-300 hover:scale-105"><i class="fa-solid fa-medal mr-1 text-slate-500"></i> เกียรตินิยมอันดับ 2</span>`;
+                } else {
+                    honorsBadge.innerHTML = ''; // ซ่อนป้ายถ้าเกรดไม่ถึง
+                }
+            }
+        }
+
+        // โค้ดเดิมของคุณพงศ์ภัค อยู่ต่อจากตรงนี้ครับ
+        async function updateGrade(code, grade) {
+            let msgLoading = appLang === 'en' ? `Saving ${code}...` : `กำลังบันทึกเกรดวิชา ${code}...`;
+            let msgErr = appLang === 'en' ? 'Failed to save. Try again.' : 'บันทึกไม่สำเร็จ กรุณาลองใหม่';
 
         async function updateGrade(code, grade) {
             let msgLoading = appLang === 'en' ? `Saving ${code}...` : `กำลังบันทึกเกรดวิชา ${code}...`;
@@ -2103,6 +2129,31 @@ async function initHonorsChart() {
         });
     } catch (error) {
         console.error("Error loading chart:", error);
+    }
+}
+        // 🏆 ฟังก์ชันคำนวณและแสดงป้ายเกียรตินิยม
+function updateHonorsBadge() {
+    let honorsBadge = document.getElementById('honorsBadgeContainer');
+    
+    // เช็คว่ามีกล่องป้าย และนักศึกษาต้องมีหน่วยกิตมากกว่า 0 ถึงจะเริ่มคำนวณ
+    if (honorsBadge && currentTotalCredits > 0) {
+        
+        // เอา 2 ตัวแปรที่คุณพงศ์ภัคเจอ มาหารกันเป็นเกรดเฉลี่ย (GPA)
+        let currentGpaValue = currentTotalPoints / currentTotalCredits; 
+        
+        if (currentGpaValue >= 3.60) {
+            honorsBadge.innerHTML = `
+                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-yellow-50 to-amber-100 text-amber-700 border border-amber-300 shadow-sm transition-all duration-300 hover:scale-105">
+                    <i class="fa-solid fa-trophy mr-1 text-amber-500"></i> เกียรตินิยมอันดับ 1
+                </span>`;
+        } else if (currentGpaValue >= 3.25) {
+            honorsBadge.innerHTML = `
+                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-slate-50 to-gray-200 text-slate-700 border border-slate-300 shadow-sm transition-all duration-300 hover:scale-105">
+                    <i class="fa-solid fa-medal mr-1 text-slate-500"></i> เกียรตินิยมอันดับ 2
+                </span>`;
+        } else {
+            honorsBadge.innerHTML = ''; // ซ่อนป้ายถ้าเกรดไม่ถึง
+        }
     }
 }
     </script>
