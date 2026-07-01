@@ -1748,24 +1748,24 @@ function syncCoursesToDB() {
             try {
                 let batch = db.batch();
 
-                let curRef63 = db.collection("Curriculums").doc("2563"); // 👈 เติมเพิ่ม
-let curRef64 = db.collection("Curriculums").doc("2564"); // 👈 เติมเพิ่ม
-let curRef65 = db.collection("Curriculums").doc("2565"); // 👈 เติมเพิ่ม
-let curRef66 = db.collection("Curriculums").doc("2566"); // 👈 เติมเพิ่ม
+                let curRef63 = db.collection("Curriculums").doc("2563");
+let curRef64 = db.collection("Curriculums").doc("2564");
+let curRef65 = db.collection("Curriculums").doc("2565");
+let curRef66 = db.collection("Curriculums").doc("2566");
                 let curRef67 = db.collection("Curriculums").doc("2567");
                 let curRef68 = db.collection("Curriculums").doc("2568");
                 let curRef69 = db.collection("Curriculums").doc("2569");
 
-                // ส่งวิชาชุดเก่าเข้าปี 63-66
-            batch.set(curRef63, { year: "2563", courses: COURSES_2563 });
-            batch.set(curRef64, { year: "2564", courses: COURSES_2563 });
-            batch.set(curRef65, { year: "2565", courses: COURSES_2563 });
-            batch.set(curRef66, { year: "2566", courses: COURSES_2563 });
-            
-            // ส่งวิชาชุดใหม่ (67) เข้าปี 67-69
-            batch.set(curRef67, { year: "2567", courses: BASE_COURSES });
-            batch.set(curRef68, { year: "2568", courses: BASE_COURSES });
-            batch.set(curRef69, { year: "2569", courses: BASE_COURSES });
+                // ตรงนี้ต้องเป็น COURSES_2563 นะครับ (วิชาชุดเก่า)
+batch.set(curRef63, { year: "2563", courses: COURSES_2563 });
+batch.set(curRef64, { year: "2564", courses: COURSES_2563 });
+batch.set(curRef65, { year: "2565", courses: COURSES_2563 });
+batch.set(curRef66, { year: "2566", courses: COURSES_2563 });
+
+// ตรงนี้เป็น BASE_COURSES (วิชาชุดใหม่ปี 67)
+batch.set(curRef67, { year: "2567", courses: BASE_COURSES });
+batch.set(curRef68, { year: "2568", courses: BASE_COURSES });
+batch.set(curRef69, { year: "2569", courses: BASE_COURSES });
                 
                 batch.commit().then(() => {
                     Swal.fire('สำเร็จ!', 'อัปโหลดรายวิชาเข้าฐานข้อมูลเรียบร้อยแล้ว!', 'success');
