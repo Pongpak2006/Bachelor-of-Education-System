@@ -2014,148 +2014,67 @@ function exportToExcel() {
     });
 }
         // 📊 ฟังก์ชันดึงข้อมูลนักศึกษาทั้งหมดมาประมวลผลทำกราฟสถิติ
-async function initHonorsChart() {
-    try {
-        // 1. ดึงข้อมูล Users เฉพาะคนที่เป็น student ทั้งหมดจาก Firestore
-        const snapshot = await db.collection("Users").where("role", "==", "student").get();
-        
-        let normalCount = 0;
-        let probationCount = 0;
-        let honorsCount = 0;
 
-        // 2. วิ่งลูปนับจำนวนแยกตามเกณฑ์สถิติ
-        snapshot.forEach(doc => {
-            const student = doc.data();
-            
-            // 💡 อิงตามเกรดเฉลี่ยสะสม (ถ้ามีเก็บไว้) หรือเงื่อนไขสถานะในระบบ
-            if (student.status === "เฝ้าระวัง") {
-                probationCount++;
-            } else if (student.gpa >= 3.50) { // สมมุติตัวอย่างเงื่อนไขเกียรตินิยม
-                honorsCount++;
-            } else {
-                normalCount++;
-            }
-        });
+        // 📊 ฟังก์ชันดึงข้อมูลนักศึกษาทั้งหมดมาประมวลผลทำกราฟสถิติ (แอดมิน)
+        async function initHonorsChart() {
+            try {
+                const snapshot = await db.collection("Users").where("role", "==", "student").get();
+                let normalCount = 0;
+                let probationCount = 0;
+                let honorsCount = 0;
 
-        // 3. เริ่มวาดกราฟลงบน Canvas
-        const ctx = document.getElementById('honorsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut', // ใช้กราฟทรงโดนัท สวยงามและประหยัดพื้นที่ Dashboard
-            data: {
-                labels: ['สถานะปกติ', 'เฝ้าระวัง/ตกค้าง', 'เกณฑ์เกียรตินิยม'],
-                datasets: [{
-                    data: [normalCount, probationCount, honorsCount],
-                    backgroundColor: [
-                        '#10B981', // สีเขียว Emerald
-                        '#EF4444', // สีแดง Red
-                        '#F59E0B'  // สีส้ม Amber
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom', // เอาป้ายคำอธิบายไปไว้ด้านล่าง
-                        labels: {
-                            boxWidth: 12,
-                            font: { size: 11, family: 'Kanit' }
-                        }
+                snapshot.forEach(doc => {
+                    const student = doc.data();
+                    if (student.status === "เฝ้าระวัง" || student.status === "ตกค้าง") {
+                        probationCount++;
+                    } else if (student.gpa && student.gpa >= 3.50) { 
+                        honorsCount++;
+                    } else {
+                        normalCount++;
                     }
-                }
+                });
+
+                let chartStatus = Chart.getChart("honorsChart");
+                if (chartStatus) chartStatus.destroy();
+
+                const ctx = document.getElementById('honorsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['สถานะปกติ', 'เฝ้าระวัง/ตกค้าง', 'เกณฑ์เกียรตินิยม'],
+                        datasets: [{
+                            data: [normalCount, probationCount, honorsCount],
+                            backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Prompt' } } } }
+                    }
+                });
+            } catch (error) {
+                console.error("Error loading chart statistics:", error);
             }
-        });
-
-    } catch (error) {
-        console.error("Error loading chart statistics:", error);
-    }
-}
-
-// 💡 อย่าลืมใส่คำสั่งนี้ไว้ในฟังก์ชันตอนที่แอดมินล็อกอินสำเร็จ หรือตอนโหลดหน้าแผงควบคุมเสร็จด้วยนะครับ
-// initHonorsChart();
-        // 📊 ฟังก์ชันวาดกราฟสถิติ
-async function initHonorsChart() {
-    try {
-        const snapshot = await db.collection("Users").where("role", "==", "student").get();
-        let normalCount = 0;
-        let probationCount = 0;
-        let honorsCount = 0;
-
-        // วิ่งลูปเช็คสถานะนักศึกษาแต่ละคน (ตัวอย่างข้อมูลเบื้องต้น)
-        snapshot.forEach(doc => {
-            const student = doc.data();
-            // สมมติฐานเช็คจากเกรด หรือถ้ามีสถานะเก็บไว้
-            if (student.status === "เฝ้าระวัง" || student.status === "ตกค้าง") {
-                probationCount++;
-            } else if (student.gpa && student.gpa >= 3.50) { 
-                honorsCount++;
-            } else {
-                normalCount++;
-            }
-        });
-
-        // ล้างกราฟเก่าออกก่อน (ป้องกันกราฟซ้อนกันเวลาโหลดใหม่)
-        let chartStatus = Chart.getChart("honorsChart");
-        if (chartStatus != undefined) {
-            chartStatus.destroy();
         }
 
-        // เริ่มวาดกราฟ
-        const ctx = document.getElementById('honorsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['สถานะปกติ', 'เฝ้าระวัง/ตกค้าง', 'เกณฑ์เกียรตินิยม'],
-                datasets: [{
-                    data: [normalCount, probationCount, honorsCount],
-                    backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { font: { family: 'Prompt' } }
-                    }
+        // 🏆 ฟังก์ชันคำนวณและแสดงป้ายเกียรตินิยม (นักศึกษา)
+        function updateHonorsBadge() {
+            let honorsBadge = document.getElementById('honorsBadgeContainer');
+            if (honorsBadge && currentTotalCredits > 0) {
+                let currentGpaValue = currentTotalPoints / currentTotalCredits; 
+                
+                if (currentGpaValue >= 3.60) {
+                    honorsBadge.innerHTML = `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-yellow-50 to-amber-100 text-amber-700 border border-amber-300 shadow-sm transition-all duration-300 hover:scale-105"><i class="fa-solid fa-trophy mr-1 text-amber-500"></i> เกียรตินิยมอันดับ 1</span>`;
+                } else if (currentGpaValue >= 3.25) {
+                    honorsBadge.innerHTML = `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-slate-50 to-gray-200 text-slate-700 border border-slate-300 shadow-sm transition-all duration-300 hover:scale-105"><i class="fa-solid fa-medal mr-1 text-slate-500"></i> เกียรตินิยมอันดับ 2</span>`;
+                } else {
+                    honorsBadge.innerHTML = '';
                 }
             }
-        });
-    } catch (error) {
-        console.error("Error loading chart:", error);
-    }
-}
-        // 🏆 ฟังก์ชันคำนวณและแสดงป้ายเกียรตินิยม
-function updateHonorsBadge() {
-    let honorsBadge = document.getElementById('honorsBadgeContainer');
-    
-    // เช็คว่ามีกล่องป้าย และนักศึกษาต้องมีหน่วยกิตมากกว่า 0 ถึงจะเริ่มคำนวณ
-    if (honorsBadge && currentTotalCredits > 0) {
-        
-        // เอา 2 ตัวแปรที่คุณพงศ์ภัคเจอ มาหารกันเป็นเกรดเฉลี่ย (GPA)
-        let currentGpaValue = currentTotalPoints / currentTotalCredits; 
-        
-        if (currentGpaValue >= 3.60) {
-            honorsBadge.innerHTML = `
-                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-yellow-50 to-amber-100 text-amber-700 border border-amber-300 shadow-sm transition-all duration-300 hover:scale-105">
-                    <i class="fa-solid fa-trophy mr-1 text-amber-500"></i> เกียรตินิยมอันดับ 1
-                </span>`;
-        } else if (currentGpaValue >= 3.25) {
-            honorsBadge.innerHTML = `
-                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-slate-50 to-gray-200 text-slate-700 border border-slate-300 shadow-sm transition-all duration-300 hover:scale-105">
-                    <i class="fa-solid fa-medal mr-1 text-slate-500"></i> เกียรตินิยมอันดับ 2
-                </span>`;
-        } else {
-            honorsBadge.innerHTML = ''; // ซ่อนป้ายถ้าเกรดไม่ถึง
         }
-    }
-}
     </script>
 </body>
 </html>
