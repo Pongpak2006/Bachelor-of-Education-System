@@ -1317,7 +1317,7 @@ function calculateStatus(totalCr) {
             currentTotalPoints = totalPt;
             
             // 🌟 1. ดึงเป้าหมายหน่วยกิตตามชั้นปีของเด็กที่ล็อกอิน (ถ้าไม่มีข้อมูลให้ใช้ 141 เป็นค่าเริ่มต้น)
-            let targetCr = REQUIRED_CREDITS[currentUser.year] || 141;
+let targetCr = REQUIRED_CREDITS[currentUser.curriculumYear] || 141;
             
             // 🌟 2. คำนวณส่วนที่เหลือและเปอร์เซ็นต์ โดยเปลี่ยนไปใช้ targetCr แทน
             let remaining = Math.max(0, targetCr - totalCr);
