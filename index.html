@@ -21,6 +21,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <!-- วางบรรทัดนี้เพิ่มเข้าไป 👇 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
         
@@ -226,15 +227,17 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 col-span-1 lg:col-span-2 relative overflow-hidden flex items-center justify-center min-h-[140px] md:min-h-[160px]">
-                <div class="absolute inset-0 bg-slate-50/50"></div>
-                <div class="text-center relative z-10">
-                    <div class="w-12 h-12 md:w-14 md:h-14 bg-white text-slate-300 rounded-full flex items-center justify-center text-xl md:text-2xl mx-auto mb-3 shadow-sm border border-slate-100">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    <p class="text-sm md:text-base font-semibold text-slate-400 lang-txt" data-th="พื้นที่เตรียมแสดงกราฟสถิติเกียรตินิยม" data-en="Honors Statistics Graph Area">พื้นที่เตรียมแสดงกราฟสถิติเกียรตินิยม</p>
-                    <p class="text-[10px] md:text-xs text-slate-300 mt-1 uppercase tracking-wider">(Coming in Phase 4)</p>
-                </div>
+            <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 col-span-1 lg:col-span-2 relative overflow-hidden flex flex-col items-center justify-center min-h-[250px]">
+    <!-- หัวข้อกราฟ -->
+    <div class="w-full text-center mb-4 relative z-10">
+        <h3 class="text-sm md:text-base font-semibold text-slate-700 lang-txt" data-th="📊 สถิติสถานะและเกียรตินิยมรวม" data-en="📊 Honors Statistics">📊 สถิติสถานะและเกียรตินิยมรวม</h3>
+    </div>
+    
+    <!-- พื้นที่วาดกราฟ -->
+    <div class="relative w-full h-full max-h-[200px] flex justify-center items-center z-10">
+        <canvas id="honorsChart"></canvas>
+    </div>
+</div>
             </div>
         </div> 
 
@@ -1981,6 +1984,69 @@ function exportToExcel() {
         Swal.fire('ผิดพลาด', 'ไม่สามารถดึงข้อมูลเพื่อสำรองไฟล์ได้', 'error');
     });
 }
+        // 📊 ฟังก์ชันดึงข้อมูลนักศึกษาทั้งหมดมาประมวลผลทำกราฟสถิติ
+async function initHonorsChart() {
+    try {
+        // 1. ดึงข้อมูล Users เฉพาะคนที่เป็น student ทั้งหมดจาก Firestore
+        const snapshot = await db.collection("Users").where("role", "==", "student").get();
+        
+        let normalCount = 0;
+        let probationCount = 0;
+        let honorsCount = 0;
+
+        // 2. วิ่งลูปนับจำนวนแยกตามเกณฑ์สถิติ
+        snapshot.forEach(doc => {
+            const student = doc.data();
+            
+            // 💡 อิงตามเกรดเฉลี่ยสะสม (ถ้ามีเก็บไว้) หรือเงื่อนไขสถานะในระบบ
+            if (student.status === "เฝ้าระวัง") {
+                probationCount++;
+            } else if (student.gpa >= 3.50) { // สมมุติตัวอย่างเงื่อนไขเกียรตินิยม
+                honorsCount++;
+            } else {
+                normalCount++;
+            }
+        });
+
+        // 3. เริ่มวาดกราฟลงบน Canvas
+        const ctx = document.getElementById('honorsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut', // ใช้กราฟทรงโดนัท สวยงามและประหยัดพื้นที่ Dashboard
+            data: {
+                labels: ['สถานะปกติ', 'เฝ้าระวัง/ตกค้าง', 'เกณฑ์เกียรตินิยม'],
+                datasets: [{
+                    data: [normalCount, probationCount, honorsCount],
+                    backgroundColor: [
+                        '#10B981', // สีเขียว Emerald
+                        '#EF4444', // สีแดง Red
+                        '#F59E0B'  // สีส้ม Amber
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom', // เอาป้ายคำอธิบายไปไว้ด้านล่าง
+                        labels: {
+                            boxWidth: 12,
+                            font: { size: 11, family: 'Kanit' }
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Error loading chart statistics:", error);
+    }
+}
+
+// 💡 อย่าลืมใส่คำสั่งนี้ไว้ในฟังก์ชันตอนที่แอดมินล็อกอินสำเร็จ หรือตอนโหลดหน้าแผงควบคุมเสร็จด้วยนะครับ
+// initHonorsChart();
     </script>
 </body>
 </html>
