@@ -459,8 +459,16 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 // ---------------------------------------
 
-        let currentUser = {};
-        const TOTAL_CREDITS = 141;
+        // 🌟 ตารางเก็บเกณฑ์หน่วยกิตรวมที่ต้องเรียนจบของแต่ละปี
+        const REQUIRED_CREDITS = {
+            "2563": 149, 
+            "2564": 149, 
+            "2565": 149, 
+            "2566": 149, 
+            "2567": 141, 
+            "2568": 141,
+            "2569": 141 
+        };
         let currentTotalCredits = 0; // 🌟 ตัวแปรกลางเก็บหน่วยกิตปัจจุบัน
         let currentTotalPoints = 0;  // 🌟 ตัวแปรกลางเก็บแต้มคะแนนปัจจุบัน
         
@@ -541,6 +549,10 @@ const db = firebase.firestore();
         ];
         // 🌟 สร้างระบบแยกเล่มหลักสูตร (Curriculum Routing)
         const CURRICULUMS = {
+            "2563": BASE_COURSES, // 👈 เติมเพิ่ม
+            "2564": BASE_COURSES, // 👈 เติมเพิ่ม
+            "2565": BASE_COURSES, // 👈 เติมเพิ่ม
+            "2566": BASE_COURSES, // 👈 เติมเพิ่ม
             "2567": BASE_COURSES,
             "2568": BASE_COURSES, // ตอนนี้ดึงข้อมูลของ 67 ไปใช้พลางๆ ก่อน ถ้าวิชา 68 มาแล้วค่อยมาสร้างแยกทีหลัง
             "2569": BASE_COURSES  // เหมือนกันครับ ดึงของ 67 ไปก่อน
@@ -849,6 +861,10 @@ function showRegisterPopup() {
             
             <select id="regCurriculumYear" class="swal2-input text-sm !mx-0 !w-full !mt-3 bg-white" style="height: 50px; padding: 0 12px; border-color: #e2e8f0;">
                 <option value="" disabled selected>-- เลือกปีโครงสร้างหลักสูตร --</option>
+                <option value="2563">หลักสูตร พ.ศ. 2563</option>
+                <option value="2564">หลักสูตร พ.ศ. 2564</option>
+                <option value="2565">หลักสูตร พ.ศ. 2565</option>
+                <option value="2566">หลักสูตร พ.ศ. 2566</option>
                 <option value="2567">หลักสูตร พ.ศ. 2567</option>
                 <option value="2568">หลักสูตร พ.ศ. 2568</option>
                 <option value="2569">หลักสูตร พ.ศ. 2569</option>
@@ -1229,16 +1245,20 @@ function calculateStatus(totalCr) {
             currentTotalCredits = totalCr;
             currentTotalPoints = totalPt;
             
-            let remaining = Math.max(0, TOTAL_CREDITS - totalCr);
+            // 🌟 1. ดึงเป้าหมายหน่วยกิตตามชั้นปีของเด็กที่ล็อกอิน (ถ้าไม่มีข้อมูลให้ใช้ 141 เป็นค่าเริ่มต้น)
+            let targetCr = REQUIRED_CREDITS[currentUser.year] || 141;
+            
+            // 🌟 2. คำนวณส่วนที่เหลือและเปอร์เซ็นต์ โดยเปลี่ยนไปใช้ targetCr แทน
+            let remaining = Math.max(0, targetCr - totalCr);
             document.getElementById('remainingCredits').innerText = remaining;
             document.getElementById('totalCredits').innerText = totalCr;
             document.getElementById('passedCount').innerText = count;
             
-            let perc = Math.min(100, (totalCr/TOTAL_CREDITS)*100);
+            let perc = Math.min(100, (totalCr/targetCr)*100);
             document.getElementById('progressText').innerText = perc.toFixed(1) + '%';
             document.getElementById('progressBar').style.width = perc + '%';
 
-            // 🎯 เพิ่มป้ายสถานะมุมขวาบนตรงนี้
+            // 🎯 เพิ่มป้ายสถานะมุมขวาบนตรงนี้ (ส่วนนี้ลงไปปล่อยไว้เหมือนเดิมเลยครับ)
             let badge = document.getElementById('honorsBadge');
             badge.classList.remove('hidden'); // แสดงป้ายเสมอ
 
@@ -1656,11 +1676,19 @@ function syncCoursesToDB() {
             
             try {
                 let batch = db.batch();
-                
+
+                let curRef63 = db.collection("Curriculums").doc("2563"); // 👈 เติมเพิ่ม
+let curRef64 = db.collection("Curriculums").doc("2564"); // 👈 เติมเพิ่ม
+let curRef65 = db.collection("Curriculums").doc("2565"); // 👈 เติมเพิ่ม
+let curRef66 = db.collection("Curriculums").doc("2566"); // 👈 เติมเพิ่ม
                 let curRef67 = db.collection("Curriculums").doc("2567");
                 let curRef68 = db.collection("Curriculums").doc("2568");
                 let curRef69 = db.collection("Curriculums").doc("2569");
-                
+
+                batch.set(curRef63, { year: "2563", courses: BASE_COURSES });
+                batch.set(curRef64, { year: "2564", courses: BASE_COURSES }); 
+                batch.set(curRef65, { year: "2565", courses: BASE_COURSES });
+                batch.set(curRef65, { year: "2566", courses: BASE_COURSES }); 
                 batch.set(curRef67, { year: "2567", courses: BASE_COURSES });
                 batch.set(curRef68, { year: "2568", courses: BASE_COURSES }); 
                 batch.set(curRef69, { year: "2569", courses: BASE_COURSES }); 
