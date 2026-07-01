@@ -86,7 +86,7 @@
 </head>
 <body class="antialiased selection:bg-indigo-100">
 
-    <div id="loginSection" class="min-h-[100dvh] flex flex-col items-center justify-start md:justify-center p-4 md:p-8 bg-[#f4f7fb] relative overflow-hidden">
+    <div id="loginSection" class="min-h-[100dvh] flex flex-col items-center justify-start p-4 md:p-8 bg-[#f4f7fb] relative overflow-hidden">
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-200/40 rounded-full blur-[80px] pointer-events-none"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/40 rounded-full blur-[80px] pointer-events-none"></div>
 
@@ -109,7 +109,7 @@
         </div>
     </div>
 
-<div id="studentLoginBox" class="relative bg-white/80 backdrop-blur-2xl px-6 pt-8 pb-12 sm:p-10 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all flex flex-col justify-center mx-auto mt-10 mb-6 sm:mt-16 md:mt-auto md:mb-auto">
+        <div id="studentLoginBox" class="relative bg-white/80 backdrop-blur-2xl px-6 pt-8 pb-12 sm:p-10 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all flex flex-col justify-center mx-auto mt-10 sm:mt-16 mb-6">
     
             <div class="w-16 h-16 md:w-20 md:h-20 gradient-theme rounded-[1rem] md:rounded-[1.5rem] shadow-theme flex items-center justify-center mx-auto mb-5 md:mb-6 animate-float">
                 <i class="fa-solid fa-graduation-cap text-3xl md:text-4xl text-white"></i>
@@ -120,15 +120,16 @@
             
             <form onsubmit="event.preventDefault(); loginWithUsername();" class="space-y-3.5 md:space-y-4 text-left w-full">
                 <div class="relative">
-    <i class="fa-solid fa-user absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
-    <input type="text" id="username" name="username" autocomplete="username" class="lang-placeholder w-full pl-10 md:pl-12 pr-4 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="ชื่อผู้ใช้งาน (Username)">
-</div>
+                    <i class="fa-solid fa-user absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
+                    <input type="text" id="username" name="username" class="lang-placeholder w-full pl-10 md:pl-12 pr-4 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="ชื่อผู้ใช้งาน (Username)">
+                </div>
+                
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
+                    <input type="password" id="password" name="password" class="lang-placeholder w-full pl-10 md:pl-12 pr-10 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="รหัสผ่าน">
+                    <i class="fa-solid fa-eye-slash absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base cursor-pointer hover:text-green-600 transition" onclick="togglePassword('password', this)"></i>
+                </div>
 
-<div class="relative">
-    <i class="fa-solid fa-lock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base"></i>
-    <input type="password" id="password" name="password" autocomplete="current-password" class="lang-placeholder w-full pl-10 md:pl-12 pr-10 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:bg-white hover:border-green-500 focus:ring-4 focus:ring-green-500/10 transition text-sm md:text-base font-medium" placeholder="รหัสผ่าน">
-    <i class="fa-solid fa-eye-slash absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 text-sm md:text-base cursor-pointer hover:text-green-600 transition" onclick="togglePassword('password', this)"></i>
-</div>
                 <div class="flex items-center justify-between mt-4 mb-4 px-1">
                     <label class="flex items-center text-sm text-slate-600 cursor-pointer hover:text-slate-800 transition">
                         <input type="checkbox" id="rememberMe" class="mr-2 w-4 h-4 rounded border-slate-300 text-theme focus:ring-theme focus:ring-2">
@@ -170,7 +171,8 @@
             <p class="mt-6 text-[9px] text-slate-400 font-light tracking-widest uppercase opacity-80">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</p>
 </div>
 
-<div id="adminLoginBox" class="hidden relative bg-white/80 backdrop-blur-2xl px-6 pt-8 pb-12 sm:p-12 md:p-14 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all flex flex-col justify-center mx-auto mt-10 mb-6 sm:mt-16 md:mt-auto md:mb-auto">    
+        <div id="adminLoginBox" class="hidden relative bg-white/80 backdrop-blur-2xl px-6 pt-8 pb-12 sm:p-12 md:p-14 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all flex flex-col justify-center mx-auto mt-10 sm:mt-16 mb-6">
+    
             <div class="w-16 h-16 md:w-20 md:h-20 admin-gradient-theme rounded-[1rem] md:rounded-[1.5rem] shadow-lg shadow-green-200/50 flex items-center justify-center mx-auto mb-5 md:mb-6 animate-float">
                 <i class="fa-solid fa-server text-3xl md:text-4xl text-white"></i>
             </div>
@@ -696,11 +698,10 @@ const db = firebase.firestore();
             didOpen: (toast) => { toast.onmouseenter = Swal.stopTimer; toast.onmouseleave = Swal.resumeTimer; }
         });
 
-        
-applyDynamicTheme(); 
-window.onload = function() {
-    updateLanguageUI(); // ส่วนนี้ปล่อยให้ทำงานตอนโหลดเสร็จเหมือนเดิมครับ
-};
+        window.onload = function() {
+            applyDynamicTheme(); 
+            updateLanguageUI(); 
+        };
 
         setInterval(() => {
             let d = new Date();
@@ -742,35 +743,23 @@ window.onload = function() {
         }
 
         function clearDashboardData() {
-    let loadingTxt = appLang === 'en' ? 'Loading data... 🚀' : 'กำลังดึงข้อมูลรายวิชา... รอสักครู่นะครับ 🚀';
-    
-    // 🛠️ ฟังก์ชันตัวช่วย: เช็คก่อนว่ามีกล่องอยู่จริงไหม ถึงจะเปลี่ยนค่า (ป้องกัน Error สีแดง)
-    const updateHTML = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-    const updateText = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
-
-    // ใช้ฟังก์ชันตัวช่วยจัดการข้อมูลทั้งหมด
-    updateHTML('courseContainer', `<div class="text-center py-24 text-slate-400 text-sm font-light"><i class="fa-solid fa-spinner fa-spin text-2xl text-theme mb-3"></i><br>${loadingTxt}</div>`);
-    updateHTML('passedContainer', '');
-    updateText('profileName', '-');
-    updateText('headerName', '-');
-    updateText('profileId', '-');
-    updateText('profileEmail', '-');
-    updateText('totalCredits', '0');
-    updateText('remainingCredits', '141');
-    updateText('passedCount', '0');
-    updateText('gpax', '0.00');
-    updateText('progressText', '0%');
-    
-    // สำหรับ Style และ Class ก็ต้องเช็คก่อนทำเหมือนกัน
-    const progressBar = document.getElementById('progressBar');
-    if (progressBar) progressBar.style.width = '0%';
-    
-    const honorsBadge = document.getElementById('honorsBadge');
-    if (honorsBadge) honorsBadge.classList.add('hidden');
-    
-    updateHTML('passedSummary', '');
-    passedCoursesList = [];
-}
+            let loadingTxt = appLang === 'en' ? 'Loading data... 🚀' : 'กำลังดึงข้อมูลรายวิชา... รอสักครู่นะครับ 🚀';
+            document.getElementById('courseContainer').innerHTML = `<div class="text-center py-24 text-slate-400 text-sm font-light"><i class="fa-solid fa-spinner fa-spin text-2xl text-theme mb-3"></i><br>${loadingTxt}</div>`;
+            document.getElementById('passedContainer').innerHTML = '';
+            document.getElementById('profileName').innerText = '-';
+            document.getElementById('headerName').innerText = '-';
+            document.getElementById('profileId').innerText = '-';
+            document.getElementById('profileEmail').innerText = '-';
+            document.getElementById('totalCredits').innerText = '0';
+            document.getElementById('remainingCredits').innerText = '141';
+            document.getElementById('passedCount').innerText = '0';
+            document.getElementById('gpax').innerText = '0.00';
+            document.getElementById('progressText').innerText = '0%';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('honorsBadge').classList.add('hidden');
+            document.getElementById('passedSummary').innerHTML = '';
+            passedCoursesList = [];
+        }
 
        function login(loginType) {
     Swal.fire({ title: appLang === 'en' ? 'Logging in...' : 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
