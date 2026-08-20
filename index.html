@@ -2968,7 +2968,6 @@ function compressImageToBase64(file) {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // จำกัดขนาดภาพไม่ให้เกิน 800px เพื่อประหยัดพื้นที่ฐานข้อมูล
                 const MAX_SIZE = 800;
                 let width = img.width;
                 let height = img.height;
@@ -2985,7 +2984,6 @@ function compressImageToBase64(file) {
                 canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // บีบอัดเป็น JPEG ลดคุณภาพเหลือ 60%
                 resolve(canvas.toDataURL('image/jpeg', 0.6));
             };
             img.onerror = error => reject(error);
@@ -3116,7 +3114,6 @@ function showAddActivityModal() {
                 const file = document.getElementById('actImage').files[0];
                 if (!data.title || isNaN(data.hours) || data.hours <= 0) return Swal.showValidationMessage('กรุณากรอกชื่อและชั่วโมงให้ถูกต้อง');
                 
-                // ประมวลผลภาพถ้ามีการแนบมา
                 if (file) {
                     try {
                         data.imageBase64 = await compressImageToBase64(file);
@@ -3151,7 +3148,7 @@ async function saveActivityData(data) {
 
         if (data.type === 'กยศ') {
             savePayload.hours = data.hours;
-            savePayload.imageUrl = data.imageBase64 || ''; // เซฟ Base64 ลง Firebase ตรงๆ
+            savePayload.imageUrl = data.imageBase64 || ''; 
         } else {
             savePayload.category = data.category;
             savePayload.subCategory = data.subCategory;
@@ -3226,7 +3223,6 @@ async function loadActivities() {
     } catch (e) { console.error("Error:", e); }
 }
 
-// ฟังก์ชันสำหรับเปิดดูภาพขยาย
 function viewImage(imgUrl) {
     Swal.fire({
         imageUrl: imgUrl,
@@ -3237,7 +3233,6 @@ function viewImage(imgUrl) {
     });
 }
 
-// ฟังก์ชันดูรายละเอียดกิจกรรมครู (ปุ่มดวงตา)
 async function viewKruActivity(id) {
     try {
         const doc = await db.collection("Users").doc(currentUser.id).collection("Activities").doc(id).get();
