@@ -23,9 +23,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
         
         :root {
             --primary-theme: #4f46e5;
@@ -94,7 +94,7 @@
         <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/40 rounded-full blur-[80px] pointer-events-none"></div>
 
         <!-- แถบเมนูด้านบน (ปรับปรุงให้ Responsive ไม่ล้นขอบจอ) -->
-<div class="absolute top-4 md:top-6 w-full max-w-5xl px-4 md:px-8 z-20 flex flex-wrap justify-center md:justify-between items-center gap-2 md:gap-4 left-1/2 -translate-x-1/2">
+<div id="topNavbar" class="absolute top-4 md:top-6 w-full max-w-5xl px-4 md:px-8 z-20 flex flex-wrap justify-center md:justify-between items-center gap-2 md:gap-4 left-1/2 -translate-x-1/2 transition-opacity duration-300">
     
     <!-- ฝั่งซ้าย (มือถือจะขึ้นบรรทัดแรก) -->
     <div class="flex items-center gap-2">
@@ -966,17 +966,24 @@ window.onload = function() {
     document.getElementById('studentLoginBox').classList.add('hidden');
     document.getElementById('adminLoginBox').classList.add('hidden');
     
-    // ตรวจสอบว่ามีกล่อง AI ไหม ถ้ามีให้ปิดด้วย
+    // ตรวจสอบว่ามีกล่อง AI และแถบเมนูบนไหม
     const aiToolBox = document.getElementById('aiToolBox');
+    const topNavbar = document.getElementById('topNavbar'); // 📍 ดึงตัวแปรแถบเมนู
+    
     if (aiToolBox) aiToolBox.classList.add('hidden');
 
-    // เปิดกล่องตามที่กดมา
+    // เปิดกล่องตามที่กดมา และจัดการซ่อน/โชว์เมนูด้านบน
     if (type === 'admin') {
         document.getElementById('adminLoginBox').classList.remove('hidden');
+        if (topNavbar) topNavbar.classList.remove('opacity-0', 'pointer-events-none'); 
     } else if (type === 'aiTool') {
         aiToolBox.classList.remove('hidden');
+        // 📍 ซ่อนเมนูด้านบนเมื่อเปิดหน้า AI เพื่อลดความแออัด
+        if (topNavbar) topNavbar.classList.add('opacity-0', 'pointer-events-none'); 
     } else {
         document.getElementById('studentLoginBox').classList.remove('hidden');
+        // 📍 แสดงเมนูด้านบนกลับมาเมื่ออยู่หน้าล็อกอินปกติ
+        if (topNavbar) topNavbar.classList.remove('opacity-0', 'pointer-events-none'); 
     }
 }
 
