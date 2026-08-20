@@ -591,47 +591,48 @@
             <div id="passedContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-5xl mx-auto"></div>
         </div>
             
-<!-- 📍 หน้าต่างบริการนักศึกษา (e-Service Hub ฉบับ Minimalist & ฟังก์ชันครบ) -->
-<div id="serviceTab" class="hidden-section space-y-8 max-w-4xl mx-auto text-left">
-    
-    <!-- วิดเจ็ต: สมุดบันทึกกิจกรรมและจิตอาสา -->
-    <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden">
-        <div class="absolute top-0 right-0 px-4 py-1.5 bg-slate-50 text-slate-400 text-[9px] md:text-[10px] font-bold rounded-bl-xl z-20">📌 ทางเลือก (Optional)</div>
-        <div class="absolute -top-10 -right-10 w-40 h-40 bg-orange-50 rounded-full -z-0 opacity-50"></div>
-        
-        <div class="relative z-10">
-            <div class="flex flex-col md:flex-row gap-6 items-center mb-6">
-                <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.5rem] bg-gradient-to-br from-orange-100 to-amber-100 text-orange-500 flex items-center justify-center text-2xl md:text-3xl shadow-sm border border-orange-200 flex-shrink-0">
-                    <i class="fa-solid fa-hand-holding-heart"></i>
-                </div>
-                <div class="flex-1 w-full text-center md:text-left">
-                    <h3 class="text-base md:text-lg font-bold text-slate-800 mb-1">สมุดบันทึกกิจกรรมมหาลัย / จิตอาสา (กยศ.)</h3>
-                    <p class="text-xs text-slate-500 mb-4">สะสมชั่วโมงกิจกรรม คอร์สเรียนออนไลน์ หรือเกียรติบัตร (เกณฑ์ กยศ. 36 ชม./ปี)</p>
-                    
-                    <div class="flex justify-between items-end mb-2">
-                        <span class="text-[10px] md:text-xs font-bold text-orange-500 uppercase tracking-widest">ชั่วโมงสะสมปีนี้</span>
-                        <span class="text-sm md:text-base font-bold text-slate-800"><span id="volunteerHours">0</span> <span class="text-slate-400 text-xs">/ 36 ชั่วโมง</span></span>
+<!-- วิดเจ็ต: สมุดบันทึกกิจกรรม (กยศ. / กิจกรรมครู) -->
+            <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 px-4 py-1.5 bg-slate-50 text-slate-400 text-[9px] md:text-[10px] font-bold rounded-bl-xl z-20">📌 E-Portfolio</div>
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-orange-50 rounded-full -z-0 opacity-50"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row gap-6 items-start md:items-center">
+                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.5rem] bg-gradient-to-br from-orange-100 to-amber-100 text-orange-500 flex items-center justify-center text-2xl md:text-3xl shadow-sm border border-orange-200 flex-shrink-0">
+                        <i class="fa-solid fa-address-book"></i>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner mb-4">
-                        <div id="volunteerProgressBar" class="bg-gradient-to-r from-orange-400 to-amber-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    <div class="flex-1 w-full text-center md:text-left">
+                        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-1">สมุดบันทึกกิจกรรม กยศ. / กิจกรรมคณะ</h3>
+                        <p class="text-[11px] md:text-xs text-slate-500 mb-4">ระบบบันทึกชั่วโมงจิตอาสา และกิจกรรมเสริมความเป็นครู 5 หมวด</p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <!-- แถบ กยศ -->
+                            <div class="text-left bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-orange-500 uppercase">ชั่วโมง กยศ.</p>
+                                <p class="text-sm font-bold text-slate-800"><span id="volunteerHours">0</span><span class="text-[10px] text-slate-400">/36 ชม.</span></p>
+                                <div class="w-full bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden"><div id="volunteerProgressBar" class="bg-orange-400 h-full rounded-full transition-all" style="width: 0%"></div></div>
+                            </div>
+                            <!-- แถบ กิจกรรมครู -->
+                            <div class="text-left bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-blue-500 uppercase">กิจกรรมเสริมความเป็นครู</p>
+                                <p class="text-sm font-bold text-slate-800"><span id="kruActCount">0</span><span class="text-[10px] text-slate-400"> รายการ</span></p>
+                                <div class="w-full bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden"><div class="bg-blue-400 h-full rounded-full w-full"></div></div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="showAddActivityModal()" class="w-full md:w-auto text-xs font-bold bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 px-5 py-2.5 rounded-xl transition active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-circle-plus"></i> บันทึกกิจกรรมใหม่
+                        </button>
                     </div>
-                    
-                    <button onclick="showAddActivityModal()" class="text-xs font-bold bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 px-4 py-2.5 rounded-xl transition active:scale-95 flex items-center gap-2 md:mx-0 mx-auto shadow-sm">
-                        <i class="fa-solid fa-circle-plus"></i> เพิ่มรายการกิจกรรม / เกียรติบัตร
-                    </button>
                 </div>
-            </div>
 
-            <!-- รายการกิจกรรมที่บันทึกไว้ -->
-            <div class="border-t border-slate-100 pt-4">
-                <p class="text-xs font-bold text-slate-700 mb-3"><i class="fa-solid fa-clock-rotate-left text-orange-400 mr-1"></i> ประวัติกิจกรรมที่บันทึกไว้</p>
-                <div id="activityListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <!-- รายการกิจกรรมจะถูก Render จาก Firebase ตรงนี้ -->
-                    <div class="text-center py-6 text-slate-400 text-xs col-span-full bg-slate-50 rounded-xl border border-dashed border-slate-200">ยังไม่มีรายการกิจกรรมที่บันทึก</div>
+                <!-- รายการกิจกรรมที่บันทึกไว้ -->
+                <div class="border-t border-slate-100 pt-5 mt-5">
+                    <p class="text-xs font-bold text-slate-700 mb-3"><i class="fa-solid fa-clock-rotate-left text-orange-400 mr-1"></i> ประวัติกิจกรรมที่บันทึกไว้ล่าสุด</p>
+                    <div id="activityListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+                        <div class="text-center py-6 text-slate-400 text-xs col-span-full bg-slate-50 rounded-xl border border-dashed border-slate-200">ยังไม่มีรายการกิจกรรมที่บันทึก</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
     <!-- เครื่องมือจัดการไฟล์ Offline -->
     <div>
@@ -745,6 +746,101 @@
     </div>
 
 </div>
+            <!-- ============================================== -->
+            <!-- ศูนย์รวมเครื่องมือ AI สำหรับการศึกษา (AI Education Hub) -->
+            <!-- ============================================== -->
+            <div class="pt-2">
+                <div class="flex items-center justify-between mb-5 border-l-[4px] border-purple-500 pl-3">
+                    <h4 class="font-bold text-slate-800 text-sm md:text-base uppercase tracking-wider">ศูนย์รวม AI สำหรับการศึกษา</h4>
+                    <span class="bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full text-[9px] font-bold hidden sm:flex items-center gap-1"><i class="fa-solid fa-microchip"></i> AI Education Hub</span>
+                </div>
+
+                <div class="space-y-5">
+                    
+                    <!-- หมวดที่ 1: แชทบอท & ค้นคว้า (Chatbots & Research) -->
+                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[11px] md:text-xs font-bold text-slate-500 mb-3"><i class="fa-solid fa-robot text-blue-500 mr-1"></i> 1. ผู้ช่วยถาม-ตอบ & ค้นคว้าวิจัย</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <a href="https://chatgpt.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-emerald-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-comment-dots"></i></div>
+                                <div><p class="font-bold text-slate-700 text-xs">ChatGPT</p></div>
+                            </a>
+                            <a href="https://gemini.google.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-blue-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" class="w-5 h-5">
+                                </div>
+                                <div><p class="font-bold text-slate-700 text-xs">Google Gemini</p></div>
+                            </a>
+                            <a href="https://claude.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-orange-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-feather"></i></div>
+                                <div><p class="font-bold text-slate-700 text-xs">Claude AI</p></div>
+                            </a>
+                            <a href="https://www.perplexity.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-cyan-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-cyan-50 text-cyan-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                                <div><p class="font-bold text-slate-700 text-xs">Perplexity</p></div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- หมวดที่ 2: สร้างสื่อ & งานนำเสนอ (Media & Presentation) -->
+                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[11px] md:text-xs font-bold text-slate-500 mb-3"><i class="fa-solid fa-palette text-pink-500 mr-1"></i> 2. สร้างสื่อ นำเสนอ & รูปภาพ</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <a href="https://gamma.app" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-purple-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-presentation-screen"></i></div>
+                                <div><p class="font-bold text-slate-700 text-xs">Gamma App</p></div>
+                            </a>
+                            <a href="https://www.canva.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-indigo-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-object-group"></i></div>
+                                <div><p class="font-bold text-slate-700 text-xs">Canva Magic</p></div>
+                            </a>
+                            <a href="https://www.bing.com/images/create" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-pink-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-image"></i></div>
+                                <div><p class="font-bold text-slate-700 text-xs">Bing Image Creator</p></div>
+                            </a>
+                            <a href="https://www.remove.bg/th" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-fuchsia-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-fuchsia-50 text-fuchsia-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-eraser"></i></div>
+                                <div><p class="font-bold text-slate-700 text-xs">Remove.bg</p></div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- หมวดที่ 3: ผู้ช่วยครู & ข้อสอบ (Teacher Tools) -->
+                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                        <p class="text-[11px] md:text-xs font-bold text-slate-500 mb-3"><i class="fa-solid fa-graduation-cap text-amber-500 mr-1"></i> 3. เครื่องมือสำหรับครู & แบบทดสอบ</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <a href="https://www.magicschool.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-amber-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <div>
+                                    <p class="font-bold text-slate-700 text-xs">MagicSchool AI</p>
+                                    <p class="text-[9px] text-slate-400 mt-0.5">เจนใบงาน/รูบริก</p>
+                                </div>
+                            </a>
+                            <a href="https://quizizz.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-violet-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-gamepad"></i></div>
+                                <div>
+                                    <p class="font-bold text-slate-700 text-xs">Quizizz AI</p>
+                                    <p class="text-[9px] text-slate-400 mt-0.5">สร้างเกมข้อสอบ</p>
+                                </div>
+                            </a>
+                            <a href="https://questionwell.org/" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-rose-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-clipboard-question"></i></div>
+                                <div>
+                                    <p class="font-bold text-slate-700 text-xs">QuestionWell</p>
+                                    <p class="text-[9px] text-slate-400 mt-0.5">ดึงคำถามจากเนื้อหา</p>
+                                </div>
+                            </a>
+                            <a href="https://beta.diffit.me/" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-teal-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-layer-group"></i></div>
+                                <div>
+                                    <p class="font-bold text-slate-700 text-xs">Diffit</p>
+                                    <p class="text-[9px] text-slate-400 mt-0.5">แปลงความยากเนื้อหา</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
         <div class="text-center mt-16 text-xs text-slate-400 font-light tracking-widest uppercase lang-txt" data-th="&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์" data-en="&copy; 2026 Created by PONGPAK CHOKRAK">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</div>
     </div>
@@ -2808,33 +2904,82 @@ async function addPdfNumbers() {
     }
 }
 
-        // =========================================================
-// ⏱️ ระบบบันทึกกิจกรรม & อัปโหลดรูปภาพแปลงเป็นลิงก์ (ImgBB API)
+       // =========================================================
+// ⏱️ ระบบบันทึกกิจกรรมมหาลัย (กยศ. & กิจกรรมเสริมความเป็นครู)
 // =========================================================
 
-// 1. ฟังก์ชันเปิด Modal กรอกข้อมูลกิจกรรม
 function showAddActivityModal() {
     Swal.fire({
-        title: '<span class="text-base md:text-lg font-bold text-slate-800">บันทึกกิจกรรม / ชั่วโมงจิตอาสา</span>',
+        title: '<span class="text-base md:text-lg font-bold text-slate-800">บันทึกกิจกรรมใหม่</span>',
         html: `
-            <div class="space-y-3 text-left pt-2">
+            <div class="mb-4 text-left">
+                <label class="text-[11px] font-bold text-slate-500 ml-1">ประเภทการบันทึก</label>
+                <select id="actTypeSelect" class="w-full px-3 py-2 bg-orange-50 border border-orange-200 text-orange-700 rounded-xl outline-none text-sm font-bold">
+                    <option value="กยศ">จิตอาสา / กิจกรรม (กยศ.)</option>
+                    <option value="ครู">กิจกรรมเสริมความเป็นครู</option>
+                </select>
+            </div>
+
+            <!-- ฟอร์ม กยศ. -->
+            <div id="formKYS" class="space-y-3 text-left">
                 <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">ชื่อกิจกรรม / คอร์สเรียน</label>
-                    <input id="actTitle" class="swal2-input !w-full !m-0 !mt-1 !text-xs md:!text-sm !rounded-xl" placeholder="เช่น อบรมออนไลน์ทักษะครูประถม">
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">ชื่อกิจกรรม</label>
+                    <input id="actTitleKYS" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="เช่น บริจาคโลหิต, เรียนออนไลน์">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-[11px] font-bold text-slate-500 ml-1">จำนวนชั่วโมง</label>
-                        <input id="actHours" type="number" step="0.5" class="swal2-input !w-full !m-0 !mt-1 !text-xs md:!text-sm !rounded-xl" placeholder="เช่น 3">
+                        <input id="actHours" type="number" step="0.5" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="เช่น 3">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-500 ml-1">วันที่ทำกิจกรรม</label>
-                        <input id="actDate" type="date" class="swal2-input !w-full !m-0 !mt-1 !text-xs md:!text-sm !rounded-xl" value="${new Date().toISOString().split('T')[0]}">
+                        <input id="actDateKYS" type="date" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" value="${new Date().toISOString().split('T')[0]}">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">แนบภาพเกียรติบัตร / หลักฐาน (ถ้ามี)</label>
-                    <input id="actImage" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-orange-50 file:text-orange-600 hover:file:bg-orange-100 cursor-pointer border border-slate-200 rounded-xl p-1 mt-1 bg-slate-50">
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">อัปโหลดภาพหลักฐาน (แปลงเป็นลิงก์อัตโนมัติ)</label>
+                    <input id="actImage" type="file" accept="image/*" class="w-full text-xs text-slate-500 border border-slate-200 rounded-xl p-1 mt-1 bg-slate-50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-orange-100 file:text-orange-700 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- ฟอร์ม กิจกรรมครู -->
+            <div id="formKru" class="space-y-3 text-left hidden max-h-[50vh] overflow-y-auto px-1 custom-scrollbar">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">ชื่อโครงการ / กิจกรรม</label>
+                    <input id="actTitleKru" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="ระบุชื่อโครงการ">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">หมวดหมู่กิจกรรม</label>
+                    <select id="actCategory" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm mb-2 outline-none">
+                        <option value="1">หมวดที่ 1 ปลูกฝังอัตลักษณ์พื้นฐานความเป็นครู</option>
+                        <option value="2">หมวดที่ 2 ส่งเสริมสมรรถภาพและความสามารถส่วนบุคคล</option>
+                        <option value="3">หมวดที่ 3 ส่งเสริมทักษะสังคม การมีส่วนร่วมฯ</option>
+                        <option value="4">หมวดที่ 4 ส่งเสริมความสามารถทางวิชาการฯ</option>
+                        <option value="5">หมวดที่ 5 กิจกรรมอื่นๆ</option>
+                    </select>
+                    <select id="actSubCategory" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-[11px] text-slate-600 bg-slate-50 outline-none"></select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 ml-1">วัน/เวลา</label>
+                        <input id="actDateKru" type="datetime-local" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 ml-1">หน่วยงานรับผิดชอบ</label>
+                        <input id="actAgency" type="text" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none" placeholder="เช่น คณะศึกษาศาสตร์">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">สรุปองค์ความรู้ที่ได้</label>
+                    <textarea id="actKnowledge" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none" placeholder="วัตถุประสงค์โครงการ, เนื้อหา/กิจกรรมที่เกิดขึ้น..."></textarea>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">ความคิดเห็นต่อเนื้อหา (เขียนเป็นข้อๆ)</label>
+                    <textarea id="actOpinion" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none" placeholder="1...\n2..."></textarea>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">การนำความรู้ไปใช้ในวิชาชีพครู (เขียนเป็นข้อๆ)</label>
+                    <textarea id="actApplication" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none" placeholder="1...\n2..."></textarea>
                 </div>
             </div>
         `,
@@ -2843,129 +2988,156 @@ function showAddActivityModal() {
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: 'var(--primary-theme)',
         customClass: { popup: 'rounded-[2rem]' },
+        didOpen: () => {
+            const typeSelect = document.getElementById('actTypeSelect');
+            const formKYS = document.getElementById('formKYS');
+            const formKru = document.getElementById('formKru');
+            const catSelect = document.getElementById('actCategory');
+            const subCatSelect = document.getElementById('actSubCategory');
+
+            const subCats = {
+                "1": ["กิจกรรมศรัทธามุ่งมั่น และรักอาชีพครู", "กิจกรรมรักชาติ ศาสน์ กษัตริย์ ความเป็นไทย", "กิจกรรมรักษ์ ศิลปะดนตรี นาฏศิลป์สืบสานวัฒนธรรม"],
+                "2": ["กิจกรรมเสริมสร้างสุขภาวะที่สมบูรณ์", "กิจกรรมส่งเสริมสุขภาพ กีฬา และนันทนาการ"],
+                "3": ["กิจกรรมตระหนักถึงความเป็นพลเมืองไทยและพลเมืองโลก", "กิจกรรมจิตอาสาและจิตสาธารณะ"],
+                "4": ["กิจกรรมความรอบรู้ทางวิชาการและความสามารถในการประยุกต์ใช้"],
+                "5": ["กิจกรรมอื่นๆ"]
+            };
+
+            const updateSubCats = () => {
+                subCatSelect.innerHTML = subCats[catSelect.value].map(sc => `<option value="${sc}">${sc}</option>`).join('');
+            };
+            updateSubCats();
+            catSelect.addEventListener('change', updateSubCats);
+
+            typeSelect.addEventListener('change', (e) => {
+                if(e.target.value === 'กยศ') {
+                    formKYS.classList.remove('hidden'); formKru.classList.add('hidden');
+                    typeSelect.className = "w-full px-3 py-2 bg-orange-50 border border-orange-200 text-orange-700 rounded-xl outline-none text-sm font-bold";
+                } else {
+                    formKYS.classList.add('hidden'); formKru.classList.remove('hidden');
+                    typeSelect.className = "w-full px-3 py-2 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl outline-none text-sm font-bold";
+                }
+            });
+        },
         preConfirm: async () => {
-            const title = document.getElementById('actTitle').value.trim();
-            const hours = parseFloat(document.getElementById('actHours').value);
-            const date = document.getElementById('actDate').value;
-            const imageFile = document.getElementById('actImage').files[0];
+            const type = document.getElementById('actTypeSelect').value;
+            let data = { type: type };
 
-            if (!title || isNaN(hours) || hours <= 0) {
-                Swal.showValidationMessage('กรุณากรอกชื่อกิจกรรมและระบุชั่วโมงให้ถูกต้อง');
-                return false;
+            if (type === 'กยศ') {
+                data.title = document.getElementById('actTitleKYS').value.trim();
+                data.hours = parseFloat(document.getElementById('actHours').value);
+                data.date = document.getElementById('actDateKYS').value;
+                data.imageFile = document.getElementById('actImage').files[0];
+                if (!data.title || isNaN(data.hours) || data.hours <= 0) return Swal.showValidationMessage('กรุณากรอกชื่อและชั่วโมงให้ถูกต้อง');
+            } else {
+                data.title = document.getElementById('actTitleKru').value.trim();
+                data.category = document.getElementById('actCategory').options[document.getElementById('actCategory').selectedIndex].text;
+                data.subCategory = document.getElementById('actSubCategory').value;
+                data.date = document.getElementById('actDateKru').value;
+                data.agency = document.getElementById('actAgency').value.trim();
+                data.knowledge = document.getElementById('actKnowledge').value.trim();
+                data.opinion = document.getElementById('actOpinion').value.trim();
+                data.application = document.getElementById('actApplication').value.trim();
+                if (!data.title) return Swal.showValidationMessage('กรุณาระบุชื่อโครงการ');
             }
-
-            return { title, hours, date, imageFile };
+            return data;
         }
     }).then(async (result) => {
-        if (result.isConfirmed) {
-            await saveActivityData(result.value);
-        }
+        if (result.isConfirmed) await saveActivityData(result.value);
     });
 }
 
-// 2. ฟังก์ชันอัปโหลดภาพไป ImgBB (แปลงไฟล์เป็น URL ฟรี) และบันทึกลง Firestore
 async function saveActivityData(data) {
     Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    
-    let imageUrl = '';
-
     try {
-        // ถ้ามีการแนบภาพ ให้ส่งไปแปลงเป็น URL ที่ ImgBB
-        if (data.imageFile) {
-            const formData = new FormData();
-            formData.append("image", data.imageFile);
-            
-            // 💡 ใช้ API Key สาธารณะของ ImgBB สำหรับอัปโหลด
-            const res = await fetch("https://api.imgbb.com/1/upload?key=6d207e02198a847aa5ea3d0a77b81261", {
-                method: "POST",
-                body: formData
-            });
-            const imgRes = await res.json();
-            if (imgRes.success) {
-                imageUrl = imgRes.data.url; // ได้ลิงก์ภาพมาเก็บไว้
+        let savePayload = { 
+            type: data.type, title: data.title, date: data.date, createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+        };
+
+        if (data.type === 'กยศ') {
+            savePayload.hours = data.hours;
+            savePayload.imageUrl = '';
+            // โหลดรูปขึ้น ImgBB อัตโนมัติ ป้องกันฐานข้อมูลเต็ม
+            if (data.imageFile) {
+                const formData = new FormData();
+                formData.append("image", data.imageFile);
+                const res = await fetch("https://api.imgbb.com/1/upload?key=6d207e02198a847aa5ea3d0a77b81261", { method: "POST", body: formData });
+                const imgRes = await res.json();
+                if (imgRes.success) savePayload.imageUrl = imgRes.data.url;
             }
+        } else {
+            savePayload.category = data.category;
+            savePayload.subCategory = data.subCategory;
+            savePayload.agency = data.agency;
+            savePayload.knowledge = data.knowledge;
+            savePayload.opinion = data.opinion;
+            savePayload.application = data.application;
         }
 
-        // บันทึกลง Firestore (เฉพาะลิงก์ภาพและข้อมูลกิจกรรม)
-        await db.collection("Users").doc(currentUser.id).collection("Activities").add({
-            title: data.title,
-            hours: data.hours,
-            date: data.date,
-            imageUrl: imageUrl,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
+        await db.collection("Users").doc(currentUser.id).collection("Activities").add(savePayload);
         Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', timer: 1200, showConfirmButton: false });
-        loadActivities(); // โหลดรายการกิจกรรมใหม่
+        loadActivities();
     } catch (error) {
-        console.error("Error saving activity:", error);
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถบันทึกกิจกรรมได้: ' + error.message, 'error');
+        Swal.fire('ข้อผิดพลาด', 'บันทึกไม่สำเร็จ: ' + error.message, 'error');
     }
 }
 
-// 3. ฟังก์ชันดึงรายการกิจกรรมและคำนวณชั่วโมงรวม
 async function loadActivities() {
     if (!currentUser || !currentUser.id) return;
-    
     try {
-        const snap = await db.collection("Users").doc(currentUser.id).collection("Activities").orderBy("date", "desc").get();
-        let totalHours = 0;
-        let html = '';
+        const snap = await db.collection("Users").doc(currentUser.id).collection("Activities").orderBy("createdAt", "desc").get();
+        let totalHours = 0; let kruCount = 0; let html = '';
 
         snap.forEach(doc => {
             const act = doc.data();
-            totalHours += (parseFloat(act.hours) || 0);
             
-            html += `
-                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex items-center justify-between text-left">
+            if (act.type === 'กยศ') {
+                totalHours += (parseFloat(act.hours) || 0);
+                html += `
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 flex items-center justify-between text-left shadow-sm">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        ${act.imageUrl ? `
-                            <a href="${act.imageUrl}" target="_blank" title="ดูรูปหลักฐาน" class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 bg-white">
-                                <img src="${act.imageUrl}" class="w-full h-full object-cover">
-                            </a>
-                        ` : `
-                            <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-500 flex items-center justify-center flex-shrink-0 text-sm">
-                                <i class="fa-solid fa-award"></i>
-                            </div>
-                        `}
+                        ${act.imageUrl ? `<a href="${act.imageUrl}" target="_blank" title="ดูรูป" class="w-10 h-10 rounded-lg flex-shrink-0 border border-slate-200"><img src="${act.imageUrl}" class="w-full h-full object-cover rounded-lg"></a>` : `<div class="w-10 h-10 rounded-lg bg-orange-50 text-orange-400 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-clock"></i></div>`}
                         <div class="truncate">
-                            <p class="font-bold text-slate-800 text-xs truncate">${act.title}</p>
+                            <span class="text-[9px] font-bold text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded">กยศ.</span>
+                            <p class="font-bold text-slate-800 text-xs truncate mt-0.5">${act.title}</p>
                             <p class="text-[10px] text-slate-400">${act.date || '-'}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 flex-shrink-0 ml-2">
-                        <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">+${act.hours} ชม.</span>
-                        <button onclick="deleteActivity('${doc.id}')" class="text-slate-300 hover:text-red-500 transition px-1 text-xs">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                    <div class="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                        <span class="text-xs font-bold text-slate-600 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">${act.hours} ชม.</span>
+                        <button onclick="deleteActivity('${doc.id}')" class="text-slate-300 hover:text-red-500 transition px-1"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
-                </div>
-            `;
+                </div>`;
+            } else {
+                kruCount++;
+                html += `
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 flex items-center justify-between text-left shadow-sm">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-chalkboard-user"></i></div>
+                        <div class="truncate">
+                            <span class="text-[9px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">กิจกรรมครู</span>
+                            <p class="font-bold text-slate-800 text-xs truncate mt-0.5" title="${act.title}">${act.title}</p>
+                            <p class="text-[10px] text-slate-400 truncate">${act.subCategory || '-'}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-shrink-0 ml-2">
+                        <button onclick="deleteActivity('${doc.id}')" class="text-slate-300 hover:text-red-500 transition px-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>`;
+            }
         });
 
         document.getElementById('activityListContainer').innerHTML = html || `<div class="text-center py-6 text-slate-400 text-xs col-span-full bg-slate-50 rounded-xl border border-dashed border-slate-200">ยังไม่มีรายการกิจกรรมที่บันทึก</div>`;
-        document.getElementById('volunteerHours').innerText = totalHours;
         
-        // อัปเดต Progress bar (เป้าหมาย 36 ชั่วโมง)
+        document.getElementById('volunteerHours').innerText = totalHours;
+        document.getElementById('kruActCount').innerText = kruCount;
         const percent = Math.min(100, (totalHours / 36) * 100);
         document.getElementById('volunteerProgressBar').style.width = percent + '%';
-    } catch (e) {
-        console.error("Error loading activities:", e);
-    }
+    } catch (e) { console.error("Error:", e); }
 }
 
-// 4. ลบรายการกิจกรรม
 async function deleteActivity(id) {
-    const res = await Swal.fire({
-        title: 'ยืนยันการลบ?',
-        text: 'ต้องการลบรายการกิจกรรมนี้ใช่หรือไม่',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        confirmButtonText: 'ลบ',
-        cancelButtonText: 'ยกเลิก'
-    });
-
+    const res = await Swal.fire({ title: 'ลบกิจกรรม?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
     if (res.isConfirmed) {
         await db.collection("Users").doc(currentUser.id).collection("Activities").doc(id).delete();
         loadActivities();
