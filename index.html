@@ -590,6 +590,9 @@
             </div>
             <div id="passedContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-5xl mx-auto"></div>
         </div>
+
+            <!-- 📍 หน้าต่างบริการนักศึกษา (e-Service Hub) -->
+        <div id="serviceTab" class="hidden-section max-w-4xl mx-auto text-left pb-10">
             
 <!-- วิดเจ็ต: สมุดบันทึกกิจกรรม (กยศ. / กิจกรรมครู) -->
             <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden">
@@ -1596,22 +1599,28 @@ function showStudentDashboard() {
         }
 
         function switchTab(t) {
-            document.getElementById('structureTab').style.display = t === 'structureTab' ? 'block' : 'none';
-            document.getElementById('passedTab').style.display = t === 'passedTab' ? 'block' : 'none';
-            document.getElementById('serviceTab').style.display = t === 'serviceTab' ? 'block' : 'none'; // 📍 เพิ่มคำสั่งให้แสดงหน้า e-Service
+            // 1. ซ่อนทุกหน้าต่าง
+            document.getElementById('structureTab').style.display = 'none';
+            document.getElementById('passedTab').style.display = 'none';
+            document.getElementById('serviceTab').style.display = 'none';
             
-            // เปลี่ยนคลาสสีปุ่มให้รู้ว่ากดแท็บไหนอยู่
-            let activeClass = "flex-1 text-theme font-bold py-3.5 border-b-[3px] border-theme transition text-sm md:text-base lang-txt";
-            let inactiveClass = "flex-1 text-slate-400 font-medium py-3.5 border-b-[3px] border-transparent hover-text-theme transition text-sm md:text-base lang-txt";
+            // 2. แสดงเฉพาะหน้าที่ถูกเลือก
+            document.getElementById(t).style.display = 'block';
             
-            // กรณีเป็นปุ่ม e-Service ที่มีไอคอนอยู่ข้างใน
-            let serviceActiveClass = "flex-1 text-theme font-bold py-3.5 border-b-[3px] border-theme transition text-sm md:text-base flex items-center justify-center gap-2";
-            let serviceInactiveClass = "flex-1 text-slate-400 font-medium py-3.5 border-b-[3px] border-transparent hover-text-theme transition text-sm md:text-base flex items-center justify-center gap-2";
+            // 3. รีเซ็ตปุ่มทั้งหมดให้เป็นสีเทา (ไม่ถูกเลือก)
+            const allBtns = ['btn-structureTab', 'btn-passedTab', 'btn-serviceTab'];
+            allBtns.forEach(btnId => {
+                let btn = document.getElementById(btnId);
+                // ลบสีฟ้าและเส้นใต้
+                btn.classList.remove('text-theme', 'font-bold', 'border-theme');
+                // ใส่สีเทาและเส้นใส
+                btn.classList.add('text-slate-400', 'font-medium', 'border-transparent');
+            });
 
-            document.getElementById('btn-structureTab').className = t === 'structureTab' ? activeClass : inactiveClass;
-            document.getElementById('btn-passedTab').className = t === 'passedTab' ? activeClass : inactiveClass;
-            // 📍 เพิ่มคำสั่งคุมสีปุ่ม e-Service
-            document.getElementById('btn-serviceTab').className = t === 'serviceTab' ? serviceActiveClass : serviceInactiveClass;
+            // 4. ใส่สีฟ้าและเส้นใต้ ให้ปุ่มที่กำลังถูกกด
+            let activeBtn = document.getElementById('btn-' + t);
+            activeBtn.classList.remove('text-slate-400', 'font-medium', 'border-transparent');
+            activeBtn.classList.add('text-theme', 'font-bold', 'border-theme');
         }
 
         function filterCourses() {
