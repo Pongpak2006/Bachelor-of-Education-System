@@ -23,6 +23,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
         
         :root {
@@ -92,10 +94,17 @@
         <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/40 rounded-full blur-[80px] pointer-events-none"></div>
 
         <div class="absolute top-4 md:top-6 w-full max-w-5xl px-4 md:px-8 z-20 flex justify-between items-center left-1/2 -translate-x-1/2">
-            <button onclick="showManual()" class="bg-white/80 backdrop-blur-md text-slate-600 text-[10px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2">
-                <i class="fa-solid fa-book-open text-theme"></i>
-                <span class="lang-txt" data-th="คู่มือการใช้งาน" data-en="User Manual">คู่มือการใช้งาน</span>
-            </button>
+    <div class="flex gap-2">
+        <button onclick="showManual()" class="bg-white/80 backdrop-blur-md text-slate-600 text-[10px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2">
+            <i class="fa-solid fa-book-open text-theme"></i>
+            <span class="lang-txt" data-th="คู่มือการใช้งาน" data-en="User Manual">คู่มือการใช้งาน</span>
+        </button>
+        <!-- 📍 ปุ่ม AI ที่เพิ่มเข้ามาใหม่ -->
+        <button onclick="toggleLoginView('aiTool')" class="bg-white/80 backdrop-blur-md text-purple-600 text-[10px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="lang-txt" data-th="ตัวช่วยสร้างแผนฯ (AI)" data-en="AI Lesson Planner">ตัวช่วยสร้างแผนฯ (AI)</span>
+        </button>
+    </div>
 
             <div class="flex items-center gap-2 md:gap-3">
             <div class="bg-white/80 backdrop-blur-md text-slate-600 text-[9px] md:text-xs font-semibold px-3 py-2 md:px-4 md:py-2 rounded-full border border-white flex items-center gap-1.5 md:gap-2">
@@ -174,6 +183,131 @@
                 </div>
             </form>
             <p class="mt-6 text-[9px] text-slate-400 font-light tracking-widest uppercase opacity-80">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</p>
+</div>
+        <!-- 📍 กล่องเครื่องมือ AI (เวอร์ชันอัปเกรด เลือกมาตรฐาน + KPA ภาษาพูด) -->
+<div id="aiToolBox" class="hidden relative bg-white/80 backdrop-blur-2xl px-6 pt-12 pb-12 sm:p-10 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[90vw] md:max-w-[850px] max-h-[90vh] overflow-y-auto border border-white z-10 text-center transition-all mx-auto mt-8 mb-6 custom-scrollbar">
+    
+    <!-- ปุ่มย้อนกลับ -->
+    <button onclick="toggleLoginView('student')" class="absolute top-6 left-6 text-slate-400 hover:text-slate-700 font-semibold text-xs md:text-sm transition flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
+        <i class="fa-solid fa-arrow-left"></i> <span class="lang-txt" data-th="ปิดหน้าต่าง" data-en="Close">ปิดหน้าต่าง</span>
+    </button>
+
+    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-gradient-to-br from-purple-100 to-fuchsia-100 text-purple-600 flex items-center justify-center mx-auto mb-4 text-2xl md:text-3xl shadow-sm border border-purple-200 animate-float">
+        <i class="fa-solid fa-brain"></i>
+    </div>
+    <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-1 lang-txt" data-th="ระบบสร้างแผนการสอนอัจฉริยะ" data-en="AI Lesson Planner">ระบบสร้างแผนการสอนอัจฉริยะ</h2>
+    <p class="text-[11px] md:text-xs text-slate-500 mb-6 lang-txt" data-th="กรอกข้อมูลด้วยภาษาพูดธรรมดา แล้วให้ AI ช่วยเรียบเรียงเป็นแผนการสอนแบบมืออาชีพ" data-en="Type naturally and let AI generate a professional lesson plan">กรอกข้อมูลด้วยภาษาพูดธรรมดา แล้วให้ AI ช่วยเรียบเรียงเป็นแผนการสอนแบบมืออาชีพ</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-6 w-full">
+        <!-- ข้อมูลพื้นฐาน -->
+        <div class="space-y-1.5 md:col-span-2 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+            <h3 class="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wider"><i class="fa-solid fa-layer-group text-purple-500 mr-1"></i> 1. ข้อมูลรายวิชา</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="space-y-1">
+                    <label class="text-[10px] md:text-xs font-bold text-slate-500">กลุ่มสาระการเรียนรู้</label>
+                    <select id="aiSubjectGroup" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+                        <option value="">-- เลือกกลุ่มสาระฯ --</option>
+                        <option value="ภาษาไทย">ภาษาไทย</option>
+                        <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+                        <option value="วิทยาศาสตร์และเทคโนโลยี">วิทยาศาสตร์และเทคโนโลยี</option>
+                        <option value="สังคมศึกษา ศาสนา และวัฒนธรรม">สังคมศึกษาฯ</option>
+                        <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+                        <option value="ศิลปะ">ศิลปะ</option>
+                        <option value="การงานอาชีพ">การงานอาชีพ</option>
+                        <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+                        <option value="ปฐมวัย / บูรณาการ">ปฐมวัย / บูรณาการ</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] md:text-xs font-bold text-slate-500">มาตรฐาน (ถ้ามี)</label>
+                    <input type="text" id="aiStandardCode" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm" placeholder="เช่น ท 1.1, ค 1.1">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] md:text-xs font-bold text-slate-500">ตัวชี้วัด (ถ้ามี)</label>
+                    <input type="text" id="aiIndicator" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm" placeholder="เช่น ป.1/1">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                <div class="space-y-1 md:col-span-2">
+                    <label class="text-[10px] md:text-xs font-bold text-slate-500">เรื่อง / หัวข้อที่จะสอน</label>
+                    <input type="text" id="aiTopic" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm" placeholder="เช่น การบวกเลขสองหลัก, มาตราแม่กน">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] md:text-xs font-bold text-slate-500">ระดับชั้น</label>
+                    <select id="aiLevel" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+                        <option value="ป.1">ป.1</option> <option value="ป.2">ป.2</option>
+                        <option value="ป.3">ป.3</option> <option value="ป.4">ป.4</option>
+                        <option value="ป.5">ป.5</option> <option value="ป.6">ป.6</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- เป้าหมาย KPA (ภาษาพูด) -->
+        <div class="space-y-1.5 md:col-span-2 bg-slate-50 p-4 rounded-2xl border border-slate-100 mt-2">
+            <h3 class="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wider flex items-center justify-between">
+                <span><i class="fa-solid fa-bullseye text-orange-500 mr-1"></i> 2. จุดประสงค์ K-P-A <span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-[9px] ml-1">พิมพ์ภาษาพูดได้เลย!</span></span>
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- K -->
+                <div class="space-y-1 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                    <label class="text-[10px] md:text-xs font-bold text-blue-700"><i class="fa-solid fa-book-open text-blue-500 mr-1"></i> ความรู้ (K)</label>
+                    <textarea id="aiObjK" class="w-full px-3 py-2 bg-white border border-blue-200 rounded-lg outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition text-xs shadow-sm h-16 resize-none" placeholder="เด็กต้องรู้อะไร? เช่น 'เด็กต้องรู้ว่าคำไหนใช้แม่กน'"></textarea>
+                </div>
+                <!-- P -->
+                <div class="space-y-1 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
+                    <label class="text-[10px] md:text-xs font-bold text-emerald-700"><i class="fa-solid fa-hand-sparkles text-emerald-500 mr-1"></i> ทักษะ (P)</label>
+                    <textarea id="aiObjP" class="w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition text-xs shadow-sm h-16 resize-none" placeholder="เด็กต้องทำอะไรได้? เช่น 'แต่งประโยคได้'"></textarea>
+                </div>
+                <!-- A -->
+                <div class="space-y-1 bg-amber-50/50 p-3 rounded-xl border border-amber-100">
+                    <label class="text-[10px] md:text-xs font-bold text-amber-700"><i class="fa-solid fa-heart text-amber-500 mr-1"></i> คุณลักษณะ (A)</label>
+                    <textarea id="aiObjA" class="w-full px-3 py-2 bg-white border border-amber-200 rounded-lg outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition text-xs shadow-sm h-16 resize-none" placeholder="ทัศนคติ? เช่น 'สนุก, กล้าแสดงออก'"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- รูปแบบการสอน -->
+        <div class="space-y-1.5">
+            <label class="text-[10px] md:text-xs font-bold text-slate-500 ml-1">รูปแบบการสอน (Methodology)</label>
+            <select id="aiMethod" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+                <option value="วัฏจักรการเรียนรู้ 5 ขั้น (5E)">วัฏจักรการเรียนรู้ 5 ขั้น (5E)</option>
+                <option value="การจัดการเรียนรู้โดยใช้สมองเป็นฐาน (BBL)">Brain-Based Learning (BBL)</option>
+                <option value="การเรียนรู้เชิงรุก (Active Learning)">Active Learning</option>
+                <option value="การเรียนรู้โดยใช้เกมเป็นฐาน (Game-Based Learning)">Game-Based Learning</option>
+            </select>
+        </div>
+        <div class="space-y-1.5">
+            <label class="text-[10px] md:text-xs font-bold text-slate-500 ml-1">เวลา (นาที)</label>
+            <input type="number" id="aiTime" value="60" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+        </div>
+    </div>
+
+    <button onclick="generateAIPrompt()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 md:py-4 rounded-xl md:rounded-2xl transition shadow-[0_5px_15px_rgba(147,51,234,0.3)] hover:shadow-[0_8px_25px_rgba(147,51,234,0.4)] hover:opacity-90 active:scale-95 text-sm md:text-base flex items-center justify-center gap-2 mb-6">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> สร้างคำสั่งสำหรับให้ AI เขียนแผน (Generate Prompt)
+    </button>
+
+    <!-- กล่องแสดงผลลัพธ์ -->
+    <div id="aiOutputSection" class="hidden flex flex-col gap-3 text-left">
+        <div class="flex justify-between items-end border-t border-slate-100 pt-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest"><i class="fa-solid fa-terminal mr-1"></i> ผลลัพธ์ (คัดลอกไปวางใน AI ได้เลย)</span>
+            <button onclick="copyAIPrompt()" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-full font-bold transition flex items-center gap-1 active:scale-95">
+                <i class="fa-regular fa-copy"></i> คัดลอกข้อความ
+            </button>
+        </div>
+        <textarea id="aiPromptOutput" readonly class="w-full h-48 p-4 bg-slate-900 text-emerald-400 text-xs md:text-sm font-mono rounded-xl md:rounded-2xl border border-slate-700 outline-none resize-none leading-relaxed shadow-inner"></textarea>
+        
+        <div class="flex flex-col sm:flex-row gap-2 mt-2">
+            <a href="https://gemini.google.com" target="_blank" class="flex-1 bg-white border border-slate-200 text-slate-600 text-xs md:text-sm font-bold py-3 rounded-xl hover:bg-slate-50 transition shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" class="w-4 h-4 md:w-5 md:h-5"> นำไปวางใน Google Gemini
+            </a>
+            <a href="https://chatgpt.com" target="_blank" class="flex-1 bg-white border border-slate-200 text-slate-600 text-xs md:text-sm font-bold py-3 rounded-xl hover:bg-slate-50 transition shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                <i class="fa-solid fa-robot text-teal-600 text-base md:text-lg"></i> นำไปวางใน ChatGPT
+            </a>
+        </div>
+    </div>
 </div>
 
 <div id="adminLoginBox" class="hidden relative bg-white/80 backdrop-blur-2xl px-6 pt-8 pb-12 sm:p-12 md:p-14 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all flex flex-col justify-center mx-auto mt-10 mb-6 sm:mt-16 md:mt-auto md:mb-auto">    
@@ -824,14 +958,23 @@ window.onload = function() {
         }, 1000);
 
         function toggleLoginView(type) {
-            if(type === 'admin') {
-                document.getElementById('studentLoginBox').classList.add('hidden');
-                document.getElementById('adminLoginBox').classList.remove('hidden');
-            } else {
-                document.getElementById('adminLoginBox').classList.add('hidden');
-                document.getElementById('studentLoginBox').classList.remove('hidden');
-            }
-        }
+    // ปิดกล่องทั้งหมดก่อน
+    document.getElementById('studentLoginBox').classList.add('hidden');
+    document.getElementById('adminLoginBox').classList.add('hidden');
+    
+    // ตรวจสอบว่ามีกล่อง AI ไหม ถ้ามีให้ปิดด้วย
+    const aiToolBox = document.getElementById('aiToolBox');
+    if (aiToolBox) aiToolBox.classList.add('hidden');
+
+    // เปิดกล่องตามที่กดมา
+    if (type === 'admin') {
+        document.getElementById('adminLoginBox').classList.remove('hidden');
+    } else if (type === 'aiTool') {
+        aiToolBox.classList.remove('hidden');
+    } else {
+        document.getElementById('studentLoginBox').classList.remove('hidden');
+    }
+}
 
        function getGreeting() {
             let hr = new Date().getHours(); // ดึงเวลาชั่วโมงปัจจุบัน (0-23)
@@ -2170,6 +2313,101 @@ async function initHonorsChart() {
         console.error("Error loading chart:", error);
     }
 }
+        function generateAIPrompt() {
+    // 1. ดึงข้อมูลรายวิชาและมาตรฐาน
+    const subjectGroup = document.getElementById('aiSubjectGroup').value;
+    const standardCode = document.getElementById('aiStandardCode').value.trim();
+    const indicator = document.getElementById('aiIndicator').value.trim();
+    const topic = document.getElementById('aiTopic').value.trim();
+    const level = document.getElementById('aiLevel').value;
+    
+    // 2. ดึงข้อมูล KPA ภาษาพูด
+    const k_obj = document.getElementById('aiObjK').value.trim();
+    const p_obj = document.getElementById('aiObjP').value.trim();
+    const a_obj = document.getElementById('aiObjA').value.trim();
+
+    // 3. รูปแบบและเวลา
+    const method = document.getElementById('aiMethod').value;
+    const time = document.getElementById('aiTime').value;
+
+    if (!topic) {
+        Swal.fire({
+            title: 'ข้อมูลไม่ครบถ้วน',
+            text: 'กรุณาระบุ "เรื่อง/หัวข้อที่จะสอน" ด้วยครับ',
+            icon: 'warning',
+            confirmButtonColor: '#a855f7', 
+            customClass: { popup: 'rounded-[2rem]' }
+        });
+        return;
+    }
+
+    // --- จัดโครงสร้างข้อความ มาตรฐาน/ตัวชี้วัด ---
+    let standardText = "";
+    if(subjectGroup || standardCode || indicator) {
+        standardText = `มาตรฐานการเรียนรู้/ตัวชี้วัด: \n`;
+        if(subjectGroup) standardText += `- กลุ่มสาระการเรียนรู้: ${subjectGroup}\n`;
+        if(standardCode) standardText += `- มาตรฐาน: ${standardCode}\n`;
+        if(indicator) standardText += `- ตัวชี้วัด: ${indicator}\n`;
+    } else {
+        standardText = `มาตรฐานการเรียนรู้/ตัวชี้วัด: (ให้คุณวิเคราะห์และอิงตามหลักสูตรแกนกลางที่สอดคล้องกับเนื้อหานี้)`;
+    }
+
+    // --- จัดโครงสร้างข้อความ KPA ภาษาพูด -> สั่งให้ AI แปลงเป็นภาษาวิชาการ ---
+    let kpaText = "";
+    if(k_obj || p_obj || a_obj) {
+        kpaText = `จุดประสงค์การเรียนรู้ (ด้านล่างนี้คือความต้องการที่ครูพิมพ์ไว้เป็น "ภาษาพูด" ขอให้คุณนำไปขัดเกลาและเขียนใหม่ให้เป็น "จุดประสงค์เชิงพฤติกรรม" ที่ถูกต้องตามหลักวิชาการและวัดผลได้ชัดเจน):\n`;
+        if(k_obj) kpaText += `- ด้านความรู้ (K): ${k_obj}\n`;
+        if(p_obj) kpaText += `- ด้านทักษะ/กระบวนการ (P): ${p_obj}\n`;
+        if(a_obj) kpaText += `- ด้านคุณลักษณะ (A): ${a_obj}\n`;
+    } else {
+        kpaText = `จุดประสงค์การเรียนรู้ (K-P-A): (ให้คุณเขียนจุดประสงค์เชิงพฤติกรรมแยก K, P, A ให้ชัดเจนและสอดคล้องกับเนื้อหาการสอน)`;
+    }
+
+    // --- ประกอบร่าง Prompt สั่งงาน AI ---
+    const prompt = `จงสวมบทบาทเป็นผู้เชี่ยวชาญด้านการจัดการเรียนรู้ระดับประถมศึกษา
+ช่วยเขียนแผนการจัดการเรียนรู้ที่สมบูรณ์ โดยใช้ข้อมูลเบื้องต้นดังนี้:
+
+เรื่องที่สอน: ${topic}
+ระดับชั้น: ${level}
+เวลาที่ใช้: ${time} นาที
+รูปแบบการจัดกิจกรรม: ${method}
+
+${standardText}
+
+${kpaText}
+
+กรุณาเขียนแผนการสอนฉบับสมบูรณ์ โดยเรียงลำดับหัวข้อดังนี้ (จัดรูปแบบให้อ่านง่าย):
+1. หัวข้อแผนการจัดการเรียนรู้
+2. สาระสำคัญ / ความคิดรวบยอด
+3. จุดประสงค์การเรียนรู้ (K-P-A) ที่ผ่านการขัดเกลาเป็นภาษาวิชาการแล้ว
+4. สาระการเรียนรู้ (เนื้อหาโดยย่อ)
+5. กิจกรรมการเรียนรู้ (เขียนแยกเป็นขั้นๆ ตามรูปแบบ ${method} อย่างละเอียด เน้นบรรยากาศที่นักเรียนได้ลงมือปฏิบัติจริง)
+6. สื่อ/แหล่งการเรียนรู้
+7. การวัดและประเมินผล (พร้อมระบุเกณฑ์หรือ รูบริกสเกล-Rubric แบบประยุกต์ใช้ได้จริงในห้องเรียน)
+
+ขอภาษาที่เป็นทางการ เข้าใจง่าย และสามารถนำไปปรับใช้เขียนลงในแผนการสอนส่งผู้บริหารได้ทันที`;
+
+    // ยัดข้อความลงในช่อง Textarea
+    const outputBox = document.getElementById('aiPromptOutput');
+    outputBox.value = prompt;
+    
+    // โชว์กล่องผลลัพธ์
+    const outputSection = document.getElementById('aiOutputSection');
+    outputSection.classList.remove('hidden');
+    
+    // เลื่อนหน้าจอลงไปให้เห็นผลลัพธ์อัตโนมัติ
+    setTimeout(() => {
+        outputBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+}
+        function copyAIPrompt() {
+            const promptText = document.getElementById('aiPromptOutput');
+            promptText.select();
+            promptText.setSelectionRange(0, 99999); // สำหรับมือถือ
+            navigator.clipboard.writeText(promptText.value).then(() => {
+                Toast.fire({ icon: 'success', title: appLang === 'en' ? 'Prompt Copied!' : 'คัดลอก Prompt แล้ว!' });
+            });
+        }
     </script>
 </body>
 </html>
