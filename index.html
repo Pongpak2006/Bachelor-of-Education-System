@@ -2719,6 +2719,91 @@ function openLocalTool(toolType) {
     }
 }
 
+        function compressMyImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    Swal.fire({ title: 'กำลังบีบอัด...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    document.getElementById('originalSize').innerText = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(e) {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const MAX_SIZE = 1920;
+            let [width, height] = [img.width, img.height];
+            if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } 
+            else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+            canvas.width = width; canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                document.getElementById('compressedSize').innerText = (blob.size / 1024 / 1024).toFixed(2) + ' MB';
+                const downloadBtn = document.getElementById('downloadCompressed');
+                downloadBtn.href = url;
+                downloadBtn.download = 'compressed_' + file.name;
+                document.getElementById('compressResult').classList.remove('hidden');
+                Swal.close();
+            }, 'image/jpeg', 0.7);
+        };
+    };
+}
+
+function parsePageNumbers(inputStr, totalPages) {
+    let pages = new Set();
+    inputStr.split(',').forEach(part => {
+        part = part.trim();
+        if (part.includes('-')) {
+            let [start, end] = part.split('-').map(Number);
+            if(start && end) {
+                for (let i = start; i <= end; i++) { if(i > 0 && i <= totalPages) pages.add(i - 1); }
+            }
+        } else {
+            let num = Number(part);
+            if(num > 0 && num <= totalPages) pages.add(num - 1);
+        }
+    });
+    return Array.from(pages).sort((a, b) => a - b);
+}
+
+async function processPdfPages(action) {
+    const fileInput = document.getElementById('pdfFile').files[0];
+    const pagesStr = document.getElementById('pdfPages').value;
+    if (!fileInput || !pagesStr) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์และระบุหน้าให้ครบ', 'warning');
+    Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    try {
+        const arrayBuffer = await fileInput.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+        const totalPages = pdfDoc.getPageCount();
+        const selectedPages = parsePageNumbers(pagesStr, totalPages);
+        if(selectedPages.length === 0) return Swal.fire('ผิดพลาด', 'ระบุหน้าไม่ถูกต้อง', 'error');
+
+        const newPdf = await PDFLib.PDFDocument.create();
+        let pagesToCopy = action === 'deletePdf' 
+            ? Array.from({length: totalPages}, (_, i) => i).filter(i => !selectedPages.includes(i))
+            : selectedPages;
+
+        const copiedPages = await newPdf.copyPages(pdfDoc, pagesToCopy);
+        copiedPages.forEach((page) => newPdf.addPage(page));
+
+        const pdfBytes = await newPdf.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (action === 'deletePdf' ? 'deleted_' : 'extracted_') + fileInput.name;
+        a.click();
+        URL.revokeObjectURL(url);
+        Swal.fire('สำเร็จ', 'โหลดเอกสารเรียบร้อยแล้ว', 'success');
+    } catch (e) {
+        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถจัดการไฟล์นี้ได้', 'error');
+    }
+}
+        
 // 🔧 ตัวแปลงตัวเลขให้เป็นสไตล์ต่างๆ
 function getPageLabel(index, style) {
     if (style === 'arabic') return String(index + 1);
@@ -2822,10 +2907,9 @@ async function addPdfNumbers() {
 }
 
      // =========================================================
-// ⏱️ ระบบบันทึกกิจกรรมมหาลัย (กยศ. & กิจกรรมเสริมความเป็นครู)
+// ⏱️ ระบบบันทึกกิจกรรมมหาลัย (รองรับแนบหลายรูป + ดาวน์โหลด)
 // =========================================================
 
-// ฟังก์ชันย่อขนาดรูปภาพก่อนเซฟลง Firebase (ป้องกันฐานข้อมูลเต็ม)
 function compressImageToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2836,29 +2920,30 @@ function compressImageToBase64(file) {
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                
-                const MAX_SIZE = 800;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height && width > MAX_SIZE) {
-                    height *= MAX_SIZE / width;
-                    width = MAX_SIZE;
-                } else if (height > MAX_SIZE) {
-                    width *= MAX_SIZE / height;
-                    height = MAX_SIZE;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
+                const MAX_SIZE = 800; // ย่อขนาดเพื่อไม่ให้ฐานข้อมูลเต็ม
+                let [width, height] = [img.width, img.height];
+                if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } 
+                else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                canvas.width = width; canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
-                
                 resolve(canvas.toDataURL('image/jpeg', 0.6));
             };
             img.onerror = error => reject(error);
         };
         reader.onerror = error => reject(error);
     });
+}
+
+// ฟังก์ชันแปลงหลายรูปพร้อมกัน
+async function processMultipleImages(files) {
+    let base64Array = [];
+    for (let i = 0; i < files.length; i++) {
+        try {
+            let b64 = await compressImageToBase64(files[i]);
+            base64Array.push(b64);
+        } catch (e) { console.error("Error compressing image", e); }
+    }
+    return base64Array;
 }
 
 function showAddActivityModal() {
@@ -2875,32 +2960,20 @@ function showAddActivityModal() {
 
             <!-- ฟอร์ม กยศ. -->
             <div id="formKYS" class="space-y-3 text-left">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">ชื่อกิจกรรม</label>
-                    <input id="actTitleKYS" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="เช่น บริจาคโลหิต, เรียนออนไลน์">
-                </div>
+                <div><label class="text-[11px] font-bold text-slate-500 ml-1">ชื่อกิจกรรม</label><input id="actTitleKYS" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="เช่น บริจาคโลหิต, เรียนออนไลน์"></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-500 ml-1">จำนวนชั่วโมง</label>
-                        <input id="actHours" type="number" step="0.5" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="เช่น 3">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-500 ml-1">วันที่ทำกิจกรรม</label>
-                        <input id="actDateKYS" type="date" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" value="${new Date().toISOString().split('T')[0]}">
-                    </div>
+                    <div><label class="text-[11px] font-bold text-slate-500 ml-1">จำนวนชั่วโมง</label><input id="actHours" type="number" step="0.5" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="เช่น 3"></div>
+                    <div><label class="text-[11px] font-bold text-slate-500 ml-1">วันที่ทำกิจกรรม</label><input id="actDateKYS" type="date" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" value="${new Date().toISOString().split('T')[0]}"></div>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">อัปโหลดภาพหลักฐาน (ระบบจะย่อขนาดอัตโนมัติ)</label>
-                    <input id="actImage" type="file" accept="image/jpeg, image/png" class="w-full text-xs text-slate-500 border border-slate-200 rounded-xl p-1 mt-1 bg-slate-50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-orange-100 file:text-orange-700 cursor-pointer">
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">แนบภาพหลักฐาน <span class="text-orange-500">(เลือกได้หลายรูป)</span></label>
+                    <input id="actImageKYS" type="file" multiple accept="image/jpeg, image/png" class="w-full text-xs text-slate-500 border border-slate-200 rounded-xl p-1 mt-1 bg-slate-50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-orange-100 file:text-orange-700 cursor-pointer">
                 </div>
             </div>
 
             <!-- ฟอร์ม กิจกรรมครู -->
-            <div id="formKru" class="space-y-3 text-left hidden max-h-[50vh] overflow-y-auto px-1 custom-scrollbar">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">ชื่อโครงการ / กิจกรรม</label>
-                    <input id="actTitleKru" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="ระบุชื่อโครงการ">
-                </div>
+            <div id="formKru" class="space-y-3 text-left hidden max-h-[60vh] overflow-y-auto px-1 custom-scrollbar pb-4">
+                <div><label class="text-[11px] font-bold text-slate-500 ml-1">ชื่อโครงการ / กิจกรรม</label><input id="actTitleKru" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none" placeholder="ระบุชื่อโครงการ"></div>
                 <div>
                     <label class="text-[11px] font-bold text-slate-500 ml-1">หมวดหมู่กิจกรรม</label>
                     <select id="actCategory" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm mb-2 outline-none">
@@ -2913,26 +2986,15 @@ function showAddActivityModal() {
                     <select id="actSubCategory" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-[11px] text-slate-600 bg-slate-50 outline-none"></select>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-500 ml-1">วัน/เวลา</label>
-                        <input id="actDateKru" type="datetime-local" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-500 ml-1">หน่วยงานรับผิดชอบ</label>
-                        <input id="actAgency" type="text" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none" placeholder="เช่น คณะศึกษาศาสตร์">
-                    </div>
+                    <div><label class="text-[11px] font-bold text-slate-500 ml-1">วัน/เวลา</label><input id="actDateKru" type="datetime-local" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none"></div>
+                    <div><label class="text-[11px] font-bold text-slate-500 ml-1">หน่วยงานรับผิดชอบ</label><input id="actAgency" type="text" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none" placeholder="เช่น คณะศึกษาศาสตร์"></div>
                 </div>
+                <div><label class="text-[11px] font-bold text-slate-500 ml-1">สรุปองค์ความรู้ที่ได้</label><textarea id="actKnowledge" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none"></textarea></div>
+                <div><label class="text-[11px] font-bold text-slate-500 ml-1">ความคิดเห็นต่อเนื้อหา (เขียนเป็นข้อๆ)</label><textarea id="actOpinion" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none"></textarea></div>
+                <div><label class="text-[11px] font-bold text-slate-500 ml-1">การนำความรู้ไปใช้ในวิชาชีพครู</label><textarea id="actApplication" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none"></textarea></div>
                 <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">สรุปองค์ความรู้ที่ได้</label>
-                    <textarea id="actKnowledge" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none" placeholder="วัตถุประสงค์โครงการ, เนื้อหา/กิจกรรมที่เกิดขึ้น..."></textarea>
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">ความคิดเห็นต่อเนื้อหา (เขียนเป็นข้อๆ)</label>
-                    <textarea id="actOpinion" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none" placeholder="1...\\n2..."></textarea>
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 ml-1">การนำความรู้ไปใช้ในวิชาชีพครู (เขียนเป็นข้อๆ)</label>
-                    <textarea id="actApplication" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs h-16 resize-none outline-none" placeholder="1...\\n2..."></textarea>
+                    <label class="text-[11px] font-bold text-slate-500 ml-1">แนบภาพกิจกรรม <span class="text-blue-500">(เลือกได้หลายรูป)</span></label>
+                    <input id="actImageKru" type="file" multiple accept="image/jpeg, image/png" class="w-full text-xs text-slate-500 border border-slate-200 rounded-xl p-1 mt-1 bg-slate-50 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 cursor-pointer">
                 </div>
             </div>
         `,
@@ -2947,7 +3009,6 @@ function showAddActivityModal() {
             const formKru = document.getElementById('formKru');
             const catSelect = document.getElementById('actCategory');
             const subCatSelect = document.getElementById('actSubCategory');
-
             const subCats = {
                 "1": ["กิจกรรมศรัทธามุ่งมั่น และรักอาชีพครู", "กิจกรรมรักชาติ ศาสน์ กษัตริย์ ความเป็นไทย", "กิจกรรมรักษ์ ศิลปะดนตรี นาฏศิลป์สืบสานวัฒนธรรม"],
                 "2": ["กิจกรรมเสริมสร้างสุขภาวะที่สมบูรณ์", "กิจกรรมส่งเสริมสุขภาพ กีฬา และนันทนาการ"],
@@ -2955,13 +3016,9 @@ function showAddActivityModal() {
                 "4": ["กิจกรรมความรอบรู้ทางวิชาการและความสามารถในการประยุกต์ใช้"],
                 "5": ["กิจกรรมอื่นๆ"]
             };
-
-            const updateSubCats = () => {
-                subCatSelect.innerHTML = subCats[catSelect.value].map(sc => `<option value="${sc}">${sc}</option>`).join('');
-            };
+            const updateSubCats = () => { subCatSelect.innerHTML = subCats[catSelect.value].map(sc => `<option value="${sc}">${sc}</option>`).join(''); };
             updateSubCats();
             catSelect.addEventListener('change', updateSubCats);
-
             typeSelect.addEventListener('change', (e) => {
                 if(e.target.value === 'กยศ') {
                     formKYS.classList.remove('hidden'); formKru.classList.add('hidden');
@@ -2975,20 +3032,16 @@ function showAddActivityModal() {
         preConfirm: async () => {
             const type = document.getElementById('actTypeSelect').value;
             let data = { type: type };
-
             if (type === 'กยศ') {
                 data.title = document.getElementById('actTitleKYS').value.trim();
                 data.hours = parseFloat(document.getElementById('actHours').value);
                 data.date = document.getElementById('actDateKYS').value;
-                const file = document.getElementById('actImage').files[0];
-                if (!data.title || isNaN(data.hours) || data.hours <= 0) return Swal.showValidationMessage('กรุณากรอกชื่อและชั่วโมงให้ถูกต้อง');
+                const files = document.getElementById('actImageKYS').files;
                 
-                if (file) {
-                    try {
-                        data.imageBase64 = await compressImageToBase64(file);
-                    } catch (err) {
-                        return Swal.showValidationMessage('ไม่สามารถอ่านไฟล์รูปภาพได้');
-                    }
+                if (!data.title || isNaN(data.hours) || data.hours <= 0) return Swal.showValidationMessage('กรุณากรอกชื่อและชั่วโมง');
+                if (files.length > 0) {
+                    Swal.fire({ title: 'กำลังบีบอัดรูปภาพ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    data.imagesArray = await processMultipleImages(files);
                 }
             } else {
                 data.title = document.getElementById('actTitleKru').value.trim();
@@ -2999,7 +3052,13 @@ function showAddActivityModal() {
                 data.knowledge = document.getElementById('actKnowledge').value.trim();
                 data.opinion = document.getElementById('actOpinion').value.trim();
                 data.application = document.getElementById('actApplication').value.trim();
+                const files = document.getElementById('actImageKru').files;
+                
                 if (!data.title) return Swal.showValidationMessage('กรุณาระบุชื่อโครงการ');
+                if (files.length > 0) {
+                    Swal.fire({ title: 'กำลังบีบอัดรูปภาพ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    data.imagesArray = await processMultipleImages(files);
+                }
             }
             return data;
         }
@@ -3009,15 +3068,19 @@ function showAddActivityModal() {
 }
 
 async function saveActivityData(data) {
-    Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
         let savePayload = { 
-            type: data.type, title: data.title, date: data.date, createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+            type: data.type, 
+            title: data.title, 
+            date: data.date, 
+            images: data.imagesArray || [], // บันทึกเป็น Array เสมอ (หลายรูป)
+            createdAt: firebase.firestore.FieldValue.serverTimestamp() 
         };
-
+        
         if (data.type === 'กยศ') {
             savePayload.hours = data.hours;
-            savePayload.imageUrl = data.imageBase64 || ''; 
+            if(data.imagesArray && data.imagesArray.length > 0) savePayload.imageUrl = data.imagesArray[0]; // เผื่อไฟล์เก่า
         } else {
             savePayload.category = data.category;
             savePayload.subCategory = data.subCategory;
@@ -3026,13 +3089,10 @@ async function saveActivityData(data) {
             savePayload.opinion = data.opinion;
             savePayload.application = data.application;
         }
-
         await db.collection("Users").doc(currentUser.id).collection("Activities").add(savePayload);
         Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', timer: 1200, showConfirmButton: false });
         loadActivities();
-    } catch (error) {
-        Swal.fire('ข้อผิดพลาด', 'บันทึกไม่สำเร็จ: ' + error.message, 'error');
-    }
+    } catch (error) { Swal.fire('ข้อผิดพลาด', error.message, 'error'); }
 }
 
 async function loadActivities() {
@@ -3040,17 +3100,18 @@ async function loadActivities() {
     try {
         const snap = await db.collection("Users").doc(currentUser.id).collection("Activities").orderBy("createdAt", "desc").get();
         let totalHours = 0; let kruCount = 0; let html = '';
-
+        
         snap.forEach(doc => {
             const act = doc.data();
+            let hasImages = (act.images && act.images.length > 0) || act.imageUrl;
             
             if (act.type === 'กยศ') {
                 totalHours += (parseFloat(act.hours) || 0);
                 html += `
                 <div class="bg-white p-3 rounded-2xl border border-slate-100 flex items-center justify-between text-left shadow-sm">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        ${act.imageUrl 
-                            ? `<button onclick="viewImage('${act.imageUrl}')" title="ดูรูปภาพหลักฐาน" class="w-10 h-10 rounded-lg flex-shrink-0 border border-slate-200 overflow-hidden relative group"><img src="${act.imageUrl}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/30 hidden group-hover:flex items-center justify-center text-white"><i class="fa-solid fa-magnifying-glass-plus"></i></div></button>` 
+                        ${hasImages
+                            ? `<button onclick="viewActivityDetails('${doc.id}')" title="คลิกดูรายละเอียดและรูปภาพ" class="w-10 h-10 rounded-lg flex-shrink-0 border border-slate-200 overflow-hidden relative group"><img src="${act.images ? act.images[0] : act.imageUrl}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white"><i class="fa-solid fa-images"></i></div></button>` 
                             : `<div class="w-10 h-10 rounded-lg bg-orange-50 text-orange-400 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-clock"></i></div>`}
                         <div class="truncate">
                             <span class="text-[9px] font-bold text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded">กยศ.</span>
@@ -3068,7 +3129,9 @@ async function loadActivities() {
                 html += `
                 <div class="bg-white p-3 rounded-2xl border border-slate-100 flex items-center justify-between text-left shadow-sm">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-chalkboard-user"></i></div>
+                        ${hasImages
+                            ? `<button onclick="viewActivityDetails('${doc.id}')" title="คลิกดูรายละเอียดและรูปภาพ" class="w-10 h-10 rounded-lg flex-shrink-0 border border-slate-200 overflow-hidden relative group"><img src="${act.images ? act.images[0] : act.imageUrl}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white"><i class="fa-solid fa-images"></i></div></button>` 
+                            : `<div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-chalkboard-user"></i></div>`}
                         <div class="truncate">
                             <span class="text-[9px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">กิจกรรมครู</span>
                             <p class="font-bold text-slate-800 text-xs truncate mt-0.5" title="${act.title}">${act.title}</p>
@@ -3076,61 +3139,88 @@ async function loadActivities() {
                         </div>
                     </div>
                     <div class="flex items-center flex-shrink-0 ml-2">
-                        <button onclick="viewKruActivity('${doc.id}')" class="text-blue-400 hover:text-blue-600 transition px-1"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="viewActivityDetails('${doc.id}')" class="text-blue-400 hover:text-blue-600 transition px-1"><i class="fa-solid fa-eye"></i></button>
                         <button onclick="deleteActivity('${doc.id}')" class="text-slate-300 hover:text-red-500 transition px-1"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>`;
             }
         });
-
         document.getElementById('activityListContainer').innerHTML = html || `<div class="text-center py-6 text-slate-400 text-xs col-span-full bg-slate-50 rounded-xl border border-dashed border-slate-200">ยังไม่มีรายการกิจกรรมที่บันทึก</div>`;
-        
         document.getElementById('volunteerHours').innerText = totalHours;
         document.getElementById('kruActCount').innerText = kruCount;
-        const percent = Math.min(100, (totalHours / 36) * 100);
-        document.getElementById('volunteerProgressBar').style.width = percent + '%';
-    } catch (e) { console.error("Error:", e); }
+        document.getElementById('volunteerProgressBar').style.width = Math.min(100, (totalHours / 36) * 100) + '%';
+    } catch (e) { console.error(e); }
 }
 
-function viewImage(imgUrl) {
-    Swal.fire({
-        imageUrl: imgUrl,
-        imageAlt: 'หลักฐานกิจกรรม',
-        showConfirmButton: false,
-        showCloseButton: true,
-        customClass: { popup: 'rounded-[2rem] p-2' }
-    });
+// ฟังก์ชันดาวน์โหลดรูปภาพ
+function downloadImage(base64Data, filename) {
+    const a = document.createElement('a');
+    a.href = base64Data;
+    a.download = filename || 'activity_photo.jpg';
+    a.click();
 }
 
-async function viewKruActivity(id) {
+// ฟังก์ชันรวม ดูรายละเอียดกิจกรรม + ดูรูปทั้งหมด
+async function viewActivityDetails(id) {
     try {
         const doc = await db.collection("Users").doc(currentUser.id).collection("Activities").doc(id).get();
         if(doc.exists) {
             const act = doc.data();
+            
+            // เตรียมก้อน HTML สำหรับรูปภาพทั้งหมด
+            let imagesHtml = '';
+            let imageArray = act.images || [];
+            if(imageArray.length === 0 && act.imageUrl) imageArray.push(act.imageUrl); 
+            
+            if (imageArray.length > 0) {
+                imagesHtml = `<div class="mt-4 border-t border-slate-200 pt-3">
+                    <p class="font-bold text-slate-700 text-xs mb-2"><i class="fa-regular fa-images"></i> ภาพหลักฐาน (${imageArray.length} รูป):</p>
+                    <div class="flex overflow-x-auto gap-2 pb-2 custom-scrollbar">`;
+                
+                imageArray.forEach((imgBase64, index) => {
+                    imagesHtml += `
+                    <div class="relative group flex-shrink-0">
+                        <img src="${imgBase64}" class="h-24 rounded-lg border border-slate-200 object-cover w-32 cursor-pointer hover:opacity-80 transition" onclick="Swal.fire({imageUrl: '${imgBase64}', imageAlt: 'รูปภาพ', customClass: {popup: 'rounded-[2rem] p-2'}})">
+                        <button onclick="downloadImage('${imgBase64}', 'activity_${act.type}_${index}.jpg')" class="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-theme transition" title="ดาวน์โหลดรูปนี้"><i class="fa-solid fa-download text-[10px]"></i></button>
+                    </div>`;
+                });
+                imagesHtml += `</div></div>`;
+            }
+
+            // เตรียมก้อน HTML ของรายละเอียดเนื้อหา
+            let contentHtml = '';
+            if (act.type === 'ครู') {
+                contentHtml = `
+                    <p><b>หมวดหมู่:</b> ${act.category}</p><p><b>กิจกรรมย่อย:</b> ${act.subCategory}</p><p><b>หน่วยงาน:</b> ${act.agency || '-'}</p><p><b>วันที่:</b> ${act.date ? act.date.replace('T', ' เวลา ') : '-'}</p>
+                    <hr class="my-2">
+                    <p class="font-bold text-slate-700">สรุปความรู้:</p><p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.knowledge || '-'}</p>
+                    <p class="font-bold text-slate-700 mt-2">ความคิดเห็นต่อเนื้อหา:</p><p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.opinion || '-'}</p>
+                    <p class="font-bold text-slate-700 mt-2">การนำไปประยุกต์ใช้:</p><p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.application || '-'}</p>
+                `;
+            } else {
+                contentHtml = `
+                    <p><b>ประเภท:</b> จิตอาสา / กยศ.</p>
+                    <p><b>จำนวนชั่วโมง:</b> <span class="text-orange-500 font-bold">${act.hours} ชั่วโมง</span></p>
+                    <p><b>วันที่ทำกิจกรรม:</b> ${act.date || '-'}</p>
+                `;
+            }
+
+            // แสดงหน้าต่าง
             Swal.fire({
-                title: '<span class="text-lg font-bold text-blue-600">รายละเอียดกิจกรรม</span>',
+                title: `<span class="text-lg font-bold ${act.type === 'ครู' ? 'text-blue-600' : 'text-orange-500'}">รายละเอียดกิจกรรม: ${act.title}</span>`,
                 html: `
-                    <div class="text-left text-sm space-y-3 mt-2">
-                        <p><b>ชื่อโครงการ:</b> ${act.title}</p>
-                        <p><b>หมวดหมู่:</b> ${act.category}</p>
-                        <p><b>กิจกรรมย่อย:</b> ${act.subCategory}</p>
-                        <p><b>หน่วยงาน:</b> ${act.agency || '-'}</p>
-                        <p><b>วันที่:</b> ${act.date ? act.date.replace('T', ' เวลา ') : '-'}</p>
-                        <hr>
-                        <p class="font-bold text-slate-700">สรุปความรู้:</p>
-                        <p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.knowledge || '-'}</p>
-                        <p class="font-bold text-slate-700">ความคิดเห็นต่อเนื้อหา:</p>
-                        <p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.opinion || '-'}</p>
-                        <p class="font-bold text-slate-700">การนำไปประยุกต์ใช้:</p>
-                        <p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.application || '-'}</p>
+                    <div class="text-left text-sm space-y-1.5 mt-2">
+                        ${contentHtml}
+                        ${imagesHtml}
                     </div>
                 `,
                 confirmButtonText: 'ปิด',
-                confirmButtonColor: '#3b82f6',
-                customClass: { popup: 'rounded-[2rem]' }
+                confirmButtonColor: 'var(--primary-theme)',
+                customClass: { popup: 'rounded-[2rem]' },
+                width: '500px'
             });
         }
-    } catch(e) {}
+    } catch(e) { console.error(e); }
 }
 
 async function deleteActivity(id) {
