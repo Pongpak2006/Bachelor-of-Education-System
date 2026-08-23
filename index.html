@@ -592,9 +592,8 @@
             <div id="passedContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-5xl mx-auto"></div>
         </div>
 
-            <!-- 📍 หน้าต่างบริการนักศึกษา (e-Service Hub) -->
-        <!-- 📍 หน้าต่างบริการนักศึกษา (e-Service Hub ฉบับ Minimalist & ปลอดภัย) -->
-        <div id="serviceTab" class="hidden-section max-w-4xl mx-auto text-left pb-10">
+            <!-- 📍 หน้าต่างบริการนักศึกษา (e-Service Hub ฉบับปรับปรุง UI ให้มินิมอล) -->
+        <div id="serviceTab" class="hidden-section max-w-4xl mx-auto text-left pb-10 space-y-12">
             
             <!-- วิดเจ็ต: สมุดบันทึกกิจกรรม (กยศ. / กิจกรรมคณะ) -->
             <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden">
@@ -612,24 +611,24 @@
                             
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <!-- แถบ กยศ -->
-                                <div class="text-left bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <p class="text-[10px] font-bold text-orange-500 uppercase">ชั่วโมง กยศ.</p>
-                                    <p class="text-sm font-bold text-slate-800"><span id="volunteerHours">0</span><span class="text-[10px] text-slate-400">/36 ชม.</span></p>
-                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
-                                        <div id="volunteerProgressBar" class="bg-orange-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <p class="text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-1">ชั่วโมง กยศ.</p>
+                                    <p class="text-sm font-bold text-slate-800"><span id="volunteerHours">0</span><span class="text-[10px] text-slate-400 font-normal"> / 36 ชม.</span></p>
+                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mt-2 overflow-hidden">
+                                        <div id="volunteerProgressBar" class="bg-gradient-to-r from-orange-400 to-amber-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
                                     </div>
                                 </div>
                                 <!-- แถบ กิจกรรมครู -->
-                                <div class="text-left bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <p class="text-[10px] font-bold text-blue-500 uppercase">กิจกรรมเสริมความเป็นครู</p>
-                                    <p class="text-sm font-bold text-slate-800"><span id="kruActCount">0</span><span class="text-[10px] text-slate-400"> รายการ</span></p>
-                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
-                                        <div class="bg-blue-400 h-full rounded-full w-full"></div>
+                                <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">กิจกรรมเสริมความเป็นครู</p>
+                                    <p class="text-sm font-bold text-slate-800"><span id="kruActCount">0</span><span class="text-[10px] text-slate-400 font-normal"> รายการ</span></p>
+                                    <div class="w-full bg-slate-200 rounded-full h-1.5 mt-2 overflow-hidden">
+                                        <div class="bg-gradient-to-r from-blue-400 to-cyan-400 h-full rounded-full w-full"></div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <button onclick="showAddActivityModal()" class="w-full md:w-auto text-xs font-bold bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 px-5 py-2.5 rounded-xl transition active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                            <button onclick="showAddActivityModal()" class="w-full md:w-auto text-xs font-bold bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 px-6 py-3 rounded-xl transition active:scale-95 flex items-center justify-center gap-2 shadow-sm mt-2">
                                 <i class="fa-solid fa-circle-plus"></i> บันทึกกิจกรรมใหม่
                             </button>
                         </div>
@@ -639,7 +638,6 @@
                     <div class="border-t border-slate-100 pt-5 mt-5">
                         <p class="text-xs font-bold text-slate-700 mb-3"><i class="fa-solid fa-clock-rotate-left text-orange-400 mr-1"></i> ประวัติกิจกรรมที่บันทึกไว้ล่าสุด</p>
                         <div id="activityListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                            <!-- รายการกิจกรรมจะถูก Render จาก Firebase ตรงนี้ -->
                             <div class="text-center py-6 text-slate-400 text-xs col-span-full bg-slate-50 rounded-xl border border-dashed border-slate-200">ยังไม่มีรายการกิจกรรมที่บันทึก</div>
                         </div>
                     </div>
@@ -647,49 +645,55 @@
             </div>
 
             <!-- 📍 หมวดหมู่ที่ 1: เครื่องมือจัดการไฟล์ Offline -->
-            <div class="mt-12">
+            <div>
                 <div class="flex items-center justify-between mb-5 border-l-[4px] border-theme pl-3">
                     <h4 class="font-bold text-slate-700 text-sm md:text-base uppercase tracking-wider">จัดการไฟล์เอกสาร (Offline 100%)</h4>
                     <span class="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[9px] font-bold hidden sm:flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> ปลอดภัย ไม่ส่งไฟล์ออกนอกเครื่อง</span>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    <button onclick="openLocalTool('compressImage')" class="text-left bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-teal-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                        <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-500 flex items-center justify-center text-lg group-hover:scale-110 transition"><i class="fa-solid fa-image"></i></div>
+                    <button onclick="openLocalTool('compressImage')" class="text-left bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm hover:shadow-md hover:border-teal-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                        <div class="w-12 h-12 rounded-full bg-teal-50 text-teal-500 flex items-center justify-center text-xl group-hover:scale-110 transition mb-1"><i class="fa-solid fa-image"></i></div>
                         <div>
                             <p class="font-bold text-slate-800 text-xs mb-0.5">ลดขนาดรูปภาพ</p>
                             <p class="text-[9px] text-slate-400 leading-tight">บีบอัด JPG/PNG</p>
                         </div>
                     </button>
                     
-                    <button onclick="openLocalTool('deletePdf')" class="text-left bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-red-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                        <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-lg group-hover:scale-110 transition"><i class="fa-solid fa-file-circle-minus"></i></div>
+                    <button onclick="openLocalTool('deletePdf')" class="text-left bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm hover:shadow-md hover:border-red-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                        <div class="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-xl group-hover:scale-110 transition mb-1"><i class="fa-solid fa-file-circle-minus"></i></div>
                         <div>
                             <p class="font-bold text-slate-800 text-xs mb-0.5">ลบหน้า PDF</p>
                             <p class="text-[9px] text-slate-400 leading-tight">ตัดหน้าที่ไม่ใช้ทิ้ง</p>
                         </div>
                     </button>
 
-                    <button onclick="openLocalTool('extractPdf')" class="text-left bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-orange-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                        <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-lg group-hover:scale-110 transition"><i class="fa-solid fa-file-export"></i></div>
+                    <button onclick="openLocalTool('extractPdf')" class="text-left bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm hover:shadow-md hover:border-orange-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                        <div class="w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-xl group-hover:scale-110 transition mb-1"><i class="fa-solid fa-file-export"></i></div>
                         <div>
                             <p class="font-bold text-slate-800 text-xs mb-0.5">ดึงเฉพาะหน้า PDF</p>
                             <p class="text-[9px] text-slate-400 leading-tight">แยกหน้าที่ต้องการ</p>
                         </div>
                     </button>
 
-                    <button onclick="openLocalTool('numberPdf')" class="text-left bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-blue-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                        <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg group-hover:scale-110 transition"><i class="fa-solid fa-list-ol"></i></div>
+                    <button onclick="openLocalTool('numberPdf')" class="text-left bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition mb-1"><i class="fa-solid fa-list-ol"></i></div>
                         <div>
                             <p class="font-bold text-slate-800 text-xs mb-0.5">ใส่เลขหน้า PDF</p>
                             <p class="text-[9px] text-slate-400 leading-tight">ประทับเลข 4 มุม</p>
                         </div>
                     </button>
                 </div>
+
+                <!-- 📍 พื้นที่ทำงานของเครื่องมือ Offline (Workspace) ย้ายมาซ่อนไว้ตรงนี้ -->
+                <div id="localToolWorkspace" class="hidden bg-white rounded-[2rem] p-8 text-slate-800 text-center mt-6 shadow-[0_15px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-200 relative transform transition-all">
+                    <button onclick="document.getElementById('localToolWorkspace').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+                    <div id="toolContent" class="py-2"></div>
+                </div>
             </div>
 
-            <!-- 📍 หมวดหมู่ที่ 2: เครื่องมือ AI ครบเซ็ต (แก้ไขให้เหลืออันเดียว) -->
-            <div class="mt-12">
+            <!-- 📍 หมวดหมู่ที่ 2: ศูนย์รวม AI สำหรับการศึกษา -->
+            <div>
                 <div class="flex items-center justify-between mb-5 border-l-[4px] border-purple-500 pl-3">
                     <h4 class="font-bold text-slate-800 text-sm md:text-base uppercase tracking-wider">ศูนย์รวม AI สำหรับการศึกษา</h4>
                     <span class="bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full text-[9px] font-bold hidden sm:flex items-center gap-1"><i class="fa-solid fa-microchip"></i> AI Education Hub</span>
@@ -698,193 +702,91 @@
                 <div class="space-y-6">
                     
                     <!-- หมวดที่ 2.1: แชทบอท & ค้นคว้า -->
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
                         <p class="text-xs font-bold text-slate-600 mb-4"><i class="fa-solid fa-robot text-blue-500 mr-2"></i> 1. ผู้ช่วยถาม-ตอบ & ค้นคว้าวิจัย</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <a href="https://chatgpt.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-comment-dots"></i></div>
+                            <a href="https://chatgpt.com" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-emerald-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-comment-dots"></i></div>
                                 <div><p class="font-bold text-slate-700 text-xs">ChatGPT</p></div>
                             </a>
-                            <a href="https://gemini.google.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                            <a href="https://gemini.google.com" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-blue-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition">
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" class="w-5 h-5">
                                 </div>
                                 <div><p class="font-bold text-slate-700 text-xs">Google Gemini</p></div>
                             </a>
-                            <a href="https://claude.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-orange-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-feather"></i></div>
+                            <a href="https://claude.ai" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-orange-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-feather"></i></div>
                                 <div><p class="font-bold text-slate-700 text-xs">Claude AI</p></div>
                             </a>
-                            <a href="https://www.perplexity.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-cyan-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-cyan-50 text-cyan-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                            <a href="https://www.perplexity.ai" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-cyan-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
                                 <div><p class="font-bold text-slate-700 text-xs">Perplexity</p></div>
                             </a>
                         </div>
                     </div>
 
                     <!-- หมวดที่ 2.2: สร้างสื่อ & งานนำเสนอ -->
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
                         <p class="text-xs font-bold text-slate-600 mb-4"><i class="fa-solid fa-palette text-pink-500 mr-2"></i> 2. สร้างสื่อ นำเสนอ & รูปภาพ</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <a href="https://gamma.app" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-presentation-screen"></i></div>
+                            <a href="https://gamma.app" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-purple-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-presentation-screen"></i></div>
                                 <div><p class="font-bold text-slate-700 text-xs">Gamma App</p></div>
                             </a>
-                            <a href="https://www.canva.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-object-group"></i></div>
+                            <a href="https://www.canva.com" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-indigo-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-object-group"></i></div>
                                 <div><p class="font-bold text-slate-700 text-xs">Canva Magic</p></div>
                             </a>
-                            <a href="https://www.bing.com/images/create" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-pink-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-image"></i></div>
+                            <a href="https://www.bing.com/images/create" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-pink-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-image"></i></div>
                                 <div><p class="font-bold text-slate-700 text-xs">Bing Image</p></div>
                             </a>
-                            <a href="https://www.remove.bg/th" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-fuchsia-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-fuchsia-50 text-fuchsia-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-eraser"></i></div>
+                            <a href="https://www.remove.bg/th" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-fuchsia-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-fuchsia-100 text-fuchsia-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-eraser"></i></div>
                                 <div><p class="font-bold text-slate-700 text-xs">Remove.bg</p></div>
                             </a>
                         </div>
                     </div>
 
                     <!-- หมวดที่ 2.3: ผู้ช่วยครู & ข้อสอบ -->
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
                         <p class="text-xs font-bold text-slate-600 mb-4"><i class="fa-solid fa-graduation-cap text-amber-500 mr-2"></i> 3. เครื่องมือสำหรับครู & แบบทดสอบ</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <a href="https://www.magicschool.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-amber-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <a href="https://www.magicschool.ai" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-amber-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                                 <div>
-                                    <p class="font-bold text-slate-700 text-xs">MagicSchool AI</p>
+                                    <p class="font-bold text-slate-700 text-xs">MagicSchool</p>
                                     <p class="text-[9px] text-slate-400 mt-0.5">เจนใบงาน/รูบริก</p>
                                 </div>
                             </a>
-                            <a href="https://quizizz.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-violet-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-gamepad"></i></div>
+                            <a href="https://quizizz.com" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-violet-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-gamepad"></i></div>
                                 <div>
                                     <p class="font-bold text-slate-700 text-xs">Quizizz AI</p>
                                     <p class="text-[9px] text-slate-400 mt-0.5">สร้างเกมข้อสอบ</p>
                                 </div>
                             </a>
-                            <a href="https://questionwell.org/" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-rose-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-clipboard-question"></i></div>
+                            <a href="https://questionwell.org/" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-rose-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-clipboard-question"></i></div>
                                 <div>
                                     <p class="font-bold text-slate-700 text-xs">QuestionWell</p>
                                     <p class="text-[9px] text-slate-400 mt-0.5">ดึงคำถามจากเนื้อหา</p>
                                 </div>
                             </a>
-                            <a href="https://beta.diffit.me/" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-200 shadow-sm hover:shadow-md hover:border-teal-300 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-layer-group"></i></div>
+                            <a href="https://beta.diffit.me/" target="_blank" class="bg-slate-50 p-4 rounded-[1.2rem] border border-transparent hover:bg-white hover:shadow-md hover:border-teal-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
+                                <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-layer-group"></i></div>
                                 <div>
                                     <p class="font-bold text-slate-700 text-xs">Diffit</p>
-                                    <p class="text-[9px] text-slate-400 mt-0.5">แปลงความยากเนื้อหา</p>
+                                    <p class="text-[9px] text-slate-400 mt-0.5">แปลงความยาก</p>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- 📍 พื้นที่ทำงานของเครื่องมือ Offline (Workspace) -->
-            <div id="localToolWorkspace" class="hidden bg-white rounded-[2rem] p-6 text-slate-800 text-center mt-12 shadow-[0_15px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-200 relative">
-                <button onclick="document.getElementById('localToolWorkspace').classList.add('hidden')" class="absolute top-4 right-5 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
-                <div id="toolContent" class="py-2"></div>
             </div>
 
         </div>
-            
-            <!-- ============================================== -->
-            <!-- ศูนย์รวมเครื่องมือ AI สำหรับการศึกษา (AI Education Hub) -->
-            <!-- ============================================== -->
-            <div class="pt-2">
-                <div class="flex items-center justify-between mb-5 border-l-[4px] border-purple-500 pl-3">
-                    <h4 class="font-bold text-slate-800 text-sm md:text-base uppercase tracking-wider">ศูนย์รวม AI สำหรับการศึกษา</h4>
-                    <span class="bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full text-[9px] font-bold hidden sm:flex items-center gap-1"><i class="fa-solid fa-microchip"></i> AI Education Hub</span>
-                </div>
-
-                <div class="space-y-5">
-                    
-                    <!-- หมวดที่ 1: แชทบอท & ค้นคว้า (Chatbots & Research) -->
-                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                        <p class="text-[11px] md:text-xs font-bold text-slate-500 mb-3"><i class="fa-solid fa-robot text-blue-500 mr-1"></i> 1. ผู้ช่วยถาม-ตอบ & ค้นคว้าวิจัย</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <a href="https://chatgpt.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-emerald-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-comment-dots"></i></div>
-                                <div><p class="font-bold text-slate-700 text-xs">ChatGPT</p></div>
-                            </a>
-                            <a href="https://gemini.google.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-blue-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl group-hover:scale-110 transition">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" class="w-5 h-5">
-                                </div>
-                                <div><p class="font-bold text-slate-700 text-xs">Google Gemini</p></div>
-                            </a>
-                            <a href="https://claude.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-orange-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-feather"></i></div>
-                                <div><p class="font-bold text-slate-700 text-xs">Claude AI</p></div>
-                            </a>
-                            <a href="https://www.perplexity.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-cyan-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-cyan-50 text-cyan-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
-                                <div><p class="font-bold text-slate-700 text-xs">Perplexity</p></div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- หมวดที่ 2: สร้างสื่อ & งานนำเสนอ (Media & Presentation) -->
-                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                        <p class="text-[11px] md:text-xs font-bold text-slate-500 mb-3"><i class="fa-solid fa-palette text-pink-500 mr-1"></i> 2. สร้างสื่อ นำเสนอ & รูปภาพ</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <a href="https://gamma.app" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-purple-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-presentation-screen"></i></div>
-                                <div><p class="font-bold text-slate-700 text-xs">Gamma App</p></div>
-                            </a>
-                            <a href="https://www.canva.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-indigo-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-object-group"></i></div>
-                                <div><p class="font-bold text-slate-700 text-xs">Canva Magic</p></div>
-                            </a>
-                            <a href="https://www.bing.com/images/create" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-pink-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-image"></i></div>
-                                <div><p class="font-bold text-slate-700 text-xs">Bing Image Creator</p></div>
-                            </a>
-                            <a href="https://www.remove.bg/th" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-fuchsia-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-fuchsia-50 text-fuchsia-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-eraser"></i></div>
-                                <div><p class="font-bold text-slate-700 text-xs">Remove.bg</p></div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- หมวดที่ 3: ผู้ช่วยครู & ข้อสอบ (Teacher Tools) -->
-                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                        <p class="text-[11px] md:text-xs font-bold text-slate-500 mb-3"><i class="fa-solid fa-graduation-cap text-amber-500 mr-1"></i> 3. เครื่องมือสำหรับครู & แบบทดสอบ</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <a href="https://www.magicschool.ai" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-amber-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                                <div>
-                                    <p class="font-bold text-slate-700 text-xs">MagicSchool AI</p>
-                                    <p class="text-[9px] text-slate-400 mt-0.5">เจนใบงาน/รูบริก</p>
-                                </div>
-                            </a>
-                            <a href="https://quizizz.com" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-violet-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-gamepad"></i></div>
-                                <div>
-                                    <p class="font-bold text-slate-700 text-xs">Quizizz AI</p>
-                                    <p class="text-[9px] text-slate-400 mt-0.5">สร้างเกมข้อสอบ</p>
-                                </div>
-                            </a>
-                            <a href="https://questionwell.org/" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-rose-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-clipboard-question"></i></div>
-                                <div>
-                                    <p class="font-bold text-slate-700 text-xs">QuestionWell</p>
-                                    <p class="text-[9px] text-slate-400 mt-0.5">ดึงคำถามจากเนื้อหา</p>
-                                </div>
-                            </a>
-                            <a href="https://beta.diffit.me/" target="_blank" class="bg-white p-4 rounded-[1.2rem] border border-slate-100 shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-teal-200 transition group flex flex-col items-center text-center gap-2 active:scale-95">
-                                <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fa-solid fa-layer-group"></i></div>
-                                <div>
-                                    <p class="font-bold text-slate-700 text-xs">Diffit</p>
-                                    <p class="text-[9px] text-slate-400 mt-0.5">แปลงความยากเนื้อหา</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
         <div class="text-center mt-16 text-xs text-slate-400 font-light tracking-widest uppercase lang-txt" data-th="&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์" data-en="&copy; 2026 Created by PONGPAK CHOKRAK">&copy; 2026 จัดทำโดย นายพงศ์ภัค โชครักษ์</div>
     </div>
