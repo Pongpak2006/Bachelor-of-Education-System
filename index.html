@@ -23,6 +23,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <!-- 📍 Library จัดการไฟล์แบบปลอดภัย (ประมวลผลบนเครื่องผู้ใช้ 100%) -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/@pdf-lib/fontkit/dist/fontkit.umd.min.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
@@ -592,6 +593,7 @@
         </div>
 
             <!-- 📍 หน้าต่างบริการนักศึกษา (e-Service Hub) -->
+        <!-- 📍 หน้าต่างบริการนักศึกษา (e-Service Hub ฉบับ Minimalist & ปลอดภัย) -->
         <div id="serviceTab" class="hidden-section max-w-4xl mx-auto text-left pb-10">
             
             <!-- วิดเจ็ต: สมุดบันทึกกิจกรรม (กยศ. / กิจกรรมคณะ) -->
@@ -686,7 +688,7 @@
                 </div>
             </div>
 
-            <!-- 📍 หมวดหมู่ที่ 2: เครื่องมือ AI ครบเซ็ต -->
+            <!-- 📍 หมวดหมู่ที่ 2: เครื่องมือ AI ครบเซ็ต (แก้ไขให้เหลืออันเดียว) -->
             <div class="mt-12">
                 <div class="flex items-center justify-between mb-5 border-l-[4px] border-purple-500 pl-3">
                     <h4 class="font-bold text-slate-800 text-sm md:text-base uppercase tracking-wider">ศูนย์รวม AI สำหรับการศึกษา</h4>
@@ -2735,7 +2737,7 @@ ${kpaText}
 // ==========================================
 // 🛠️ ระบบจัดการไฟล์ (Workspace สีขาว) + PDF Tools
 // ==========================================
-
+// 🛠️ ระบบจัดการไฟล์ (Workspace สีขาว) + PDF Tools
 function openLocalTool(toolType) {
     const workspace = document.getElementById('localToolWorkspace');
     const content = document.getElementById('toolContent');
@@ -2784,16 +2786,29 @@ function openLocalTool(toolType) {
         content.innerHTML = `
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl mx-auto mb-3 border border-blue-100"><i class="fa-solid fa-list-ol"></i></div>
             <h3 class="text-lg font-bold mb-1 text-slate-800">ประทับเลขหน้า PDF</h3>
-            <p class="text-xs text-slate-500 mb-6">เลือกตำแหน่งที่ต้องการวางเลขหน้า</p>
+            <p class="text-xs text-slate-500 mb-6">เลือกรูปแบบตัวเลขและตำแหน่ง</p>
             
-            <div class="flex flex-col items-center gap-3 w-full max-w-sm mx-auto">
+            <div class="flex flex-col items-center gap-3 w-full max-w-sm mx-auto text-left">
                 <input type="file" id="pdfFileNum" accept="application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-full p-1 shadow-sm">
-                <select id="pdfNumPos" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-400 transition text-sm">
-                    <option value="tr">มุมขวาบน (Top Right)</option>
-                    <option value="tl">มุมซ้ายบน (Top Left)</option>
-                    <option value="br">มุมขวาล่าง (Bottom Right)</option>
-                    <option value="bl">มุมซ้ายล่าง (Bottom Left)</option>
-                </select>
+                
+                <div class="w-full flex gap-2">
+                    <!-- เลือกรูปแบบตัวเลข -->
+                    <select id="pdfNumStyle" class="w-1/2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-400 transition text-xs">
+                        <option value="arabic">เลขอารบิค (1, 2, 3)</option>
+                        <option value="thai">เลขไทย (๑, ๒, ๓)</option>
+                        <option value="alpha_th">พยัญชนะไทย (ก, ข, ค)</option>
+                        <option value="alpha_en">อักษรภาษาอังกฤษ (A, B, C)</option>
+                    </select>
+                    
+                    <!-- เลือกตำแหน่ง -->
+                    <select id="pdfNumPos" class="w-1/2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-400 transition text-xs">
+                        <option value="tr">มุมขวาบน</option>
+                        <option value="tl">มุมซ้ายบน</option>
+                        <option value="br">มุมขวาล่าง</option>
+                        <option value="bl">มุมซ้ายล่าง</option>
+                    </select>
+                </div>
+
                 <button onclick="addPdfNumbers()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition shadow-sm active:scale-95 text-sm mt-2">
                     ประทับเลขหน้าและดาวน์โหลด
                 </button>
@@ -2802,138 +2817,73 @@ function openLocalTool(toolType) {
     }
 }
 
-// 🔧 บีบอัดรูปภาพและแปลงเป็น Blob (แก้ปัญหาโหลดไม่ขึ้น)
-function compressMyImage(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    Swal.fire({ title: 'กำลังบีบอัด...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    document.getElementById('originalSize').innerText = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function(e) {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const MAX_SIZE = 1920;
-            let [width, height] = [img.width, img.height];
-
-            if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } 
-            else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-
-            canvas.width = width; canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // แปลง Canvas เป็น Blob เพื่อให้ดาวน์โหลดได้ชัวร์ 100%
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const compressedSizeMB = (blob.size / 1024 / 1024).toFixed(2);
-                
-                document.getElementById('compressedSize').innerText = compressedSizeMB + ' MB';
-                const downloadBtn = document.getElementById('downloadCompressed');
-                downloadBtn.href = url;
-                downloadBtn.download = 'compressed_' + file.name;
-
-                document.getElementById('compressResult').classList.remove('hidden');
-                Swal.close();
-            }, 'image/jpeg', 0.7);
-        };
-    };
-}
-
-// 🔧 Helper แยกหน้า PDF
-function parsePageNumbers(inputStr, totalPages) {
-    let pages = new Set();
-    inputStr.split(',').forEach(part => {
-        part = part.trim();
-        if (part.includes('-')) {
-            let [start, end] = part.split('-').map(Number);
-            if(start && end) {
-                for (let i = start; i <= end; i++) { if(i > 0 && i <= totalPages) pages.add(i - 1); }
-            }
-        } else {
-            let num = Number(part);
-            if(num > 0 && num <= totalPages) pages.add(num - 1);
-        }
-    });
-    return Array.from(pages).sort((a, b) => a - b);
-}
-
-// 🔧 จัดการ PDF (ดึงหน้า / ลบหน้า)
-async function processPdfPages(action) {
-    const fileInput = document.getElementById('pdfFile').files[0];
-    const pagesStr = document.getElementById('pdfPages').value;
-    
-    if (!fileInput || !pagesStr) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์และระบุหน้าให้ครบ', 'warning');
-    
-    Swal.fire({ title: 'กำลังประมวลผล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-    try {
-        const arrayBuffer = await fileInput.arrayBuffer();
-        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-        const totalPages = pdfDoc.getPageCount();
-        const selectedPages = parsePageNumbers(pagesStr, totalPages);
-        
-        if(selectedPages.length === 0) return Swal.fire('ผิดพลาด', 'ระบุหน้าไม่ถูกต้อง', 'error');
-
-        const newPdf = await PDFLib.PDFDocument.create();
-        
-        // ถ้ายกเลิกหน้า (Delete): ดึงหน้าทั้งหมดที่ "ไม่ถูกเลือก" มาใส่
-        // ถ้าดึงเฉพาะหน้า (Extract): ดึงเฉพาะหน้าที่ "ถูกเลือก"
-        let pagesToCopy = action === 'deletePdf' 
-            ? Array.from({length: totalPages}, (_, i) => i).filter(i => !selectedPages.includes(i))
-            : selectedPages;
-
-        const copiedPages = await newPdf.copyPages(pdfDoc, pagesToCopy);
-        copiedPages.forEach((page) => newPdf.addPage(page));
-
-        const pdfBytes = await newPdf.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = (action === 'deletePdf' ? 'deleted_' : 'extracted_') + fileInput.name;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        Swal.fire('สำเร็จ', 'โหลดเอกสารเรียบร้อยแล้ว', 'success');
-    } catch (e) {
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถจัดการไฟล์นี้ได้', 'error');
+// 🔧 ตัวแปลงตัวเลขให้เป็นสไตล์ต่างๆ
+function getPageLabel(index, style) {
+    if (style === 'arabic') return String(index + 1);
+    if (style === 'thai') {
+        const thaiNums = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+        return String(index + 1).split('').map(digit => thaiNums[digit]).join('');
     }
+    if (style === 'alpha_en') {
+        // ใช้ 26 ตัวอักษร A-Z
+        let result = '';
+        let num = index;
+        while (num >= 0) {
+            result = String.fromCharCode((num % 26) + 65) + result;
+            num = Math.floor(num / 26) - 1;
+        }
+        return result;
+    }
+    if (style === 'alpha_th') {
+        // ใช้พยัญชนะไทย 44 ตัว ก-ฮ
+        const thaiAlpha = ['ก','ข','ฃ','ค','ฅ','ฆ','ง','จ','ฉ','ช','ซ','ฌ','ญ','ฎ','ฏ','ฐ','ฑ','ฒ','ณ','ด','ต','ถ','ท','ธ','น','บ','ป','ผ','ฝ','พ','ฟ','ภ','ม','ย','ร','ล','ว','ศ','ษ','ส','ห','ฬ','อ','ฮ'];
+        let result = '';
+        let num = index;
+        while (num >= 0) {
+            result = thaiAlpha[num % 44] + result;
+            num = Math.floor(num / 44) - 1;
+        }
+        return result;
+    }
+    return String(index + 1);
 }
 
-// 🔧 ประทับเลขหน้า PDF
+// 🔧 ประทับเลขหน้า PDF (อัปเกรดให้รองรับฟอนต์ไทย)
 async function addPdfNumbers() {
     const fileInput = document.getElementById('pdfFileNum').files[0];
     const pos = document.getElementById('pdfNumPos').value;
-    if (!fileInput) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์', 'warning');
+    const style = document.getElementById('pdfNumStyle').value;
+    if (!fileInput) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์ PDF ก่อนครับ', 'warning');
 
-    Swal.fire({ title: 'กำลังประทับเลข...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'กำลังประทับเลขหน้า...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
     try {
         const arrayBuffer = await fileInput.arrayBuffer();
         const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
         const pages = pdfDoc.getPages();
-        const { rgb, StandardFonts } = PDFLib;
-        const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const { rgb } = PDFLib;
+
+        // 🌟 ต้องใช้ Custom Font สำหรับภาษาไทยและพยัญชนะไทย เพื่อไม่ให้เป็นตัวสี่เหลี่ยม
+        // อัปโหลดไฟล์ฟอนต์ THSarabunNew มาฝังใน PDF (ใช้ฟอนต์จาก CDN สาธารณะเพื่อให้โหลดเร็ว)
+        const fontUrl = 'https://raw.githubusercontent.com/wutthichai/Sarabun-Font/master/Sarabun-Regular.ttf';
+        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        
+        pdfDoc.registerFontkit(window.fontkit); // ลงทะเบียน Fontkit 
+        const customFont = await pdfDoc.embedFont(fontBytes);
 
         pages.forEach((page, idx) => {
             const { width, height } = page.getSize();
-            const text = String(idx + 1);
-            const size = 12;
+            const text = getPageLabel(idx, style);
+            const size = 14;
             let x, y;
-            const margin = 30;
+            const margin = 35; // ขยับขอบให้ห่างออกมานิดนึง
 
             if(pos === 'tr') { x = width - margin - (size/2); y = height - margin; }
             else if(pos === 'tl') { x = margin; y = height - margin; }
             else if(pos === 'br') { x = width - margin - (size/2); y = margin; }
             else if(pos === 'bl') { x = margin; y = margin; }
 
-            page.drawText(text, { x, y, size, font: helveticaFont, color: rgb(0,0,0) });
+            page.drawText(text, { x, y, size, font: customFont, color: rgb(0,0,0) });
         });
 
         const pdfBytes = await pdfDoc.save();
@@ -2946,11 +2896,14 @@ async function addPdfNumbers() {
         a.click();
         URL.revokeObjectURL(url);
         
-        Swal.fire('สำเร็จ', 'โหลดเอกสารเรียบร้อยแล้ว', 'success');
+        Swal.fire('สำเร็จ', 'เพิ่มเลขหน้าและดาวน์โหลดเรียบร้อยแล้ว', 'success');
     } catch (e) {
-        Swal.fire('ข้อผิดพลาด', 'ไฟล์ถูกล็อกรหัสผ่าน หรือโครงสร้างอ่านไม่ได้', 'error');
+        Swal.fire('ข้อผิดพลาด', 'ไฟล์อาจจะถูกล็อกรหัสผ่าน หรือเกิดข้อผิดพลาดในการโหลดฟอนต์ภาษาไทย', 'error');
+        console.error(e);
     }
 }
+
+
 
      // =========================================================
 // ⏱️ ระบบบันทึกกิจกรรมมหาลัย (กยศ. & กิจกรรมเสริมความเป็นครู)
