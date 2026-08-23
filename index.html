@@ -2755,6 +2755,7 @@ async function addPdfNumbers() {
     const fileInput = document.getElementById('pdfFileNum').files[0];
     const pos = document.getElementById('pdfNumPos').value;
     const style = document.getElementById('pdfNumStyle').value;
+    
     if (!fileInput) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์ PDF ก่อนครับ', 'warning');
 
     Swal.fire({ title: 'กำลังประทับเลขหน้า...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -2765,20 +2766,34 @@ async function addPdfNumbers() {
         const pages = pdfDoc.getPages();
         const { rgb } = PDFLib;
 
-        // 🌟 ต้องใช้ Custom Font สำหรับภาษาไทยและพยัญชนะไทย เพื่อไม่ให้เป็นตัวสี่เหลี่ยม
-        // อัปโหลดไฟล์ฟอนต์ THSarabunNew มาฝังใน PDF (ใช้ฟอนต์จาก CDN สาธารณะเพื่อให้โหลดเร็ว)
-        const fontUrl = 'https://raw.githubusercontent.com/wutthichai/Sarabun-Font/master/Sarabun-Regular.ttf';
-        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        // 🌟 เปลี่ยนมาใช้ฟอนต์ THSarabunNew จาก Server ที่เสถียรและรองรับ CORS 100%
+        const fontUrl = 'https://cdn.jsdelivr.net/gh/wutthichai/Sarabun-Font@master/Sarabun-Regular.ttf';
         
-        pdfDoc.registerFontkit(window.fontkit); // ลงทะเบียน Fontkit 
-        const customFont = await pdfDoc.embedFont(fontBytes);
+        let customFont;
+        try {
+            const fontBytes = await fetch(fontUrl).then(res => {
+                if (!res.ok) throw new Error("โหลดฟอนต์ไม่สำเร็จ");
+                return res.arrayBuffer();
+            });
+            
+            // ตรวจสอบว่ามี fontkit หรือไม่
+            if (window.fontkit) {
+                pdfDoc.registerFontkit(window.fontkit); 
+                customFont = await pdfDoc.embedFont(fontBytes);
+            } else {
+                throw new Error("Library fontkit ทำงานผิดพลาด");
+            }
+        } catch (fontErr) {
+            console.error("Font Error:", fontErr);
+            throw new Error("ไม่สามารถโหลดฟอนต์ภาษาไทยได้ กรุณาตรวจสอบอินเทอร์เน็ต");
+        }
 
         pages.forEach((page, idx) => {
             const { width, height } = page.getSize();
             const text = getPageLabel(idx, style);
             const size = 14;
             let x, y;
-            const margin = 35; // ขยับขอบให้ห่างออกมานิดนึง
+            const margin = 35;
 
             if(pos === 'tr') { x = width - margin - (size/2); y = height - margin; }
             else if(pos === 'tl') { x = margin; y = height - margin; }
@@ -2800,12 +2815,11 @@ async function addPdfNumbers() {
         
         Swal.fire('สำเร็จ', 'เพิ่มเลขหน้าและดาวน์โหลดเรียบร้อยแล้ว', 'success');
     } catch (e) {
-        Swal.fire('ข้อผิดพลาด', 'ไฟล์อาจจะถูกล็อกรหัสผ่าน หรือเกิดข้อผิดพลาดในการโหลดฟอนต์ภาษาไทย', 'error');
-        console.error(e);
+        console.error("PDF Processing Error:", e);
+        // 🌟 แสดงข้อผิดพลาดที่แท้จริงออกมาให้เห็นชัดๆ
+        Swal.fire('ข้อผิดพลาด', 'สาเหตุ: ' + e.message, 'error');
     }
 }
-
-
 
      // =========================================================
 // ⏱️ ระบบบันทึกกิจกรรมมหาลัย (กยศ. & กิจกรรมเสริมความเป็นครู)
