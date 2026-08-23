@@ -3174,69 +3174,14 @@ function downloadImage(base64Data, filename) {
         });
 }
 
-// 🌟 ฟังก์ชันรวม ดูรายละเอียดกิจกรรม + ดูรูปทั้งหมด (ปรับ UI ใหม่ เรียงบน-ล่าง สบายตาขึ้น)
+// 🌟 ฟังก์ชันรวม ดูรายละเอียดกิจกรรม + ดูรูปทั้งหมด (ดีไซน์ใหม่ แบบมินิมอล อ่านง่าย)
 async function viewActivityDetails(id) {
     try {
         const doc = await db.collection("Users").doc(currentUser.id).collection("Activities").doc(id).get();
         if(doc.exists) {
             const act = doc.data();
             
-            // 1. เตรียมเนื้อหา (ให้อยู่ส่วนบน)
-            let contentHtml = '';
-            if (act.type === 'ครู') {
-                contentHtml = `
-                    <div class="bg-blue-50/50 p-5 rounded-[1.5rem] border border-blue-100 mb-5 relative overflow-hidden">
-                        <div class="absolute -right-4 -top-4 text-blue-200/50 text-6xl"><i class="fa-solid fa-chalkboard-user"></i></div>
-                        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1 relative z-10">กิจกรรมเสริมความเป็นครู</p>
-                        <h4 class="font-bold text-slate-800 text-xl leading-snug relative z-10">${act.title}</h4>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                            <div class="flex flex-col"><span class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">หมวดหมู่</span><span class="text-sm text-slate-700 font-medium">${act.category}</span></div>
-                            <div class="flex flex-col"><span class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">กิจกรรมย่อย</span><span class="text-sm text-slate-700 font-medium">${act.subCategory}</span></div>
-                            <div class="flex flex-col"><span class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">วันที่ทำกิจกรรม</span><span class="text-sm text-slate-700 font-medium">${act.date ? act.date.replace('T', ' เวลา ') : '-'}</span></div>
-                            <div class="flex flex-col"><span class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">หน่วยงานที่รับผิดชอบ</span><span class="text-sm text-slate-700 font-medium">${act.agency || '-'}</span></div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <div>
-                                <p class="font-bold text-slate-700 text-xs mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-lightbulb text-amber-500"></i> สรุปองค์ความรู้</p>
-                                <div class="text-slate-600 text-xs md:text-sm whitespace-pre-wrap bg-slate-50 p-3.5 rounded-xl border border-slate-100 leading-relaxed">${act.knowledge || '-'}</div>
-                            </div>
-                            <div>
-                                <p class="font-bold text-slate-700 text-xs mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-comment-dots text-sky-500"></i> ความคิดเห็นต่อเนื้อหา</p>
-                                <div class="text-slate-600 text-xs md:text-sm whitespace-pre-wrap bg-slate-50 p-3.5 rounded-xl border border-slate-100 leading-relaxed">${act.opinion || '-'}</div>
-                            </div>
-                            <div>
-                                <p class="font-bold text-slate-700 text-xs mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-seedling text-emerald-500"></i> การประยุกต์ใช้ในวิชาชีพ</p>
-                                <div class="text-slate-600 text-xs md:text-sm whitespace-pre-wrap bg-slate-50 p-3.5 rounded-xl border border-slate-100 leading-relaxed">${act.application || '-'}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                contentHtml = `
-                    <div class="bg-orange-50/50 p-5 rounded-[1.5rem] border border-orange-100 mb-5 relative overflow-hidden">
-                        <div class="absolute -right-4 -top-4 text-orange-200/50 text-6xl"><i class="fa-solid fa-hand-holding-heart"></i></div>
-                        <p class="text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-1 relative z-10">จิตอาสา / กยศ.</p>
-                        <h4 class="font-bold text-slate-800 text-xl leading-snug relative z-10">${act.title}</h4>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="flex flex-col"><span class="text-[10px] text-slate-400 font-bold uppercase mb-1">จำนวนชั่วโมงที่ได้รับ</span><span class="text-2xl text-orange-500 font-black">${act.hours} ชม.</span></div>
-                            <i class="fa-solid fa-clock text-4xl text-orange-100"></i>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-                            <div class="flex flex-col"><span class="text-[10px] text-slate-400 font-bold uppercase mb-1">วันที่ทำกิจกรรม</span><span class="text-lg text-slate-700 font-bold">${act.date || '-'}</span></div>
-                            <i class="fa-solid fa-calendar-day text-4xl text-slate-100"></i>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // 2. เตรียมรูปภาพ (ให้อยู่ส่วนล่าง)
+            // 1. เตรียมส่วนแกลเลอรีรูปภาพ (วางไว้ด้านล่างสุด)
             let imagesHtml = '';
             let imageArray = act.images || [];
             if(imageArray.length === 0 && act.imageUrl) imageArray.push(act.imageUrl); 
@@ -3244,58 +3189,110 @@ async function viewActivityDetails(id) {
             if (imageArray.length > 0) {
                 imagesHtml = `
                     <div class="mt-6 pt-5 border-t border-slate-100">
-                        <p class="font-bold text-slate-700 text-sm mb-3 flex items-center gap-2"><i class="fa-regular fa-images text-theme"></i> ภาพหลักฐาน (${imageArray.length} รูป)</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">`;
+                        <p class="font-bold text-slate-800 text-sm mb-3"><i class="fa-solid fa-images text-theme mr-1"></i> ภาพหลักฐานแนบ (${imageArray.length} รูป)</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">`;
                 
                 imageArray.forEach((imgBase64, index) => {
                     imagesHtml += `
-                    <div class="relative group w-full aspect-[4/3] rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50">
-                        <img src="${imgBase64}" class="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-500" onclick="Swal.fire({imageUrl: '${imgBase64}', imageAlt: 'รูปภาพ', width: 'auto', customClass: {popup: 'rounded-[2rem] p-2'}})">
+                    <div class="relative group w-full aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50">
+                        <img src="${imgBase64}" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition duration-300" onclick="Swal.fire({imageUrl: '${imgBase64}', imageAlt: 'รูปภาพ', width: 'auto', customClass: {popup: 'rounded-[2rem] p-2'}})">
                         
-                        <!-- Overlay ปุ่มควบคุม -->
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none"></div>
-                        <div class="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition duration-300 translate-y-2 group-hover:translate-y-0">
-                            <button onclick="Swal.fire({imageUrl: '${imgBase64}', imageAlt: 'รูปภาพ', width: 'auto', customClass: {popup: 'rounded-[2rem] p-2'}})" class="bg-white/90 text-slate-700 rounded-full w-8 h-8 flex items-center justify-center hover:text-theme transition shadow-sm pointer-events-auto" title="ดูรูปเต็ม"><i class="fa-solid fa-expand text-xs"></i></button>
-                            <button onclick="downloadImage('${imgBase64}', 'activity_${act.type}_${index+1}.jpg')" class="bg-theme text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-theme/80 transition shadow-sm pointer-events-auto" title="ดาวน์โหลดรูปนี้"><i class="fa-solid fa-download text-xs"></i></button>
+                        <!-- ปุ่มดาวน์โหลด มุมขวาบนของรูป -->
+                        <div class="absolute top-2 right-2 flex gap-2">
+                            <button onclick="downloadImage('${imgBase64}', 'activity_${act.type}_${index+1}.jpg')" class="bg-black/50 hover:bg-theme text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition shadow-sm" title="ดาวน์โหลดรูปนี้"><i class="fa-solid fa-download text-xs"></i></button>
                         </div>
                     </div>`;
                 });
                 imagesHtml += `</div></div>`;
+            }
+
+            // 2. เตรียมเนื้อหา (แยกสีไอคอนตามประเภท)
+            let contentHtml = '';
+            let headerIcon = '';
+            let headerColor = '';
+            let headerBg = '';
+            let typeLabel = '';
+
+            if (act.type === 'ครู') {
+                headerIcon = '<i class="fa-solid fa-chalkboard-user"></i>';
+                headerColor = 'text-blue-600';
+                headerBg = 'bg-blue-50';
+                typeLabel = 'กิจกรรมเสริมความเป็นครู';
+                
+                contentHtml = `
+                    <div class="space-y-4 text-left">
+                        <div class="grid grid-cols-2 gap-4 border-b border-slate-100 pb-5">
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase">หมวดหมู่</p><p class="text-sm font-semibold text-slate-700 mt-1">${act.category}</p></div>
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase">กิจกรรมย่อย</p><p class="text-sm font-semibold text-slate-700 mt-1">${act.subCategory}</p></div>
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase">วันที่</p><p class="text-sm font-semibold text-slate-700 mt-1">${act.date ? act.date.replace('T', ' เวลา ') : '-'}</p></div>
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase">หน่วยงาน</p><p class="text-sm font-semibold text-slate-700 mt-1">${act.agency || '-'}</p></div>
+                        </div>
+
+                        <div>
+                            <p class="font-bold text-slate-700 text-xs mb-1.5"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> สรุปองค์ความรู้</p>
+                            <p class="text-sm text-slate-600 leading-relaxed">${act.knowledge || '-'}</p>
+                        </div>
+                        <div class="pt-2">
+                            <p class="font-bold text-slate-700 text-xs mb-1.5"><i class="fa-solid fa-comment-dots text-sky-500 mr-1"></i> ความคิดเห็น</p>
+                            <p class="text-sm text-slate-600 leading-relaxed">${act.opinion || '-'}</p>
+                        </div>
+                        <div class="pt-2">
+                            <p class="font-bold text-slate-700 text-xs mb-1.5"><i class="fa-solid fa-seedling text-emerald-500 mr-1"></i> การประยุกต์ใช้</p>
+                            <p class="text-sm text-slate-600 leading-relaxed">${act.application || '-'}</p>
+                        </div>
+                    </div>
+                `;
             } else {
-                imagesHtml = `
-                    <div class="mt-6 pt-5 border-t border-slate-100">
-                        <p class="font-bold text-slate-700 text-sm mb-3 flex items-center gap-2"><i class="fa-regular fa-images text-slate-400"></i> ภาพหลักฐาน</p>
-                        <div class="flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200 p-6">
-                            <i class="fa-regular fa-image text-3xl mb-2 opacity-30"></i>
-                            <p class="text-xs font-medium">ไม่ได้แนบภาพหลักฐาน</p>
+                headerIcon = '<i class="fa-solid fa-hand-holding-heart"></i>';
+                headerColor = 'text-orange-600';
+                headerBg = 'bg-orange-50';
+                typeLabel = 'จิตอาสา / กยศ.';
+                
+                contentHtml = `
+                    <div class="flex gap-4 text-left border-b border-slate-100 pb-5">
+                        <div class="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">ชั่วโมงที่ได้รับ</p>
+                            <p class="text-2xl font-black text-orange-500">${act.hours} <span class="text-sm text-slate-500 font-medium">ชม.</span></p>
+                        </div>
+                        <div class="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">วันที่ทำกิจกรรม</p>
+                            <p class="text-lg font-bold text-slate-700 mt-1">${act.date || '-'}</p>
                         </div>
                     </div>
                 `;
             }
 
-            // 3. แสดงหน้าต่าง
+            // 3. แสดงหน้าต่างแบบ Card
             Swal.fire({
                 html: `
-                    <!-- ปุ่มปิดมุมขวาบน -->
-                    <button type="button" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-100 hover:bg-red-50 w-8 h-8 rounded-full flex items-center justify-center transition z-50" onclick="Swal.close()"><i class="fa-solid fa-xmark"></i></button>
+                    <!-- ปุ่มกากบาทปิด -->
+                    <button type="button" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 w-8 h-8 rounded-full flex items-center justify-center transition" onclick="Swal.close()"><i class="fa-solid fa-xmark"></i></button>
                     
-                    <div class="text-left mt-2 overflow-y-auto custom-scrollbar pr-2" style="max-height: 75vh;">
+                    <div class="text-left mt-2">
+                        <!-- หัวข้อ -->
+                        <div class="flex items-start gap-4 mb-6 pr-6">
+                            <div class="w-12 h-12 rounded-[1rem] flex-shrink-0 flex items-center justify-center text-2xl shadow-sm border border-slate-100 ${headerBg} ${headerColor}">${headerIcon}</div>
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-widest ${headerColor}">${typeLabel}</span>
+                                <h3 class="text-lg md:text-xl font-bold text-slate-800 leading-snug mt-0.5">${act.title}</h3>
+                            </div>
+                        </div>
+                        
+                        <!-- เนื้อหา + รูปภาพ -->
                         ${contentHtml}
                         ${imagesHtml}
                     </div>
                 `,
-                showConfirmButton: false, 
+                showConfirmButton: false,
                 customClass: { 
-                    popup: 'rounded-[2rem] p-6 md:p-8',
-                    htmlContainer: '!m-0 !p-0' 
+                    popup: 'rounded-[2rem] p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.1)]'
                 },
-                width: '700px', // ปรับความกว้างให้กำลังดีสำหรับการอ่านแบบบน-ล่าง
-                padding: '0'
+                width: '600px' // ความกว้างกำลังดี ไม่เล็กไม่ใหญ่เกินไป
             });
         }
     } catch(e) { console.error(e); }
 }
-
+        
 async function deleteActivity(id) {
     const res = await Swal.fire({ title: 'ลบกิจกรรม?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
     if (res.isConfirmed) {
