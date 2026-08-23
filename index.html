@@ -3152,40 +3152,144 @@ async function loadActivities() {
     } catch (e) { console.error(e); }
 }
 
-// ฟังก์ชันดาวน์โหลดรูปภาพ
+// 🌟 ฟังก์ชันดาวน์โหลดรูปภาพ (แก้ไขให้ดาวน์โหลดได้ 100%)
 function downloadImage(base64Data, filename) {
-    const a = document.createElement('a');
-    a.href = base64Data;
-    a.download = filename || 'activity_photo.jpg';
-    a.click();
+    // ใช้ fetch เพื่อดึงข้อมูล base64 แล้วแปลงเป็น Blob ก่อนค่อยดาวน์โหลด (เพื่อหลีกเลี่ยงปัญหา URL ยาวเกินไปในบางเบราว์เซอร์)
+    fetch(base64Data)
+        .then(res => res.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename || 'activity_photo.jpg';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(err => {
+            console.error("Download failed:", err);
+            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดาวน์โหลดรูปภาพได้', 'error');
+        });
 }
 
-// ฟังก์ชันรวม ดูรายละเอียดกิจกรรม + ดูรูปทั้งหมด
+// 🌟 ฟังก์ชันรวม ดูรายละเอียดกิจกรรม + ดูรูปทั้งหมด (ปรับ UI ใหม่ ซ้าย-ขวา & ขยายเต็มจอ)
 async function viewActivityDetails(id) {
     try {
         const doc = await db.collection("Users").doc(currentUser.id).collection("Activities").doc(id).get();
         if(doc.exists) {
             const act = doc.data();
             
-            // เตรียมก้อน HTML สำหรับรูปภาพทั้งหมด
+            // 1. เตรียมรูปภาพ
             let imagesHtml = '';
             let imageArray = act.images || [];
             if(imageArray.length === 0 && act.imageUrl) imageArray.push(act.imageUrl); 
             
             if (imageArray.length > 0) {
-                imagesHtml = `<div class="mt-4 border-t border-slate-200 pt-3">
-                    <p class="font-bold text-slate-700 text-xs mb-2"><i class="fa-regular fa-images"></i> ภาพหลักฐาน (${imageArray.length} รูป):</p>
-                    <div class="flex overflow-x-auto gap-2 pb-2 custom-scrollbar">`;
+                imagesHtml = `
+                    <div class="h-full flex flex-col">
+                        <p class="font-bold text-slate-700 text-sm mb-3 flex items-center gap-2"><i class="fa-regular fa-images text-theme"></i> ภาพหลักฐาน (${imageArray.length} รูป)</p>
+                        <div class="grid grid-cols-2 gap-3 overflow-y-auto custom-scrollbar pr-2 pb-4" style="max-height: 60vh;">`;
                 
                 imageArray.forEach((imgBase64, index) => {
                     imagesHtml += `
-                    <div class="relative group flex-shrink-0">
-                        <img src="${imgBase64}" class="h-24 rounded-lg border border-slate-200 object-cover w-32 cursor-pointer hover:opacity-80 transition" onclick="Swal.fire({imageUrl: '${imgBase64}', imageAlt: 'รูปภาพ', customClass: {popup: 'rounded-[2rem] p-2'}})">
-                        <button onclick="downloadImage('${imgBase64}', 'activity_${act.type}_${index}.jpg')" class="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-theme transition" title="ดาวน์โหลดรูปนี้"><i class="fa-solid fa-download text-[10px]"></i></button>
+                    <div class="relative group w-full aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50">
+                        <img src="${imgBase64}" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition duration-300" onclick="Swal.fire({imageUrl: '${imgBase64}', imageAlt: 'รูปภาพ', width: 'auto', customClass: {popup: 'rounded-[2rem] p-2'}})">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center gap-3">
+                            <button onclick="Swal.fire({imageUrl: '${imgBase64}', imageAlt: 'รูปภาพ', width: 'auto', customClass: {popup: 'rounded-[2rem] p-2'}})" class="bg-white/90 text-slate-700 rounded-full w-8 h-8 flex items-center justify-center hover:text-theme transition" title="ดูรูปเต็ม"><i class="fa-solid fa-expand text-xs"></i></button>
+                            <button onclick="downloadImage('${imgBase64}', 'activity_${act.type}_${index+1}.jpg')" class="bg-theme text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-theme/80 transition shadow-lg" title="ดาวน์โหลดรูปนี้"><i class="fa-solid fa-download text-xs"></i></button>
+                        </div>
                     </div>`;
                 });
                 imagesHtml += `</div></div>`;
+            } else {
+                // กรณีไม่มีรูปภาพ
+                imagesHtml = `
+                    <div class="h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200 p-8 min-h-[200px]">
+                        <i class="fa-regular fa-image text-4xl mb-3 opacity-50"></i>
+                        <p class="text-sm font-medium">ไม่มีภาพหลักฐานแนบไว้</p>
+                    </div>
+                `;
             }
+
+            // 2. เตรียมเนื้อหา
+            let contentHtml = '';
+            if (act.type === 'ครู') {
+                contentHtml = `
+                    <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-4">
+                        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">กิจกรรมเสริมความเป็นครู</p>
+                        <h4 class="font-bold text-slate-800 text-lg leading-snug">${act.title}</h4>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex flex-col"><span class="text-[10px] text-slate-500 font-bold uppercase">หมวดหมู่</span><span class="text-sm text-slate-700 font-medium">${act.category}</span></div>
+                        <div class="flex flex-col"><span class="text-[10px] text-slate-500 font-bold uppercase">กิจกรรมย่อย</span><span class="text-sm text-slate-700 font-medium">${act.subCategory}</span></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="flex flex-col"><span class="text-[10px] text-slate-500 font-bold uppercase">วันที่</span><span class="text-sm text-slate-700 font-medium">${act.date ? act.date.replace('T', ' เวลา ') : '-'}</span></div>
+                            <div class="flex flex-col"><span class="text-[10px] text-slate-500 font-bold uppercase">หน่วยงาน</span><span class="text-sm text-slate-700 font-medium">${act.agency || '-'}</span></div>
+                        </div>
+                        <div class="border-t border-slate-100 pt-3 mt-2">
+                            <p class="font-bold text-slate-700 text-xs mb-1.5"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> สรุปองค์ความรู้</p>
+                            <div class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-3 rounded-xl border border-slate-100">${act.knowledge || '-'}</div>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-700 text-xs mb-1.5"><i class="fa-solid fa-comment-dots text-sky-500 mr-1"></i> ความคิดเห็น</p>
+                            <div class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-3 rounded-xl border border-slate-100">${act.opinion || '-'}</div>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-700 text-xs mb-1.5"><i class="fa-solid fa-seedling text-emerald-500 mr-1"></i> การประยุกต์ใช้</p>
+                            <div class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-3 rounded-xl border border-slate-100">${act.application || '-'}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentHtml = `
+                    <div class="bg-orange-50/50 p-4 rounded-2xl border border-orange-100 mb-4">
+                        <p class="text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-1">จิตอาสา / กยศ.</p>
+                        <h4 class="font-bold text-slate-800 text-lg leading-snug">${act.title}</h4>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div class="flex flex-col"><span class="text-[10px] text-slate-500 font-bold uppercase">จำนวนชั่วโมงที่ได้</span><span class="text-xl text-orange-500 font-black">${act.hours} ชม.</span></div>
+                            <i class="fa-solid fa-clock text-3xl text-orange-200"></i>
+                        </div>
+                        <div class="flex flex-col"><span class="text-[10px] text-slate-500 font-bold uppercase">วันที่ทำกิจกรรม</span><span class="text-sm text-slate-700 font-medium">${act.date || '-'}</span></div>
+                    </div>
+                `;
+            }
+
+            // 3. แสดงหน้าต่างแบบ Custom กว้างๆ
+            Swal.fire({
+                html: `
+                    <!-- ปุ่มปิดมุมขวาบน -->
+                    <button type="button" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center transition" onclick="Swal.close()"><i class="fa-solid fa-xmark"></i></button>
+                    
+                    <!-- โครงสร้างแยกซ้าย-ขวา -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 text-left mt-2">
+                        <!-- ฝั่งซ้าย: เนื้อหา -->
+                        <div class="md:border-r md:border-slate-100 md:pr-6 flex flex-col h-full">
+                            <div class="overflow-y-auto custom-scrollbar pr-2" style="max-height: 60vh;">
+                                ${contentHtml}
+                            </div>
+                        </div>
+                        
+                        <!-- ฝั่งขวา: รูปภาพ -->
+                        <div class="pt-6 md:pt-0 border-t border-slate-100 md:border-t-0">
+                            ${imagesHtml}
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false, // ซ่อนปุ่ม OK เดิมไปเลย ใช้ปุ่ม X ด้านบนแทน
+                customClass: { 
+                    popup: 'rounded-[2rem] p-6 md:p-8',
+                    htmlContainer: '!m-0 !p-0' // ลบ margin พื้นฐานของ Swal ออก
+                },
+                width: '900px', // กำหนดความกว้างป๊อปอัปให้กว้างขึ้น
+                padding: '0'
+            });
+        }
+    } catch(e) { console.error(e); }
+}
 
             // เตรียมก้อน HTML ของรายละเอียดเนื้อหา
             let contentHtml = '';
