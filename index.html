@@ -3204,7 +3204,6 @@ async function viewActivityDetails(id) {
                 });
                 imagesHtml += `</div></div>`;
             } else {
-                // กรณีไม่มีรูปภาพ
                 imagesHtml = `
                     <div class="h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200 p-8 min-h-[200px]">
                         <i class="fa-regular fa-image text-4xl mb-3 opacity-50"></i>
@@ -3258,70 +3257,28 @@ async function viewActivityDetails(id) {
                 `;
             }
 
-            // 3. แสดงหน้าต่างแบบ Custom กว้างๆ
+            // 3. แสดงหน้าต่างแบบ Custom
             Swal.fire({
                 html: `
-                    <!-- ปุ่มปิดมุมขวาบน -->
                     <button type="button" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 w-8 h-8 rounded-full flex items-center justify-center transition" onclick="Swal.close()"><i class="fa-solid fa-xmark"></i></button>
-                    
-                    <!-- โครงสร้างแยกซ้าย-ขวา -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 text-left mt-2">
-                        <!-- ฝั่งซ้าย: เนื้อหา -->
                         <div class="md:border-r md:border-slate-100 md:pr-6 flex flex-col h-full">
                             <div class="overflow-y-auto custom-scrollbar pr-2" style="max-height: 60vh;">
                                 ${contentHtml}
                             </div>
                         </div>
-                        
-                        <!-- ฝั่งขวา: รูปภาพ -->
                         <div class="pt-6 md:pt-0 border-t border-slate-100 md:border-t-0">
                             ${imagesHtml}
                         </div>
                     </div>
                 `,
-                showConfirmButton: false, // ซ่อนปุ่ม OK เดิมไปเลย ใช้ปุ่ม X ด้านบนแทน
+                showConfirmButton: false, 
                 customClass: { 
                     popup: 'rounded-[2rem] p-6 md:p-8',
-                    htmlContainer: '!m-0 !p-0' // ลบ margin พื้นฐานของ Swal ออก
+                    htmlContainer: '!m-0 !p-0' 
                 },
-                width: '900px', // กำหนดความกว้างป๊อปอัปให้กว้างขึ้น
+                width: '900px', 
                 padding: '0'
-            });
-        }
-    } catch(e) { console.error(e); }
-}
-
-            // เตรียมก้อน HTML ของรายละเอียดเนื้อหา
-            let contentHtml = '';
-            if (act.type === 'ครู') {
-                contentHtml = `
-                    <p><b>หมวดหมู่:</b> ${act.category}</p><p><b>กิจกรรมย่อย:</b> ${act.subCategory}</p><p><b>หน่วยงาน:</b> ${act.agency || '-'}</p><p><b>วันที่:</b> ${act.date ? act.date.replace('T', ' เวลา ') : '-'}</p>
-                    <hr class="my-2">
-                    <p class="font-bold text-slate-700">สรุปความรู้:</p><p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.knowledge || '-'}</p>
-                    <p class="font-bold text-slate-700 mt-2">ความคิดเห็นต่อเนื้อหา:</p><p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.opinion || '-'}</p>
-                    <p class="font-bold text-slate-700 mt-2">การนำไปประยุกต์ใช้:</p><p class="text-slate-600 text-xs whitespace-pre-wrap bg-slate-50 p-2 rounded-lg">${act.application || '-'}</p>
-                `;
-            } else {
-                contentHtml = `
-                    <p><b>ประเภท:</b> จิตอาสา / กยศ.</p>
-                    <p><b>จำนวนชั่วโมง:</b> <span class="text-orange-500 font-bold">${act.hours} ชั่วโมง</span></p>
-                    <p><b>วันที่ทำกิจกรรม:</b> ${act.date || '-'}</p>
-                `;
-            }
-
-            // แสดงหน้าต่าง
-            Swal.fire({
-                title: `<span class="text-lg font-bold ${act.type === 'ครู' ? 'text-blue-600' : 'text-orange-500'}">รายละเอียดกิจกรรม: ${act.title}</span>`,
-                html: `
-                    <div class="text-left text-sm space-y-1.5 mt-2">
-                        ${contentHtml}
-                        ${imagesHtml}
-                    </div>
-                `,
-                confirmButtonText: 'ปิด',
-                confirmButtonColor: 'var(--primary-theme)',
-                customClass: { popup: 'rounded-[2rem]' },
-                width: '500px'
             });
         }
     } catch(e) { console.error(e); }
@@ -3334,6 +3291,6 @@ async function deleteActivity(id) {
         loadActivities();
     }
 }
-    </script>
+</script>
 </body>
 </html>
