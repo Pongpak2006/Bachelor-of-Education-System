@@ -21,6 +21,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <!-- วางบรรทัดนี้เพิ่มเข้าไป 👇 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
     <!-- 📍 Library จัดการไฟล์แบบปลอดภัย (ประมวลผลบนเครื่องผู้ใช้ 100%) -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://unpkg.com/@pdf-lib/fontkit/dist/fontkit.umd.min.js"></script> 
@@ -178,6 +179,12 @@
                      </svg>
                         เข้าสู่ระบบด้วย Google
                     </button>
+
+                    <!-- ⬇️ วางปุ่ม LINE ตรงนี้ (หลังปุ่ม Google จบ </button>) ⬇️ -->
+                    <button type="button" onclick="loginWithLine()" class="w-full flex items-center justify-center gap-2 bg-[#06C755] text-white font-bold py-3.5 md:py-4 px-4 rounded-xl md:rounded-2xl transition hover:opacity-90 active:scale-95 text-sm shadow-sm">
+                        <i class="fa-brands fa-line text-lg"></i> เข้าสู่ระบบด้วย LINE
+                    </button>
+                    <!-- ⬆️ จบปุ่ม LINE ⬆️ -->
                     
                     <button type="button" onclick="showRegisterPopup()" style="background-color: rgba(var(--primary-theme-rgb), 0.08); color: var(--primary-theme); border-color: rgba(var(--primary-theme-rgb), 0.2);" class="w-full flex items-center justify-center gap-2 md:gap-3 font-bold py-3.5 md:py-4 px-4 rounded-xl md:rounded-2xl transition hover:opacity-80 active:scale-95 text-sm shadow-sm border">
                         <i class="fa-solid fa-user-plus text-sm md:text-base"></i>
@@ -836,6 +843,7 @@ const db = firebase.firestore();
         };
         let currentTotalCredits = 0; // 🌟 ตัวแปรกลางเก็บหน่วยกิตปัจจุบัน
         let currentTotalPoints = 0;  // 🌟 ตัวแปรกลางเก็บแต้มคะแนนปัจจุบัน
+        let currentUser = {};
         
         // 🚀 รายวิชาครบถ้วนตามลิสต์ของคุณ
         let BASE_COURSES = [
@@ -1425,7 +1433,22 @@ function loginWithUsername() {
         Swal.fire('ข้อผิดพลาด', 'ระบบมีปัญหา กรุณาลองใหม่', 'error');
     });
 }
+// ==========================================
+// เข้าสู่ระบบด้วย LINE
+// ==========================================
+const fns = firebase.functions();
 
+async function loginWithLine() {
+  Swal.fire({ title: 'กำลังเชื่อมต่อ LINE...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  try {
+    const username = document.getElementById('username') ? document.getElementById('username').value.trim() : null;
+    const res = await fns.httpsCallable('lineLoginStart')({ username });
+    window.location.href = res.data.url;
+  } catch (e) {
+    Swal.fire('ข้อผิดพลาด', e.message, 'error');
+  }
+}
+        
 // ==========================================
 // 3. ระบบเข้าสู่ระบบด้วย Google (แบบ Pop-up ดั้งเดิมที่เสถียรที่สุด)
 // ==========================================
@@ -3300,6 +3323,23 @@ async function deleteActivity(id) {
         loadActivities();
     }
 }
+// ==========================================
+// ล็อกอินอัตโนมัติหลังกลับจาก LINE
+// ==========================================
+firebase.auth().onAuthStateChanged(async (user) => {
+  const savedUser = localStorage.getItem("rememberedUsername");
+  if (user && savedUser && !currentUser.id) {
+    try {
+      const doc = await db.collection("Users").doc(savedUser).get();
+      if (doc.exists) {
+        currentUser = doc.data();
+        currentUser.id = doc.id;
+        currentUser.studentId = currentUser.studentId || doc.id;
+        showStudentDashboard();
+      }
+    } catch (e) { console.error(e); }
+  }
+});
 </script>
 </body>
 </html>
