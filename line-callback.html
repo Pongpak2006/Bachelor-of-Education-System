@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>กำลังเข้าสู่ระบบ...</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+</head>
+<body>
+<p style="text-align:center;margin-top:40px;">กำลังตรวจสอบบัญชี LINE...</p>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyDda5v7a1ZlWl6VJ6Te-S8Q6Q8inuCECK0",
+    authDomain: "bachelor-edu-system.firebaseapp.com",
+    projectId: "bachelor-edu-system",
+    appId: "1:555108991120:web:cf7bfee14a48fdabc25815"
+  });
+
+  const params = new URLSearchParams(location.search);
+  const fns = firebase.functions();
+
+  fns.httpsCallable("lineLoginCallback")({
+    code: params.get("code"),
+    state: params.get("state")
+  }).then(async (res) => {
+    if (res.data.needLink) {
+      alert("ยังไม่ได้ผูกบัญชี กรุณาเข้าสู่ระบบด้วยชื่อผู้ใช้งานก่อน");
+      location.href = "/";
+      return;
+    }
+    await firebase.auth().signInWithCustomToken(res.data.token);
+    localStorage.setItem("rememberedUsername", res.data.username);
+    location.href = "/";
+  }).catch(err => {
+    alert("เข้าสู่ระบบไม่สำเร็จ: " + err.message);
+    location.href = "/";
+  });
+</script>
+</body>
+</html>
