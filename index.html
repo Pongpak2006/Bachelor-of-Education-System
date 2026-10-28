@@ -3350,22 +3350,31 @@ async function deleteActivity(id) {
     }
 }
 // ==========================================
-// ล็อกอินอัตโนมัติหลังกลับจาก LINE
+// ล็อกอินอัตโนมัติด้วยโทเคนจาก LINE (?lt=...)
 // ==========================================
-firebase.auth().onAuthStateChanged(async (user) => {
-  const savedUser = localStorage.getItem("rememberedUsername");
-  if (user && savedUser && !currentUser.id) {
-    try {
-      const doc = await db.collection("Users").doc(savedUser).get();
-      if (doc.exists) {
-        currentUser = doc.data();
-        currentUser.id = doc.id;
-        currentUser.studentId = currentUser.studentId || doc.id;
-        showStudentDashboard();
-      }
-    } catch (e) { console.error(e); }
+(async function autoLoginFromLine() {
+  const params = new URLSearchParams(location.search);
+  const lt = params.get("lt");
+  if (!lt) return;
+
+  // ลบพารามิเตอร์ออกจาก URL ทันที กันการใช้ซ้ำ
+  history.replaceState(null, "", location.pathname);
+
+  Swal.fire({ title: "กำลังเข้าสู่ระบบ...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  try {
+    const res = await firebase.functions().httpsCallable("lineAutoLogin")({ token: lt });
+    const user = res.data.user;
+    currentUser = user;
+    currentUser.id = user.id;
+    Swal.close();
+    showStudentDashboard();
+    if (params.get("linked") === "1") {
+      Swal.fire({ icon: "success", title: "เชื่อมต่อ LINE สำเร็จ ✅", timer: 1800, showConfirmButton: false });
+    }
+  } catch (e) {
+    Swal.fire("ผิดพลาด", e.message, "error");
   }
-});
+})();
 </script>
 </body>
 </html>
