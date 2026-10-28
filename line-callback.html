@@ -17,18 +17,22 @@
     appId: "1:555108991120:web:cf7bfee14a48fdabc25815"
   });
 
+  const fns = firebase.functions();
   const params = new URLSearchParams(location.search);
 
-  firebase.functions().httpsCallable("lineLoginCallback")({
-    code: params.get("code"),
-    state: params.get("state")
-  }).then((res) => {
-    alert("เชื่อมต่อ LINE สำเร็จ ✅ กรุณาเข้าสู่ระบบอีกครั้ง");
-    location.href = "/";
-  }).catch((err) => {
-    alert("เชื่อมต่อไม่สำเร็จ: " + err.message);
-    location.href = "/";
-  });
+  (async () => {
+    try {
+      const res = await fns.httpsCallable("lineLoginCallback")({
+        code: params.get("code"),
+        state: params.get("state")
+      });
+      // ส่งโทเคนไปให้หน้าหลักล็อกอินต่อให้อัตโนมัติ
+      location.replace("/?lt=" + encodeURIComponent(res.data.loginToken) + "&linked=1");
+    } catch (err) {
+      alert("เชื่อมต่อไม่สำเร็จ: " + err.message);
+      location.replace("/");
+    }
+  })();
 </script>
 </body>
 </html>
