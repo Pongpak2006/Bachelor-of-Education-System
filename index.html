@@ -1574,7 +1574,7 @@ function showStudentDashboard() {
     const bt = document.getElementById('lineLinkBtn');
     if (st && bt) {
         if (currentUser.lineUserId) {
-            st.innerText = '✅ เชื่อมต่อ LINE แล้ว';
+            st.innerText = '✅ เชื่อมต่อ LINE แล้ว' + (currentUser.lineDisplayName ? ' (' + currentUser.lineDisplayName + ')' : '');
             bt.innerText = 'เชื่อมต่อใหม่';
         } else {
             st.innerText = 'ยังไม่ได้เชื่อมต่อ';
@@ -3263,11 +3263,12 @@ async function deleteActivity(id) {
     currentUser.id = user.id;
     Swal.close();
     showStudentDashboard();
+    if (params.get("go") === "service") switchTab("serviceTab");
     if (params.get("linked") === "1") {
       Swal.fire({ icon: "success", title: "เชื่อมต่อ LINE สำเร็จ ✅", timer: 1800, showConfirmButton: false });
     }
   } catch (e) {
-    Swal.fire("ผิดพลาด", e.message, "error");
+    Swal.fire("ลิงก์ใช้ไม่ได้", "ลิงก์ใช้ได้ครั้งเดียวและมีอายุ 5 นาที กลับไปกดปุ่มในแชท LINE อีกครั้ง หรือเข้าสู่ระบบด้วยรหัสผ่านตามปกติ", "info");
   }
 })();
 </script>
