@@ -89,6 +89,17 @@
             html, body { height: auto; }
             .page-break { page-break-inside: avoid; }
         }
+        /* ===== ปรับขนาดเฉพาะหน้าจอโน้ตบุ๊ก (ไม่กระทบมือถือ/แท็บเล็ต/จอใหญ่) ===== */
+            @media (min-width: 1024px) and (max-width: 1600px) and (max-height: 960px) {
+        /* หน้าหลักนักศึกษา: ย่อทั้งหน้าลง */
+            #studentSection {
+            zoom: 0.9;
+        }
+        /* หน้าล็อกอิน: ย่อเฉพาะกล่องล็อกอิน (ถ้าไม่ต้องการ ลบบล็อกนี้ทิ้งได้) */
+        #studentLoginBox, #adminLoginBox, #aiToolBox {
+            zoom: 0.92;
+        }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-indigo-100">
@@ -849,6 +860,7 @@ const db = firebase.firestore();
             "2568": 141,
             "2569": 141 
         };
+        const TOTAL_CREDITS = 141;
         let currentTotalCredits = 0; // 🌟 ตัวแปรกลางเก็บหน่วยกิตปัจจุบัน
         let currentTotalPoints = 0;  // 🌟 ตัวแปรกลางเก็บแต้มคะแนนปัจจุบัน
         let currentUser = {};
@@ -980,7 +992,7 @@ let COURSES_2563 = [
     { code: 'CEE2308', name: 'ความคิดสร้างสรรค์สำหรับเด็ก', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
     { code: 'CEE3301', name: 'คณิตศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
     { code: 'CEE3302', name: 'ศิลปะสำหรับครูประถมศึกษา', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
-    { code: 'CEE3303', name: 'สังคมศึก๋ษา ศาสนา และวัฒนธรรมสำหรับครูประถมศึกษา', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
+    { code: 'CEE3303', name: 'สังคมศึกษา ศาสนา และวัฒนธรรมสำหรับครูประถมศึกษา', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
     { code: 'CEE3304', name: 'วิทยาศาสตร์สำหรับครูประถมศึกษา', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
     { code: 'CEE3305', name: 'ภาษาต่างประเทศสำหรับครูประถมศึกษา', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
     { code: 'CEE3306', name: 'การจัดกิจกรรมการเรียนการเรียนรู้นอกห้องเรียนสำหรับเด็ก', credit: 3, category: '10. วิชาเอกประถมศึกษา (บังคับ)' },
@@ -2336,7 +2348,7 @@ function calculatePrediction() {
     } else if (predictedGpax >= 3.25) {
         honorsText = appLang === 'en' 
             ? '<br><span class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold border border-indigo-100 inline-block mt-2">🥈 Potential 2nd Class Honors</span>' 
-            : '<br><span class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold border border-indigo-100 inline-block mt-2">🥈 有โอกาสได้เกียรตินิยมอันดับ 2</span>';
+            : '<br><span class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold border border-indigo-100 inline-block mt-2">🥈 มีโอกาสได้เกียรตินิยมอันดับ 2</span>';
     }
 
     // กำหนดข้อความแสดงผลสองภาษา
@@ -2348,7 +2360,7 @@ function calculatePrediction() {
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Predicted GPAX</p>
                 <p class="text-3xl font-black text-theme mt-1">${predictedGpax}</p>
             </div>
-            <p class="text-xs text-slate-400 text-center">Total Earned Credits will be ${newTotalCredits} / ${TOTAL_CREDITS} CR</p>
+            <p class="text-xs text-slate-400 text-center">Total Earned Credits will be ${newTotalCredits} / ${REQUIRED_CREDITS[currentUser.curriculumYear] || 141} CR</p>
             <div class="text-center">${honorsText}</div>
            </div>`
         : `<div class="text-left text-sm text-slate-600">
@@ -2357,7 +2369,7 @@ function calculatePrediction() {
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">เกรดเฉลี่ยสะสม (GPAX) คาดการณ์</p>
                 <p class="text-3xl font-black text-theme mt-1">${predictedGpax}</p>
             </div>
-            <p class="text-xs text-slate-400 text-center">หน่วยกิตสะสมรวมจะเพิ่มเป็น ${newTotalCredits} จากทั้งหมด ${TOTAL_CREDITS} หน่วยกิต</p>
+            <p class="text-xs text-slate-400 text-center">หน่วยกิตสะสมรวมจะเพิ่มเป็น ${newTotalCredits} จากทั้งหมด ${REQUIRED_CREDITS[currentUser.curriculumYear] || 141} หน่วยกิต</p>
             <div class="text-center">${honorsText}</div>
            </div>`;
 
@@ -2471,124 +2483,7 @@ function exportToExcel() {
         Swal.fire('ผิดพลาด', 'ไม่สามารถดึงข้อมูลเพื่อสำรองไฟล์ได้', 'error');
     });
 }
-        // 📊 ฟังก์ชันดึงข้อมูลนักศึกษาทั้งหมดมาประมวลผลทำกราฟสถิติ
-async function initHonorsChart() {
-    try {
-        // 1. ดึงข้อมูล Users เฉพาะคนที่เป็น student ทั้งหมดจาก Firestore
-        const snapshot = await db.collection("Users").where("role", "==", "student").get();
-        
-        let normalCount = 0;
-        let probationCount = 0;
-        let honorsCount = 0;
 
-        // 2. วิ่งลูปนับจำนวนแยกตามเกณฑ์สถิติ
-        snapshot.forEach(doc => {
-            const student = doc.data();
-            
-            // 💡 อิงตามเกรดเฉลี่ยสะสม (ถ้ามีเก็บไว้) หรือเงื่อนไขสถานะในระบบ
-            if (student.status === "เฝ้าระวัง") {
-                probationCount++;
-            } else if (student.gpa >= 3.50) { // สมมุติตัวอย่างเงื่อนไขเกียรตินิยม
-                honorsCount++;
-            } else {
-                normalCount++;
-            }
-        });
-
-        // 3. เริ่มวาดกราฟลงบน Canvas
-        const ctx = document.getElementById('honorsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut', // ใช้กราฟทรงโดนัท สวยงามและประหยัดพื้นที่ Dashboard
-            data: {
-                labels: ['สถานะปกติ', 'เฝ้าระวัง/ตกค้าง', 'เกณฑ์เกียรตินิยม'],
-                datasets: [{
-                    data: [normalCount, probationCount, honorsCount],
-                    backgroundColor: [
-                        '#10B981', // สีเขียว Emerald
-                        '#EF4444', // สีแดง Red
-                        '#F59E0B'  // สีส้ม Amber
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom', // เอาป้ายคำอธิบายไปไว้ด้านล่าง
-                        labels: {
-                            boxWidth: 12,
-                            font: { size: 11, family: 'Kanit' }
-                        }
-                    }
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error("Error loading chart statistics:", error);
-    }
-}
-
-// 💡 อย่าลืมใส่คำสั่งนี้ไว้ในฟังก์ชันตอนที่แอดมินล็อกอินสำเร็จ หรือตอนโหลดหน้าแผงควบคุมเสร็จด้วยนะครับ
-// initHonorsChart();
-        // 📊 ฟังก์ชันวาดกราฟสถิติ
-async function initHonorsChart() {
-    try {
-        const snapshot = await db.collection("Users").where("role", "==", "student").get();
-        let normalCount = 0;
-        let probationCount = 0;
-        let honorsCount = 0;
-
-        // วิ่งลูปเช็คสถานะนักศึกษาแต่ละคน (ตัวอย่างข้อมูลเบื้องต้น)
-        snapshot.forEach(doc => {
-            const student = doc.data();
-            // สมมติฐานเช็คจากเกรด หรือถ้ามีสถานะเก็บไว้
-            if (student.status === "เฝ้าระวัง" || student.status === "ตกค้าง") {
-                probationCount++;
-            } else if (student.gpa && student.gpa >= 3.50) { 
-                honorsCount++;
-            } else {
-                normalCount++;
-            }
-        });
-
-        // ล้างกราฟเก่าออกก่อน (ป้องกันกราฟซ้อนกันเวลาโหลดใหม่)
-        let chartStatus = Chart.getChart("honorsChart");
-        if (chartStatus != undefined) {
-            chartStatus.destroy();
-        }
-
-        // เริ่มวาดกราฟ
-        const ctx = document.getElementById('honorsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['สถานะปกติ', 'เฝ้าระวัง/ตกค้าง', 'เกณฑ์เกียรตินิยม'],
-                datasets: [{
-                    data: [normalCount, probationCount, honorsCount],
-                    backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { font: { family: 'Prompt' } }
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error("Error loading chart:", error);
-    }
-}
         function generateAIPrompt() {
     // 1. ดึงข้อมูลรายวิชาและมาตรฐาน
     const subjectGroup = document.getElementById('aiSubjectGroup').value;
