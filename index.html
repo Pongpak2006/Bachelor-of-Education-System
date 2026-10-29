@@ -444,6 +444,18 @@
                         <i class="fa-solid fa-calendar-days absolute left-4 top-4 text-slate-400"></i>
                         <input type="number" id="newYear" class="lang-placeholder w-full pl-11 p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-green-600 transition text-sm" placeholder="ชั้นปี" data-th="ชั้นปี" data-en="Year">
                     </div>
+                    <div class="relative">
+                    <i class="fa-solid fa-book absolute left-4 top-4 text-slate-400"></i>
+                    <select id="newCurriculumYear" class="w-full pl-11 p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-green-600 transition text-sm">
+                        <option value="2563">โครงสร้าง 2563</option>
+                        <option value="2564">โครงสร้าง 2564</option>
+                        <option value="2565">โครงสร้าง 2565</option>
+                        <option value="2566">โครงสร้าง 2566</option>
+                        <option value="2567" selected>โครงสร้าง 2567</option>
+                        <option value="2568">โครงสร้าง 2568</option>
+                        <option value="2569">โครงสร้าง 2569</option>
+                   </select>
+             </div>
                     <button onclick="addUser()" class="w-full admin-bg-theme text-white p-4 rounded-xl font-bold hover:opacity-90 transition shadow-sm active:scale-95 text-base mt-2 flex justify-center items-center gap-2">
                         <i class="fa-solid fa-save"></i> <span class="lang-txt" data-th="บันทึกข้อมูล" data-en="Save Data">บันทึกข้อมูล</span>
                     </button>
@@ -520,7 +532,7 @@
                 <div class="bg-gradient-to-br from-blue-50 to-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-blue-100 text-center flex flex-col justify-center relative overflow-hidden">
                     <i class="fa-solid fa-coins absolute -right-3 -top-3 text-5xl text-blue-100 opacity-50"></i>
                     <p class="text-[10px] md:text-xs text-blue-600 font-bold mb-1 uppercase tracking-widest relative z-10 lang-txt" data-th="หน่วยกิตสะสม" data-en="Earned Credits">หน่วยกิตสะสม</p>
-                    <p class="text-3xl md:text-4xl font-bold text-blue-600 relative z-10"><span id="totalCredits">0</span><span class="text-sm font-medium text-slate-400">/141</span></p>
+                    <p class="text-3xl md:text-4xl font-bold text-blue-600 relative z-10"><span id="totalCredits">0</span><span id="targetCreditsLabel" class="text-sm font-medium text-slate-400">/141</span></p>
                 </div>
                 <div class="bg-gradient-to-br from-orange-50 to-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-orange-100 text-center flex flex-col justify-center relative overflow-hidden">
                     <i class="fa-solid fa-bullseye absolute -right-3 -top-3 text-5xl text-orange-100 opacity-50"></i>
@@ -1816,7 +1828,8 @@ function calculateStatus(totalCr) {
             currentTotalPoints = totalPt;
             
             // 🌟 1. ดึงเป้าหมายหน่วยกิตตามชั้นปีของเด็กที่ล็อกอิน (ถ้าไม่มีข้อมูลให้ใช้ 141 เป็นค่าเริ่มต้น)
-let targetCr = REQUIRED_CREDITS[currentUser.curriculumYear] || 141;
+            let targetCr = REQUIRED_CREDITS[currentUser.curriculumYear] || 141;
+            document.getElementById('targetCreditsLabel').innerText = '/' + targetCr;
             
             // 🌟 2. คำนวณส่วนที่เหลือและเปอร์เซ็นต์ โดยเปลี่ยนไปใช้ targetCr แทน
             let remaining = Math.max(0, targetCr - totalCr);
@@ -2186,6 +2199,7 @@ let targetCr = REQUIRED_CREDITS[currentUser.curriculumYear] || 141;
                 name: document.getElementById('newName').value, 
                 email: document.getElementById('newEmail').value, 
                 year: document.getElementById('newYear').value,
+                curriculumYear: document.getElementById('newCurriculumYear').value,
                 role: 'student'
             };
             if(!data.username || !data.password || !data.studentId || !data.name) return Swal.fire(appLang === 'en' ? 'Warning' : 'เตือน', appLang === 'en' ? 'Please fill in all fields' : 'กรุณากรอกข้อมูลหลักให้ครบ', 'warning');
