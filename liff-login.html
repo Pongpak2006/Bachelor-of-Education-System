@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>กำลังเข้าสู่ระบบ</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+</head>
+<body style="font-family:sans-serif;text-align:center;padding-top:30vh;color:#334155">
+<p id="msg">กำลังเข้าสู่ระบบ...</p>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDda5v7a1ZlWl6VJ6Te-S8Q6Q8inuCECK0",
+  authDomain: "bachelor-edu-system.firebaseapp.com",
+  projectId: "bachelor-edu-system",
+  appId: "1:555108991120:web:cf7bfee14a48fdabc25815"
+});
+
+(async () => {
+  try {
+    await liff.init({ liffId: "ใส่ LIFF ID ที่นี่" });
+    if (!liff.isLoggedIn()) { liff.login(); return; }
+    const res = await firebase.functions().httpsCallable("lineLiffLogin")({
+      accessToken: liff.getAccessToken()
+    });
+    location.replace("https://pongpak.site/?lt=" + res.data.token);
+  } catch (e) {
+    document.getElementById("msg").innerText =
+      e.message || "เข้าสู่ระบบไม่สำเร็จ ลองพิมพ์ เข้าเว็บ ในแชทแทน";
+  }
+})();
+</script>
+</body>
+</html>
