@@ -20,7 +20,7 @@ firebase.initializeApp({
 
 (async () => {
   try {
-    await liff.init({ liffId: "ใส่ LIFF ID ที่นี่" });
+    await liff.init({ liffId: "2012248515-T2zzn42G" });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     const res = await firebase.functions().httpsCallable("lineLiffLogin")({
       accessToken: liff.getAccessToken()
