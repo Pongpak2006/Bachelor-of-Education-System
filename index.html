@@ -89,17 +89,17 @@
             html, body { height: auto; }
             .page-break { page-break-inside: avoid; }
         }
-        /* ===== ปรับขนาดเฉพาะหน้าจอโน้ตบุ๊ก (ไม่กระทบมือถือ/แท็บเล็ต/จอใหญ่) ===== */
-            @media (min-width: 1024px) and (max-width: 1600px) and (max-height: 960px) {
-        /* หน้าหลักนักศึกษา: ย่อทั้งหน้าลง */
-            #studentSection {
-            zoom: 0.9;
-        }
-        /* หน้าล็อกอิน: ย่อเฉพาะกล่องล็อกอิน (ถ้าไม่ต้องการ ลบบล็อกนี้ทิ้งได้) */
-        #studentLoginBox, #adminLoginBox, #aiToolBox {
-            zoom: 0.92;
-        }
-        }
+        /* ===== ปรับขนาดเฉพาะหน้าจอโน้ตบุ๊ก/MacBook (ไม่กระทบมือถือ/แท็บเล็ต) ===== */
+@media (min-width: 1024px) and (max-width: 1800px) and (min-height: 680px) and (max-height: 1200px) and (hover: hover) and (pointer: fine) {
+    /* หน้าหลักนักศึกษา: ย่อทั้งหน้าลง */
+    #studentSection {
+        zoom: 0.9;
+    }
+    /* หน้าล็อกอิน: ย่อเฉพาะกล่องล็อกอิน */
+    #studentLoginBox, #adminLoginBox, #aiToolBox {
+        zoom: 0.92;
+    }
+}
     </style>
 </head>
 <body class="antialiased selection:bg-indigo-100">
