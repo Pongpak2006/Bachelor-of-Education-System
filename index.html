@@ -52,6 +52,16 @@
         .hover-border-theme:hover { border-color: var(--primary-theme) !important; }
         .hover-text-theme:hover { color: var(--primary-theme) !important; }
 
+        /* 🎨 คลาสสำหรับส่วน AI Planner ให้ตามสีธีมรายเดือน */
+        .ai-soft-bg { background: rgba(var(--primary-theme-rgb), 0.08) !important; }
+        .ai-soft-border { border-color: rgba(var(--primary-theme-rgb), 0.25) !important; }
+        .ai-focus:focus {
+        border-color: var(--primary-theme) !important;
+        box-shadow: 0 0 0 3px rgba(var(--primary-theme-rgb), 0.12) !important;
+        }
+.ai-btn-shadow { box-shadow: 0 5px 15px rgba(var(--primary-theme-rgb), 0.3) !important; }
+.ai-btn-shadow:hover { box-shadow: 0 8px 25px rgba(var(--primary-theme-rgb), 0.4) !important; }
+
         .admin-text-theme { color: var(--admin-primary) !important; }
         .admin-bg-theme { background-color: var(--admin-primary) !important; }
         .admin-gradient-theme { background: var(--admin-gradient) !important; }
@@ -117,7 +127,7 @@
             <i class="fa-solid fa-book-open text-theme"></i>
             <span class="lang-txt" data-th="คู่มือ" data-en="Manual">คู่มือ</span>
         </button>
-        <button onclick="toggleLoginView('aiTool')" class="bg-gradient-to-r from-purple-50 to-fuchsia-50 text-purple-600 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-purple-200 shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+        <button onclick="toggleLoginView('aiTool')" class="ai-soft-bg ai-soft-border text-theme text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full border shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             <span class="lang-txt" data-th="สร้างแผนฯ (AI)" data-en="AI Planner">สร้างแผนฯ (AI)</span>
         </button>
@@ -211,8 +221,8 @@
         <i class="fa-solid fa-arrow-left"></i> <span class="lang-txt" data-th="ปิดหน้าต่าง" data-en="Close">ปิดหน้าต่าง</span>
     </button>
 
-    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-gradient-to-br from-purple-100 to-fuchsia-100 text-purple-600 flex items-center justify-center mx-auto mb-4 text-2xl md:text-3xl shadow-sm border border-purple-200 animate-float">
-        <i class="fa-solid fa-brain"></i>
+    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] ai-soft-bg ai-soft-border text-theme flex items-center justify-center mx-auto mb-4 text-2xl md:text-3xl shadow-sm border animate-float">
+    <i class="fa-solid fa-brain"></i>
     </div>
     <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-1 lang-txt" data-th="ระบบสร้างแผนการสอนอัจฉริยะ" data-en="AI Lesson Planner">ระบบสร้างแผนการสอนอัจฉริยะ</h2>
     <p class="text-[11px] md:text-xs text-slate-500 mb-6 lang-txt" data-th="กรอกข้อมูลด้วยภาษาพูดธรรมดา แล้วให้ AI ช่วยเรียบเรียงเป็นแผนการสอนแบบมืออาชีพ" data-en="Type naturally and let AI generate a professional lesson plan">กรอกข้อมูลด้วยภาษาพูดธรรมดา แล้วให้ AI ช่วยเรียบเรียงเป็นแผนการสอนแบบมืออาชีพ</p>
@@ -220,11 +230,11 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-6 w-full">
         <!-- ข้อมูลพื้นฐาน -->
         <div class="space-y-1.5 md:col-span-2 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <h3 class="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wider"><i class="fa-solid fa-layer-group text-purple-500 mr-1"></i> 1. ข้อมูลรายวิชา</h3>
+            <h3 class="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wider"><i class="fa-solid fa-layer-group text-theme mr-1"></i> 1. ข้อมูลรายวิชา</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="space-y-1">
                     <label class="text-[10px] md:text-xs font-bold text-slate-500">กลุ่มสาระการเรียนรู้</label>
-                    <select id="aiSubjectGroup" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+                    <select id="aiSubjectGroup" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none ai-focus transition text-sm shadow-sm">
                         <option value="">-- เลือกกลุ่มสาระฯ --</option>
                         <option value="ภาษาไทย">ภาษาไทย</option>
                         <option value="คณิตศาสตร์">คณิตศาสตร์</option>
@@ -239,22 +249,22 @@
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] md:text-xs font-bold text-slate-500">มาตรฐาน (ถ้ามี)</label>
-                    <input type="text" id="aiStandardCode" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm" placeholder="เช่น ท 1.1, ค 1.1">
+                    <input type="text" id="aiStandardCode" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none ai-focus transition text-sm shadow-sm" placeholder="เช่น ท 1.1, ค 1.1">
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] md:text-xs font-bold text-slate-500">ตัวชี้วัด (ถ้ามี)</label>
-                    <input type="text" id="aiIndicator" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm" placeholder="เช่น ป.1/1">
+                    <input type="text" id="aiIndicator" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none ai-focus transition text-sm shadow-sm" placeholder="เช่น ป.1/1">
                 </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                 <div class="space-y-1 md:col-span-2">
                     <label class="text-[10px] md:text-xs font-bold text-slate-500">เรื่อง / หัวข้อที่จะสอน</label>
-                    <input type="text" id="aiTopic" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm" placeholder="เช่น การบวกเลขสองหลัก, มาตราแม่กน">
+                    <input type="text" id="aiTopic" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none ai-focus transition text-sm shadow-sm" placeholder="เช่น การบวกเลขสองหลัก, มาตราแม่กน">
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] md:text-xs font-bold text-slate-500">ระดับชั้น</label>
-                    <select id="aiLevel" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+                    <select id="aiLevel" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl outline-none ai-focus transition text-sm shadow-sm">
                         <option value="ป.1">ป.1</option> <option value="ป.2">ป.2</option>
                         <option value="ป.3">ป.3</option> <option value="ป.4">ป.4</option>
                         <option value="ป.5">ป.5</option> <option value="ป.6">ป.6</option>
@@ -291,7 +301,7 @@
         <!-- รูปแบบการสอน -->
         <div class="space-y-1.5">
             <label class="text-[10px] md:text-xs font-bold text-slate-500 ml-1">รูปแบบการสอน (Methodology)</label>
-            <select id="aiMethod" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+            <select id="aiMethod" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none ai-focus transition text-sm shadow-sm">
                 <option value="วัฏจักรการเรียนรู้ 5 ขั้น (5E)">วัฏจักรการเรียนรู้ 5 ขั้น (5E)</option>
                 <option value="การจัดการเรียนรู้โดยใช้สมองเป็นฐาน (BBL)">Brain-Based Learning (BBL)</option>
                 <option value="การเรียนรู้เชิงรุก (Active Learning)">Active Learning</option>
@@ -300,11 +310,11 @@
         </div>
         <div class="space-y-1.5">
             <label class="text-[10px] md:text-xs font-bold text-slate-500 ml-1">เวลา (นาที)</label>
-            <input type="number" id="aiTime" value="60" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition text-sm shadow-sm">
+            <input type="number" id="aiTime" value="60" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none ai-focus transition text-sm shadow-sm">
         </div>
     </div>
 
-    <button onclick="generateAIPrompt()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 md:py-4 rounded-xl md:rounded-2xl transition shadow-[0_5px_15px_rgba(147,51,234,0.3)] hover:shadow-[0_8px_25px_rgba(147,51,234,0.4)] hover:opacity-90 active:scale-95 text-[13px] sm:text-sm md:text-base flex items-center justify-center gap-1.5 md:gap-2 mb-6 px-2">
+    <button onclick="generateAIPrompt()" class="w-full gradient-theme text-white font-bold py-3.5 md:py-4 rounded-xl md:rounded-2xl transition ai-btn-shadow hover:opacity-90 active:scale-95 text-[13px] sm:text-sm md:text-base flex items-center justify-center gap-1.5 md:gap-2 mb-6 px-2">
         <i class="fa-solid fa-wand-magic-sparkles text-sm md:text-base"></i> 
         <span>สร้างคำสั่ง<span class="hidden sm:inline">สำหรับให้ AI เขียนแผน</span> (Generate Prompt)</span>
     </button>
@@ -313,7 +323,7 @@
     <div id="aiOutputSection" class="hidden flex flex-col gap-3 text-left">
         <div class="flex justify-between items-end border-t border-slate-100 pt-4">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-widest"><i class="fa-solid fa-terminal mr-1"></i> ผลลัพธ์ (คัดลอกไปวางใน AI ได้เลย)</span>
-            <button onclick="copyAIPrompt()" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-full font-bold transition flex items-center gap-1 active:scale-95">
+            <button onclick="copyAIPrompt()" class="text-[10px] ai-soft-bg ai-soft-border text-theme hover:opacity-80 border px-3 py-1.5 rounded-full font-bold transition flex items-center gap-1 active:scale-95">
                 <i class="fa-regular fa-copy"></i> คัดลอกข้อความ
             </button>
         </div>
@@ -2520,7 +2530,7 @@ function exportToExcel() {
             title: 'ข้อมูลไม่ครบถ้วน',
             text: 'กรุณาระบุ "เรื่อง/หัวข้อที่จะสอน" ด้วยครับ',
             icon: 'warning',
-            confirmButtonColor: '#a855f7', 
+            confirmButtonColor: 'var(--primary-theme)',
             customClass: { popup: 'rounded-[2rem]' }
         });
         return;
