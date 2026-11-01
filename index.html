@@ -100,6 +100,103 @@
         zoom: 0.92;
     }
 }
+        /* ===== หน้าเข้าสู่ระบบแบบ 2 คอลัมน์ (เฉพาะโน้ตบุ๊ก/MacBook) ===== */
+@media (min-width: 1024px) and (max-width: 1800px) and (min-height: 680px) and (max-height: 1200px) and (hover: hover) and (pointer: fine) {
+
+    /* จัดกล่องหน้าล็อกอินให้อยู่ข้างกัน */
+    #loginSection {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 3rem;
+    }
+
+    /* กล่องแบรนด์ฝั่งซ้าย ใช้สีธีมรายเดือนอัตโนมัติ */
+    #loginBrandPanel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        width: 420px;
+        min-height: 560px;
+        align-self: stretch;
+        padding: 3rem;
+        border-radius: 2.5rem;
+        background: var(--gradient-theme);
+        box-shadow: 0 20px 50px -10px rgba(var(--primary-theme-rgb), 0.35);
+        color: #ffffff;
+        zoom: 0.92;
+        margin-right: 0;
+    }
+
+    /* การ์ดล็อกอิน: ไม่ต้องเว้นระยะบน/ล่างแบบมือถือ และกำหนดความกว้างให้ใกล้กัน */
+    #studentLoginBox {
+        margin-top: 0;
+        margin-bottom: 0;
+        max-width: 460px;
+        width: 460px;
+    }
+
+    /* เมื่อเปิดหน้า AI หรือ Admin ให้ซ่อนกล่องแบรนด์ */
+    #loginSection:has(#aiToolBox:not(.hidden)) #loginBrandPanel,
+    #loginSection:has(#adminLoginBox:not(.hidden)) #loginBrandPanel {
+        display: none;
+    }
+
+        /* ปุ่ม สร้างแผนฯ (AI) บนแถบเมนู */
+    #aiToolBox {
+    max-width: 720px;
+    }
+    #aiNavBtn {
+        background: rgba(var(--primary-theme-rgb), 0.08);
+        color: var(--primary-theme);
+        border-color: rgba(var(--primary-theme-rgb), 0.2);
+    }
+
+    /* ไอคอนหัวการ์ด AI */
+    #aiHeaderIcon {
+        background: var(--gradient-theme);
+        color: #ffffff;
+        border-color: transparent;
+        box-shadow: 0 10px 25px -5px rgba(var(--primary-theme-rgb), 0.4);
+    }
+
+    /* หัวข้อย่อยและไอคอนในฟอร์ม AI */
+    #aiToolBox .text-purple-500,
+    #aiToolBox .text-orange-500 {
+        color: var(--primary-theme) !important;
+    }
+
+    /* ป้าย "พิมพ์ภาษาพูดได้เลย!" */
+    #aiToolBox .bg-orange-100 {
+        background-color: var(--primary-theme) !important;
+    }
+    #aiToolBox .text-orange-600 {
+        color: #ffffff !important;
+    }
+
+    /* ช่อง select และ input ตอนโฟกัส */
+    #aiToolBox select:focus,
+    #aiToolBox input:focus {
+        border-color: var(--primary-theme) !important;
+        box-shadow: 0 0 0 3px rgba(var(--primary-theme-rgb), 0.15) !important;
+    }
+
+    /* ปุ่มสร้างคำสั่ง */
+    #aiGenerateBtn {
+        background: var(--gradient-theme) !important;
+        box-shadow: 0 5px 15px rgba(var(--primary-theme-rgb), 0.3);
+    }
+
+    /* ปุ่มคัดลอกข้อความ */
+    #aiCopyBtn {
+        background: rgba(var(--primary-theme-rgb), 0.08) !important;
+        color: var(--primary-theme) !important;
+        border-color: rgba(var(--primary-theme-rgb), 0.2) !important;
+    }
     </style>
 </head>
 <body class="antialiased selection:bg-indigo-100">
@@ -117,7 +214,7 @@
             <i class="fa-solid fa-book-open text-theme"></i>
             <span class="lang-txt" data-th="คู่มือ" data-en="Manual">คู่มือ</span>
         </button>
-        <button onclick="toggleLoginView('aiTool')" class="bg-gradient-to-r from-purple-50 to-fuchsia-50 text-purple-600 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-purple-200 shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+        <button id="aiNavBtn" onclick="toggleLoginView('aiTool')" class="bg-gradient-to-r from-purple-50 to-fuchsia-50 text-purple-600 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-purple-200 shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             <span class="lang-txt" data-th="สร้างแผนฯ (AI)" data-en="AI Planner">สร้างแผนฯ (AI)</span>
         </button>
@@ -136,6 +233,17 @@
         </button>
     </div>
 
+</div>
+
+        <div id="loginBrandPanel">
+    <span class="absolute -top-16 -left-16 w-56 h-56 rounded-full bg-white/10"></span>
+    <span class="absolute -bottom-20 -right-20 w-72 h-72 rounded-full bg-white/10"></span>
+    <div class="relative z-10 w-20 h-20 rounded-[1.5rem] bg-white/20 backdrop-blur-md flex items-center justify-center mb-6 animate-float">
+        <i class="fa-solid fa-graduation-cap text-4xl text-white"></i>
+    </div>
+    <h2 class="relative z-10 text-3xl font-bold tracking-tight mb-3 lang-txt" data-th="ระบบคำนวณผลการเรียน" data-en="Grade Calculation System">ระบบคำนวณผลการเรียน</h2>
+    <p class="relative z-10 text-[11px] font-bold uppercase tracking-[0.15em] mb-6 opacity-90">Bachelor of Education</p>
+    <p class="relative z-10 text-sm leading-relaxed opacity-90 lang-txt" data-th="ระบบบันทึกและคำนวณผลการเรียนส่วนบุคคล สำหรับนักศึกษาหลักสูตรศึกษาศาสตรบัณฑิต สาขาวิชาเอกการประถมศึกษา" data-en="Personal grade recording and calculation system for Bachelor of Education students, Elementary Education major.">ระบบบันทึกและคำนวณผลการเรียนส่วนบุคคล สำหรับนักศึกษาหลักสูตรศึกษาศาสตรบัณฑิต สาขาวิชาเอกการประถมศึกษา</p>
 </div>
         
 <div id="studentLoginBox" class="relative bg-white/80 backdrop-blur-2xl px-6 pt-8 pb-12 sm:p-10 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] w-[94vw] sm:w-[85vw] sm:max-w-[460px] md:max-w-[540px] border border-white z-10 text-center transition-all flex flex-col justify-center mx-auto mt-10 mb-6 sm:mt-16 md:mt-auto md:mb-auto">
@@ -211,7 +319,7 @@
         <i class="fa-solid fa-arrow-left"></i> <span class="lang-txt" data-th="ปิดหน้าต่าง" data-en="Close">ปิดหน้าต่าง</span>
     </button>
 
-    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-gradient-to-br from-purple-100 to-fuchsia-100 text-purple-600 flex items-center justify-center mx-auto mb-4 text-2xl md:text-3xl shadow-sm border border-purple-200 animate-float">
+    <div id="aiHeaderIcon" class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-gradient-to-br from-purple-100 to-fuchsia-100 text-purple-600 flex items-center justify-center mx-auto mb-4 text-2xl md:text-3xl shadow-sm border border-purple-200 animate-float">
         <i class="fa-solid fa-brain"></i>
     </div>
     <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-1 lang-txt" data-th="ระบบสร้างแผนการสอนอัจฉริยะ" data-en="AI Lesson Planner">ระบบสร้างแผนการสอนอัจฉริยะ</h2>
@@ -304,7 +412,7 @@
         </div>
     </div>
 
-    <button onclick="generateAIPrompt()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 md:py-4 rounded-xl md:rounded-2xl transition shadow-[0_5px_15px_rgba(147,51,234,0.3)] hover:shadow-[0_8px_25px_rgba(147,51,234,0.4)] hover:opacity-90 active:scale-95 text-[13px] sm:text-sm md:text-base flex items-center justify-center gap-1.5 md:gap-2 mb-6 px-2">
+    <button id="aiGenerateBtn" onclick="generateAIPrompt()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 md:py-4 rounded-xl md:rounded-2xl transition shadow-[0_5px_15px_rgba(147,51,234,0.3)] hover:shadow-[0_8px_25px_rgba(147,51,234,0.4)] hover:opacity-90 active:scale-95 text-[13px] sm:text-sm md:text-base flex items-center justify-center gap-1.5 md:gap-2 mb-6 px-2">
         <i class="fa-solid fa-wand-magic-sparkles text-sm md:text-base"></i> 
         <span>สร้างคำสั่ง<span class="hidden sm:inline">สำหรับให้ AI เขียนแผน</span> (Generate Prompt)</span>
     </button>
@@ -313,7 +421,7 @@
     <div id="aiOutputSection" class="hidden flex flex-col gap-3 text-left">
         <div class="flex justify-between items-end border-t border-slate-100 pt-4">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-widest"><i class="fa-solid fa-terminal mr-1"></i> ผลลัพธ์ (คัดลอกไปวางใน AI ได้เลย)</span>
-            <button onclick="copyAIPrompt()" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-full font-bold transition flex items-center gap-1 active:scale-95">
+            <button id="aiCopyBtn" onclick="copyAIPrompt()" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-full font-bold transition flex items-center gap-1 active:scale-95">
                 <i class="fa-regular fa-copy"></i> คัดลอกข้อความ
             </button>
         </div>
@@ -2518,9 +2626,9 @@ function exportToExcel() {
     if (!topic) {
         Swal.fire({
             title: 'ข้อมูลไม่ครบถ้วน',
-            text: 'กรุณาระบุ "เรื่อง/หัวข้อที่จะสอน" ด้วยครับ',
+            text: 'กรุณาระบุ "เรื่อง/หัวข้อที่จะสอน" ด้วยค่ะ',
             icon: 'warning',
-            confirmButtonColor: '#a855f7', 
+            confirmButtonColor: 'var(--primary-theme)',
             customClass: { popup: 'rounded-[2rem]' }
         });
         return;
