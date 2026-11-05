@@ -870,6 +870,7 @@ const firebaseConfig = {
 // เปิดสวิตช์ Firebase และเชื่อมต่อ Firestore
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+        const ADMIN_EMAIL = 'pongpakchokrak@gmail.com';
 // ---------------------------------------
 
         // 🌟 ตารางเก็บเกณฑ์หน่วยกิตรวมที่ต้องเรียนจบของแต่ละปี
@@ -1299,18 +1300,23 @@ window.onload = function() {
 
     // 👑 1. ส่วนของแอดมิน: ล็อกอินแบบพิมพ์แค่ admin (ไม่ต้องยุ่งกับ Firebase)
     if (loginType === 'admin') {
-        // 🌟 ตั้งค่า Username และ Password สำหรับแอดมินตรงนี้ได้เลยครับ! 🌟
-        if (u === 'admin' && p === 'Ru2026') { 
+    if (u !== 'admin') {
+        Swal.close();
+        return Swal.fire('เข้าไม่ได้', 'ชื่อผู้ใช้งานหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
+    }
+    firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, p)
+        .then(() => {
             Swal.close();
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('adminSection').style.display = 'block';
-            loadAdmin(); 
-            return; // จบการทำงาน ไม่ต้องไปเช็ก Firebase ให้เสียเวลา
-        } else {
+            loadAdmin();
+        })
+        .catch(() => {
             Swal.close();
-            return Swal.fire('เข้าไม่ได้', 'ชื่อผู้ใช้งานหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
-        }
-    }
+            Swal.fire('เข้าไม่ได้', 'ชื่อผู้ใช้งานหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
+        });
+    return;
+}
 
     // 🎓 2. ส่วนของนักศึกษา: แอบต่อท้ายอีเมลแล้วส่งไปให้ Firebase ตรวจ
     let loginEmail = `${u}@rumail.ru.ac.th`;
@@ -2534,14 +2540,14 @@ function exportToExcel() {
     db.collection("Users").get().then((querySnapshot) => {
         // 1. สร้างหัวตาราง Excel (รองรับภาษาไทยด้วย \uFEFF)
         let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
-        csvContent += "รหัสนักศึกษา,ชื่อ-นามสกุล,อีเมล,ชั้นปี,Username,Password\n"; 
+        csvContent += "รหัสนักศึกษา,ชื่อ-นามสกุล,อีเมล,ชั้นปี,Username\n";
 
         // 2. ดึงข้อมูลนักศึกษาทุกคนมาเรียงเป็นแถวๆ
         querySnapshot.forEach((doc) => {
             let u = doc.data();
             if(u.role !== 'admin') { // ไม่ต้องดึงข้อมูลแอดมินออกมา
                 // ใส่เครื่องหมายฟันหนู ("") คล่อมไว้ ป้องกันปัญหาเวลามีเครื่องหมายลูกน้ำในชื่อ
-                let row = `"${u.studentId || '-'}","${u.name || '-'}","${u.email || '-'}","${u.year || '-'}","${u.username || '-'}","${u.password || '-'}"`;
+                let row = `"${u.studentId || '-'}","${u.name || '-'}","${u.email || '-'}","${u.year || '-'}","${u.username || '-'}"`;
                 csvContent += row + "\n";
             }
         });
