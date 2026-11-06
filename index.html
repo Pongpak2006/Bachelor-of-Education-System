@@ -1448,37 +1448,28 @@ function showRegisterPopup() {
 function loginWithUsername() {
     let un = document.getElementById('username').value.trim();
     let pw = document.getElementById('password').value;
-
     if (!un || !pw) {
         Swal.fire('แจ้งเตือน', 'กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน', 'warning'); return;
     }
+    Swal.fire({ title: 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-    Swal.fire({ title: 'กำลังเข้าสู่ระบบ...', didOpen: () => Swal.showLoading() });
-
-    db.collection("Users").where("username", "==", un).where("password", "==", pw).get().then((snapshot) => {
-        if (!snapshot.empty) {
-            let doc = snapshot.docs[0];
-            currentUser = doc.data();
-            currentUser.id = doc.id;
-            currentUser.studentId = currentUser.studentId || doc.id;
-            
-            // 🌟 1. ระบบจำรหัสผ่านทำงานตรงนี้ 🌟
-            let rememberBox = document.getElementById('rememberMe');
-            if (rememberBox && rememberBox.checked) {
-                localStorage.setItem("rememberedUsername", un);
-            } else {
-                localStorage.removeItem("rememberedUsername");
-            }
-
-            showStudentDashboard();
-        } else {
-            Swal.close();
-            // 🌟 2. เรียกกล่องแจ้งเตือนสีแดงแทนการเด้งป๊อปอัป 🌟
-            showInlineError(appLang === 'en' ? 'Incorrect username or password' : 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
-        }
-    }).catch((error) => {
-        console.error("Login error:", error);
-        Swal.fire('ข้อผิดพลาด', 'ระบบมีปัญหา กรุณาลองใหม่', 'error');
+    firebase.auth().signInWithEmailAndPassword(`${un}@rumail.ru.ac.th`, pw)
+    .then(cred => db.collection("Users").where("email", "==", cred.user.email).get())
+    .then(snap => {
+        if (snap.empty) throw new Error('ไม่พบข้อมูลนักศึกษา');
+        let doc = snap.docs[0];
+        currentUser = doc.data();
+        currentUser.id = doc.id;
+        currentUser.studentId = currentUser.studentId || doc.id;
+        let rememberBox = document.getElementById('rememberMe');
+        if (rememberBox && rememberBox.checked) localStorage.setItem("rememberedUsername", un);
+        else localStorage.removeItem("rememberedUsername");
+        showStudentDashboard();
+    })
+    .catch(err => {
+        Swal.close();
+        console.error("Login error:", err);
+        showInlineError(appLang === 'en' ? 'Incorrect username or password' : 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
     });
 }
 // ==========================================
