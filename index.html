@@ -1478,15 +1478,12 @@ function loginWithUsername() {
 const fns = firebase.functions();
 
 async function linkLineAccount() {
-  if (!currentUser || !currentUser.id) {
+  if (!firebase.auth().currentUser) {
     return Swal.fire('แจ้งเตือน', 'กรุณาเข้าสู่ระบบก่อน', 'warning');
   }
   Swal.fire({ title: 'กำลังเชื่อมต่อ LINE...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
   try {
-    const res = await fns.httpsCallable('lineLoginStart')({
-  userId: currentUser.id,
-  password: currentUser.password
-});
+    const res = await fns.httpsCallable('lineLoginStart')({});
     window.location.href = res.data.url;
   } catch (e) {
     Swal.fire('ข้อผิดพลาด', e.message, 'error');
