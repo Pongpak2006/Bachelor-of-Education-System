@@ -3402,6 +3402,7 @@ async function deleteActivity(id) {
   try {
     const res = await firebase.functions().httpsCallable("lineAutoLogin")({ token: lt });
     const user = res.data.user;
+    await firebase.auth().signInWithCustomToken(res.data.authToken);
     currentUser = user;
     currentUser.id = user.id;
     Swal.close();
