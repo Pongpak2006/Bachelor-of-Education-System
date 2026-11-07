@@ -1401,46 +1401,17 @@ function showRegisterPopup() {
             return { name, email, curriculumYear, username, password };
         }
     }).then((result) => {
-        if (result.isConfirmed) {
-            let data = result.value;
-            Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', didOpen: () => Swal.showLoading() });
-            
-            db.collection("Users").where("email", "==", data.email).get().then(snapEmail => {
-                if (!snapEmail.empty) {
-                    Swal.fire('ข้อผิดพลาด', 'อีเมลนี้ถูกลงทะเบียนไว้แล้ว', 'error');
-                } else {
-                    db.collection("Users").where("username", "==", data.username).get().then(snapUser => {
-                        if (!snapUser.empty) {
-                            Swal.fire('ข้อผิดพลาด', 'ชื่อผู้ใช้งานนี้มีคนใช้แล้ว', 'error');
-                        } else {
-                            let studentId = data.email.split('@')[0];
-                            let entryYear = parseInt(studentId.substring(0, 2)); 
-                            let currentAcademicYear = 69; 
-                            let calculatedYear = (currentAcademicYear - entryYear) + 1;
-                            if (isNaN(calculatedYear) || calculatedYear < 1 || calculatedYear > 8) {
-                                calculatedYear = 1;
-                            }
-
-                            db.collection("Users").add({
-                                name: data.name,
-                                email: data.email,
-                                curriculumYear: data.curriculumYear,
-                                username: data.username,
-                                password: data.password,
-                                studentId: studentId,
-                                year: calculatedYear.toString(), 
-                                role: "student",
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                            }).then(() => {
-                                Swal.fire('สำเร็จ!', 'สมัครสมาชิกเรียบร้อย คุณสามารถเข้าสู่ระบบได้เลย', 'success');
-                            });
-                        }
-                    });
-                }
-            });
-        }
-    });
-}
+    if (result.isConfirmed) {
+        const d = result.value;
+        Swal.fire({ title: 'กำลังสมัคร...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        fns.httpsCallable('registerStudent')({
+            name: d.name, email: d.email, curriculumYear: d.curriculumYear, password: d.password
+        })
+        .then(() => Swal.fire('สำเร็จ!', 'สมัครสมาชิกเรียบร้อย ล็อกอินด้วยรหัสนักศึกษาที่อยู่ในอีเมล และรหัสที่ตั้งไว้', 'success'))
+        .catch(err => Swal.fire('ผิดพลาด', err.message, 'error'));
+    }
+});
+    } 
 
 // ==========================================
 // 2. ระบบเข้าสู่ระบบด้วย Username + Password (อัปเกรด แจ้งเตือนสีแดง + จำรหัส)
@@ -2230,21 +2201,13 @@ async function initHonorsChart() {
                     return newPassword;
                 }
             }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    // บันทึกรหัสผ่านใหม่ทับลงไปในฐานข้อมูล
-                    db.collection("Users").doc(username).update({ password: result.value })
-                        .then(() => {
-                            Swal.fire({
-                                icon: 'success', 
-                                title: 'สำเร็จ!', 
-                                text: 'รหัสผ่านถูกเปลี่ยนเรียบร้อยแล้ว',
-                                confirmButtonColor: 'var(--primary-theme)',
-                                customClass: { popup: 'rounded-[2rem]' }
-                            });
-                        }).catch(err => Swal.fire('ผิดพลาด', err.message, 'error'));
-                }
-            });
+               if (result.isConfirmed) {
+               Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+               fns.httpsCallable('adminSetPassword')({ username, newPassword: result.value })
+                  .then(() => Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: 'รหัสผ่านถูกเปลี่ยนแล้ว', confirmButtonColor: 'var(--primary-theme)' }))
+                  .catch(err => Swal.fire('ผิดพลาด', err.message, 'error'));
+               }
+           });
         }
 
         function confirmDelUser(u) {
@@ -2258,57 +2221,33 @@ async function initHonorsChart() {
             });
         }
 
-        function addUser() {
-            let data = { 
-                username: document.getElementById('newUsername').value, 
-                password: document.getElementById('newPassword').value, 
-                studentId: document.getElementById('newStudentId').value, 
-                name: document.getElementById('newName').value, 
-                email: document.getElementById('newEmail').value, 
-                year: document.getElementById('newYear').value,
-                curriculumYear: document.getElementById('newCurriculumYear').value,
-                role: 'student'
-            };
-            if(!data.username || !data.password || !data.studentId || !data.name) return Swal.fire(appLang === 'en' ? 'Warning' : 'เตือน', appLang === 'en' ? 'Please fill in all fields' : 'กรุณากรอกข้อมูลหลักให้ครบ', 'warning');
-            
-            Swal.fire({ title: appLang === 'en' ? 'Saving...' : 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            // 💡 ทริค: สร้างอีเมลจำลองสำหรับรหัสนักศึกษาใหม่ เพื่อไปฝากป้อมยาม
-            let dummyEmail = `${data.username}@rumail.ru.ac.th`;
+        async function addUser() {
+    const username = document.getElementById('newUsername').value.trim();
+    const password = document.getElementById('newPassword').value;
+    const studentId = document.getElementById('newStudentId').value.trim();
+    const name = document.getElementById('newName').value.trim();
+    const contactEmail = document.getElementById('newEmail').value.trim();
+    const year = document.getElementById('newYear').value;
+    const curriculumYear = document.getElementById('newCurriculumYear').value;
 
-            // ใช้แอปจำลอง (Secondary App) เพื่อสร้างบัญชี โดยไม่ทำให้แอดมินเด้งหลุดจากระบบ
-            if (!firebase.apps.length || !firebase.apps.find(app => app.name === 'SecondaryApp')) {
-                firebase.initializeApp(firebaseConfig, 'SecondaryApp');
-            }
-            const secondaryAuth = firebase.app('SecondaryApp').auth();
+    if (!username || !password || !name) {
+        return Swal.fire('เตือน', 'กรุณากรอก Username, Password และชื่อให้ครบ', 'warning');
+    }
+    Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    try {
+        await fns.httpsCallable('adminCreateStudent')({
+            username, password, studentId, name, contactEmail, year, curriculumYear
+        });
+        Swal.fire('สำเร็จ', 'เพิ่มนักศึกษาและสร้างบัญชีเรียบร้อย', 'success');
+        ['newUsername','newPassword','newStudentId','newName','newEmail','newYear']
+            .forEach(id => document.getElementById(id).value = '');
+        loadAdmin();
+    } catch (err) {
+        Swal.fire('ผิดพลาด', err.message, 'error');
+    }
+}
 
-            secondaryAuth.createUserWithEmailAndPassword(dummyEmail, data.password)
-            .then((userCredential) => {
-                // ✅ แก้ไข: เซฟรหัสผ่านลง Firestore เพื่อให้ loginWithUsername หาเจอ
-                let savedPw = data.password;
-                delete data.password; 
-                data.password = savedPw; 
-                
-                return db.collection("Users").doc(data.username).set(data);
-            })
-            .then(() => {
-                secondaryAuth.signOut(); // ปิดแอปจำลอง
-                Swal.fire(appLang === 'en' ? 'Success' : 'สำเร็จ', appLang === 'en' ? 'User Added' : 'เพิ่มนักศึกษาและสร้างรหัสผ่านเรียบร้อย', 'success');
-                
-                // ล้างข้อมูลในกล่องข้อความ
-                document.getElementById('newUsername').value = ''; document.getElementById('newPassword').value = '';
-                document.getElementById('newStudentId').value = ''; document.getElementById('newName').value = '';
-                document.getElementById('newEmail').value = ''; document.getElementById('newYear').value = '';
-                loadAdmin();
-            })
-            .catch(err => {
-                secondaryAuth.signOut();
-                console.error(err);
-                Swal.fire(appLang === 'en' ? 'Error' : 'ผิดพลาด', err.message, 'error');
-            });
-        }
-
-        // ==========================================
+// ==========================================
 // ฟังก์ชันลับสำหรับแอดมิน: โยนวิชาทั้งหมดเข้า Firebase (เวอร์ชันแจ้งเตือน Error)
 // ==========================================
 function syncCoursesToDB() {
