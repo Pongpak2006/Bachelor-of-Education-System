@@ -1299,18 +1299,25 @@ window.onload = function() {
     }
 
     // 👑 1. ส่วนของแอดมิน: ล็อกอินแบบพิมพ์แค่ admin (ไม่ต้องยุ่งกับ Firebase)
-    if (loginType === 'admin') {
-    if (u !== 'admin') {
-        Swal.close();
-        return Swal.fire('เข้าไม่ได้', 'ชื่อผู้ใช้งานหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
-    }
-            .catch((err) => {
+        if (loginType === 'admin') {
+        if (u !== 'admin') {
             Swal.close();
-            console.error("Admin login error:", err.code, err.message);
-            Swal.fire('เข้าไม่ได้', err.code + ' : ' + err.message, 'error');
-        });
-    return;
-}
+            return Swal.fire('เข้าไม่ได้', 'ชื่อผู้ใช้งานหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
+        }
+        firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, p)
+            .then(() => {
+                Swal.close();
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'block';
+                loadAdmin();
+            })
+            .catch((err) => {
+                Swal.close();
+                console.error("Admin login error:", err.code, err.message);
+                Swal.fire('เข้าไม่ได้', err.code + ' : ' + err.message, 'error');
+            });
+        return;
+    }
 
     // 🎓 2. ส่วนของนักศึกษา: แอบต่อท้ายอีเมลแล้วส่งไปให้ Firebase ตรวจ
     let loginEmail = `${u}@rumail.ru.ac.th`;
