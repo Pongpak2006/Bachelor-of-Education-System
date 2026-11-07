@@ -1304,16 +1304,10 @@ window.onload = function() {
         Swal.close();
         return Swal.fire('เข้าไม่ได้', 'ชื่อผู้ใช้งานหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
     }
-    firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, p)
-        .then(() => {
+            .catch((err) => {
             Swal.close();
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('adminSection').style.display = 'block';
-            loadAdmin();
-        })
-        .catch(() => {
-            Swal.close();
-            Swal.fire('เข้าไม่ได้', 'ชื่อผู้ใช้งานหรือรหัสผ่านแอดมินไม่ถูกต้อง', 'error');
+            console.error("Admin login error:", err.code, err.message);
+            Swal.fire('เข้าไม่ได้', err.code + ' : ' + err.message, 'error');
         });
     return;
 }
