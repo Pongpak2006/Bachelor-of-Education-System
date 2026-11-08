@@ -1643,10 +1643,14 @@ function showStudentDashboard() {
                 }
 
                 // 3. ดึงเกรดของนักศึกษาคนนี้จากตู้ StudentGrades
-                const gradeSnap = await db.collection("StudentGrades").where("studentId", "==", currentUser.id).get();
                 let studentGrades = {};
-                gradeSnap.forEach(doc => {
-                    studentGrades[doc.data().courseCode] = doc.data();
+                const newSnap = await db.collection("Users").doc(currentUser.id).collection("Grades").get();
+                newSnap.forEach(doc => { studentGrades[doc.id] = { ...doc.data(), courseCode: doc.id }; });
+
+                const oldSnap = await db.collection("StudentGrades").where("studentId", "==", currentUser.id).get();
+                oldSnap.forEach(doc => {
+                const g = doc.data();
+                if (!studentGrades[g.courseCode]) studentGrades[g.courseCode] = g;
                 });
 
                 // 4. เอาวิชาในหลักสูตร มาชนกับเกรดที่เด็กได้
