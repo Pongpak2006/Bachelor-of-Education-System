@@ -1857,7 +1857,6 @@ function calculateStatus(totalCr) {
         }
 
         async function updateGrade(code, grade) {
-            console.log("updateGrade called:", code, grade);
             let msgLoading = appLang === 'en' ? `Saving ${code}...` : `กำลังบันทึกเกรดวิชา ${code}...`;
             let msgErr = appLang === 'en' ? 'Failed to save. Try again.' : 'บันทึกไม่สำเร็จ กรุณาลองใหม่';
             let msgSuccess = appLang === 'en' ? `${code} Saved!` : `บันทึกเกรด ${code} เรียบร้อย!`;
