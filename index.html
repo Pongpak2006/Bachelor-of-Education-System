@@ -1874,7 +1874,6 @@ function calculateStatus(totalCr) {
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             await db.collection("Users").doc(currentUser.id).collection("Grades").doc(code).set(payload);
-            await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).set(payload);
                 
                 loadCourses();
                 Toast.fire({ icon: 'success', title: msgSuccess });
@@ -1894,7 +1893,6 @@ function calculateStatus(totalCr) {
                     Swal.fire({ title: appLang === 'en' ? 'Deleting...' : 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     try {
                         await db.collection("Users").doc(currentUser.id).collection("Grades").doc(code).delete();
-                        await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).delete();
                         Swal.close(); 
                         loadCourses();
                     } catch(e) {
@@ -1914,7 +1912,6 @@ function calculateStatus(totalCr) {
                     Swal.fire({ title: appLang === 'en' ? 'Deleting...' : 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     try {
                         await db.collection("Users").doc(currentUser.id).collection("Grades").doc(code).delete();
-                        await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).delete();
                         Swal.close(); 
                         loadCourses();
                     } catch(e) {
