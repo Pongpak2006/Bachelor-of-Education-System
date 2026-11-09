@@ -1408,8 +1408,12 @@ function showRegisterPopup() {
         fns.httpsCallable('registerStudent')({
             name: d.name, email: d.email, curriculumYear: d.curriculumYear, password: d.password
         })
-        .then(() => Swal.fire('สำเร็จ!', 'สมัครสมาชิกเรียบร้อย ล็อกอินด้วยรหัสนักศึกษาที่อยู่ในอีเมล และรหัสที่ตั้งไว้', 'success'))
-        .catch(err => Swal.fire('ผิดพลาด', err.message, 'error'));
+       .then(() => {
+          Swal.fire('สำเร็จ!', 'สมัครสมาชิกเรียบร้อย ล็อกอินด้วยรหัสนักศึกษาที่อยู่ในอีเมล และรหัสที่ตั้งไว้', 'success');
+       })
+       .catch(err => {
+       Swal.fire('ผิดพลาด', err.message || 'สมัครไม่สำเร็จ', 'error');
+});
     }
 });
 } 
