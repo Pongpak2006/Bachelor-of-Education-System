@@ -2042,7 +2042,7 @@ function calculateStatus(totalCr) {
             printWin.document.close();
         }
 
-        // ==========================================
+// ==========================================
 // 📊 กราฟสถิติสถานะนักศึกษา (Honors / Status Chart)
 // ==========================================
 let honorsChartInstance = null;
@@ -2050,29 +2050,25 @@ let honorsChartInstance = null;
 async function initHonorsChart() {
     const canvas = document.getElementById('honorsChart');
     if (!canvas || typeof Chart === 'undefined') return;
-
     try {
-        // นับสถานะนักศึกษาทุกคน จากเกรดที่บันทึกไว้
         const usersSnap = await db.collection("Users").get();
-        const gradesSnap = await db.collection("StudentGrades").get();
-
-        const pointsMap = {};   // { studentId: { cr, pt } }
+        const gradeDocs = await db.collectionGroup("Grades").get();
+        const pointsMap = {};
         const gradePoint = {'A':4,'B+':3.5,'B':3,'C+':2.5,'C':2,'D+':1.5,'D':1,'F':0};
 
-        gradesSnap.forEach(doc => {
+        gradeDocs.forEach(doc => {
             const g = doc.data();
+            const sid = doc.ref.parent.parent.id;
             if (!g.grade || g.grade === '-' || g.grade === 'F') return;
             const cr = parseFloat(g.credit) || 3;
-            if (!pointsMap[g.studentId]) pointsMap[g.studentId] = { cr: 0, pt: 0 };
-            pointsMap[g.studentId].cr += cr;
-            pointsMap[g.studentId].pt += cr * gradePoint[g.grade];
+            if (!pointsMap[sid]) pointsMap[sid] = { cr: 0, pt: 0 };
+            pointsMap[sid].cr += cr;
+            pointsMap[sid].pt += cr * gradePoint[g.grade];
         });
 
         let honors1 = 0, honors2 = 0, normal = 0, noData = 0;
-
         usersSnap.forEach(doc => {
-            const u = doc.data();
-            if (u.role === 'admin') return;
+            if (doc.data().role === 'admin') return;
             const s = pointsMap[doc.id];
             if (!s || s.cr === 0) { noData++; return; }
             const gpax = s.pt / s.cr;
@@ -2082,26 +2078,17 @@ async function initHonorsChart() {
         });
 
         if (honorsChartInstance) honorsChartInstance.destroy();
-
         honorsChartInstance = new Chart(canvas, {
             type: 'doughnut',
             data: {
                 labels: ['เกียรตินิยมอันดับ 1', 'เกียรตินิยมอันดับ 2', 'ปกติ', 'ยังไม่มีเกรด'],
-                datasets: [{
-                    data: [honors1, honors2, normal, noData],
-                    backgroundColor: ['#10b981', '#6366f1', '#94a3b8', '#e2e8f0'],
-                    borderWidth: 0
-                }]
+                datasets: [{ data: [honors1, honors2, normal, noData],
+                    backgroundColor: ['#10b981', '#6366f1', '#94a3b8', '#e2e8f0'], borderWidth: 0 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'right', labels: { font: { family: 'Prompt' } } } }
-            }
+            options: { responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { font: { family: 'Prompt' } } } } }
         });
-    } catch (err) {
-        console.error("Chart Error:", err);   // กราฟพังต้องไม่ทำให้ทั้งหน้าแอดมินพัง
-    }
+    } catch (err) { console.error("Chart Error:", err); }
 }
         
         // --- ส่วนแอดมิน โชว์แค่ที่เดิม ---
