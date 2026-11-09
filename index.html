@@ -1864,14 +1864,16 @@ function calculateStatus(totalCr) {
             
             try {
                 let info = BASE_COURSES.find(c => c.code === code);
-                await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).set({
+                const payload = {
                     studentId: currentUser.id,
                     courseCode: code,
                     grade: grade,
                     courseName: info ? info.name : 'วิชาเลือกเสรี',
                     credit: info ? info.credit : 3,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+            };
+            await db.collection("Users").doc(currentUser.id).collection("Grades").doc(code).set(payload);
+            await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).set(payload);
                 
                 loadCourses();
                 Toast.fire({ icon: 'success', title: msgSuccess });
@@ -1890,6 +1892,7 @@ function calculateStatus(totalCr) {
                 if(r.isConfirmed) {
                     Swal.fire({ title: appLang === 'en' ? 'Deleting...' : 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     try {
+                        await db.collection("Users").doc(currentUser.id).collection("Grades").doc(code).delete();
                         await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).delete();
                         Swal.close(); 
                         loadCourses();
@@ -1909,6 +1912,7 @@ function calculateStatus(totalCr) {
                 if(r.isConfirmed) {
                     Swal.fire({ title: appLang === 'en' ? 'Deleting...' : 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     try {
+                        await db.collection("Users").doc(currentUser.id).collection("Grades").doc(code).delete();
                         await db.collection("StudentGrades").doc(`${currentUser.id}_${code}`).delete();
                         Swal.close(); 
                         loadCourses();
