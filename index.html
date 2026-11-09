@@ -1650,7 +1650,8 @@ function showStudentDashboard() {
                 const oldSnap = await db.collection("StudentGrades").where("studentId", "==", currentUser.id).get();
                 oldSnap.forEach(doc => {
                 const g = doc.data();
-                if (!studentGrades[g.courseCode]) studentGrades[g.courseCode] = g;
+                const key = g.courseCode || doc.id.split('_').pop();
+                if (!studentGrades[key]) studentGrades[key] = { ...g, courseCode: key };
                 });
 
                 // 4. เอาวิชาในหลักสูตร มาชนกับเกรดที่เด็กได้
