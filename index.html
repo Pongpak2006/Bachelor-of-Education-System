@@ -1128,31 +1128,41 @@ let COURSES_2563 = [
 
         function showManual() {
     let titleTxt = appLang === 'en' ? 'User Manual' : 'คู่มือการใช้งานระบบ';
-    let htmlTxt = appLang === 'en' ? 
-        `<div class="text-left text-sm space-y-4 text-slate-600 mt-2">
-            <div class="bg-indigo-50 text-indigo-700 p-3.5 rounded-xl text-xs font-semibold mb-4 border border-indigo-100 flex items-start gap-2">
-                <i class="fa-solid fa-circle-info mt-0.5 text-sm"></i> 
-                <span>This grade calculation system is for <b>regular registration only</b>. It does not support credit transfer evaluation.</span>
-            </div>
-            <p><b class="text-slate-800">1. Login:</b> Please <b>Register</b> for a new account first. Then log in using your Username/Password or <b>Sign in with Google</b>.</p>
-            <p><b class="text-slate-800">2. Update Grades:</b> Select grades from the dropdown in the 'Course Structure' tab. The system saves automatically.</p>
-            <p><b class="text-slate-800">3. Add Electives:</b> Click the '+ Add Free Elective' button at the bottom of the course list.</p>
-            <p><b class="text-slate-800">4. GPAX Predictor:</b> Use the grade predictor feature to forecast and plan your target GPAX.</p>
-            <p><b class="text-slate-800">5. View Dashboard:</b> Check your current GPAX, earned credits, and remaining credits on the top dashboard.</p>
-            <p><b class="text-slate-800">6. Export to PDF:</b> Go to the 'Academic Record' tab and click 'Save as PDF' to print your document.</p>
-        </div>` : 
-        `<div class="text-left text-sm space-y-4 text-slate-600 mt-2">
-            <div class="bg-indigo-50 text-indigo-700 p-3.5 rounded-xl text-xs font-semibold mb-4 border border-indigo-100 flex items-start gap-2">
-                <i class="fa-solid fa-circle-info mt-0.5 text-sm"></i> 
-                <span>ระบบคำนวณผลการเรียนนี้ ใช้สำหรับ <b>การลงทะเบียนในภาคปกติเท่านั้น</b> (ไม่ใช่สำหรับการเทียบโอนหน่วยกิต)</span>
-            </div>
-            <p><b class="text-slate-800">1. การเข้าสู่ระบบ:</b> <b>"สมัครสมาชิกใหม่"</b> ก่อนใช้งานครั้งแรก จากนั้นสามารถเข้าสู่ระบบด้วย ชื่อผู้ใช้งาน/รหัสผ่าน หรือ <b>"เข้าสู่ระบบด้วย Google"</b></p>
-            <p><b class="text-slate-800">2. การเลือกเกรด:</b> เลือกเกรดในหน้า 'โครงสร้างรายวิชา' ระบบจะบันทึกให้อัตโนมัติ</p>
-            <p><b class="text-slate-800">3. เพิ่มวิชาเลือกเสรี:</b> เลื่อนไปล่างสุด กดปุ่ม '+ เพิ่มวิชาเรียนนอกหลักสูตร' เพื่อเพิ่มวิชาที่ไม่มีในตารางปกติ</p>
-            <p><b class="text-slate-800">4. ระบบจำลองเกรดอนาคต (GPAX Predictor):</b> ทดลองป้อนเกรดในรายวิชาที่ยังไม่ได้เรียน เพื่อคาดการณ์และวางแผนเป้าหมายเกรดเฉลี่ยล่วงหน้า</p>
-            <p><b class="text-slate-800">5. สรุปผลการเรียน:</b> ตรวจสอบเกรดเฉลี่ย (GPAX) และหน่วยกิตสะสมรวมได้ที่แผงควบคุมด้านบน</p>
-            <p><b class="text-slate-800">6. พิมพ์ผลการเรียน:</b> ไปที่แท็บ 'ประวัติการเรียน' แล้วกดปุ่ม 'บันทึกเป็น PDF' เพื่อพิมพ์เอกสาร</p>
-        </div>`;
+    const items = appLang === 'en' ? [
+        ['1. Login', 'Register first, then sign in with Username/Password, Google, or LINE (use the "เข้าเว็บ" button in the LINE bot for one-tap login).'],
+        ['2. Update Grades', 'Select a grade in the "Course Structure" tab. It saves automatically. You can also type a grade in the LINE bot, e.g. "CEE2301 A", and confirm.'],
+        ['3. Check Grades in LINE', 'Type GPAX, Credits, Remaining, History, or Summary in the LINE bot to check your results anytime.'],
+        ['4. Link Multiple LINE Accounts', 'Go to "e-Services" > "Connect LINE". Press "Connect new" to link another LINE account. All linked LINE accounts are listed, and you can remove one with the trash icon.'],
+        ['5. Add Electives', 'Scroll to the bottom of the course list and press "+ Add Free Elective".'],
+        ['6. GPAX Predictor', 'Enter expected credits and GPA to forecast your GPAX and honors chances.'],
+        ['7. Export to PDF', 'Go to "Academic Record" and press "Save as PDF" to print your transcript.'],
+        ['8. Activity Log', 'In "e-Services", record volunteer hours and teacher-training activities with photos.'],
+        ['9. Domain Change', 'The system moved to pongpakch.com. Please update your bookmarks and LINE links to this address.']
+    ] : [
+        ['1. เข้าสู่ระบบ', 'สมัครสมาชิกก่อนใช้งานครั้งแรก จากนั้นเข้าด้วย ชื่อผู้ใช้/รหัสผ่าน, Google หรือ LINE (กดปุ่ม "เข้าเว็บ" ในบอท LINE เพื่อเข้าระบบอัตโนมัติ)'],
+        ['2. บันทึกเกรด', 'เลือกเกรดในแท็บ "โครงสร้างรายวิชา" ระบบจะบันทึกให้อัตโนมัติ หรือพิมพ์ในบอท LINE เช่น "CEE2301 A" แล้วกดยืนยัน'],
+        ['3. เช็คผลการเรียนใน LINE', 'พิมพ์ GPAX, หน่วยกิต, คงเหลือ, ประวัติ, สรุป ในบอท LINE เพื่อดูผลได้ทุกเมื่อ'],
+        ['4. ผูกหลายบัญชี LINE', 'ไปที่ "บริการ e-Service" > "เชื่อมต่อบัญชี LINE" กด "เชื่อมต่อใหม่" เพื่อผูก LINE เพิ่ม ระบบจะแสดงรายการ LINE ทั้งหมด และลบได้ด้วยปุ่มถังขยะ'],
+        ['5. เพิ่มวิชาเลือกเสรี', 'เลื่อนไปล่างสุดของรายวิชา กดปุ่ม "+ เพิ่มวิชาเรียนนอกหลักสูตร"'],
+        ['6. ระบบจำลองเกรดอนาคต', 'ป้อนหน่วยกิตและเกรดเฉลี่ยที่คาดหวัง เพื่อดูว่า GPAX และโอกาสเกียรตินิยมจะเป็นอย่างไร'],
+        ['7. พิมพ์ผลการเรียน', 'ไปแท็บ "ประวัติการเรียน" แล้วกด "บันทึกเป็น PDF" เพื่อพิมพ์'],
+        ['8. บันทึกกิจกรรม', 'ในแท็บ "บริการ e-Service" บันทึกชั่วโมง กยศ. และกิจกรรมเสริมความเป็นครู พร้อมแนบรูปหลักฐานได้'],
+        ['9. การย้ายโดเมน', 'ระบบย้ายมาที่ pongpakch.com กรุณาอัปเดตที่คั่นหน้าและลิงก์เดิมเป็นที่อยู่ใหม่นี้']
+    ];
+
+    const notice = appLang === 'en'
+        ? 'This system is for <b>regular registration only</b>. It does not support credit transfer evaluation.'
+        : 'ระบบนี้ใช้สำหรับ <b>การลงทะเบียนในภาคปกติเท่านั้น</b> (ไม่ใช่สำหรับการเทียบโอนหน่วยกิต)';
+
+    const body = items.map(([h, t]) => `<p><b class="text-slate-800">${h}:</b> ${t}</p>`).join('');
+
+    const htmlTxt = `<div class="text-left text-sm space-y-4 text-slate-600 mt-2">
+        <div class="bg-indigo-50 text-indigo-700 p-3.5 rounded-xl text-xs font-semibold mb-4 border border-indigo-100 flex items-start gap-2">
+            <i class="fa-solid fa-circle-info mt-0.5 text-sm"></i>
+            <span>${notice}</span>
+        </div>
+        ${body}
+    </div>`;
 
     Swal.fire({
         title: '<i class="fa-solid fa-book-open text-theme mb-2 text-3xl"></i><br><span class="text-xl font-bold text-slate-800">' + titleTxt + '</span>',
@@ -1162,6 +1172,7 @@ let COURSES_2563 = [
         customClass: { popup: 'rounded-[2rem]' }
     });
 }
+       
 
         function toggleLanguage() {
             appLang = appLang === 'th' ? 'en' : 'th';
