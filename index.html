@@ -3104,6 +3104,30 @@ async function saveActivityData(data, editId = null) {
     } catch (error) { Swal.fire('ข้อผิดพลาด', error.message, 'error'); }
 }
 
+        // ---------- ลบ LINE (ยืนยันก่อนลบ) ----------
+function confirmUnlinkLine(lineUserId, displayName) {
+    Swal.fire({
+        title: 'ลบ LINE นี้?',
+        html: `<p class="text-sm text-slate-500">ต้องการยกเลิกการเชื่อม LINE <b>${displayName || '-'}</b> ใช่ไหม</p>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ใช่ ลบเลย',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#ef4444',
+        customClass: { popup: 'rounded-[2rem]' }
+    }).then(async (r) => {
+        if (!r.isConfirmed) return;
+        Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        try {
+            await fns.httpsCallable('lineUnlink')({ lineUserId });
+            Swal.fire({ icon: 'success', title: 'ลบ LINE แล้ว', timer: 1200, showConfirmButton: false });
+            loadLineAccounts();
+        } catch (e) {
+            Swal.fire('ผิดพลาด', e.message || 'ลบไม่สำเร็จ', 'error');
+        }
+    });
+}
+        
         // ---------- อ่านรายการ LINE ที่ผูกกับบัญชีนี้ ----------
 async function loadLineAccounts() {
     const box = document.getElementById('lineAccountList');
@@ -3118,7 +3142,10 @@ async function loadLineAccounts() {
             const a = d.data();
             return `<div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100">
                 <span class="text-xs font-bold text-slate-700">${a.displayName || '-'}</span>
+                <div class="flex items-center gap-3">
                 <span class="text-[10px] text-slate-400">${a.linkedAt && a.linkedAt.toDate ? a.linkedAt.toDate().toLocaleDateString('th-TH') : '-'}</span>
+                <button onclick="confirmUnlinkLine('${d.id}', '${(a.displayName || '').replace(/'/g, '')}')" class="text-slate-300 hover:text-red-500 transition"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
             </div>`;
         }).join('');
     } catch (e) {
