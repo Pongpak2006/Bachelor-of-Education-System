@@ -2416,7 +2416,8 @@ function calculatePrediction() {
         customClass: { popup: 'rounded-[2rem]' }
     });
 }
-        // ==========================================
+
+// ==========================================
 // 🧠 ระบบ UX/UI ใหม่ (จำรหัส, ลืมรหัส, แจ้งเตือนสีแดง)
 // ==========================================
 
@@ -2441,8 +2442,7 @@ function forgotPassword(e) {
         }
     }).then((r) => {
         if (!r.isConfirmed) return;
-        const email = `${r.value}@rumail.ru.ac.th`;
-        firebase.auth().sendPasswordResetEmail(email)
+        fns.httpsCallable('requestPasswordReset')({ username: r.value })
             .catch(() => {})
             .finally(() => {
                 Swal.fire({
