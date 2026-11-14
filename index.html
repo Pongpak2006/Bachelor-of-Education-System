@@ -1207,7 +1207,7 @@ let COURSES_2563 = [
         
 applyDynamicTheme(); 
 window.onload = function() {
-    updateLanguageUI(); // ส่วนนี้ปล่อยให้ทำงานตอนโหลดเสร็จเหมือนเดิมครับ
+    updateLanguageUI(); // ส่วนนี้ปล่อยให้ทำงานตอนโหลดเสร็จเหมือนเดิมค่ะ
 };
 
         setInterval(() => {
@@ -1266,7 +1266,7 @@ window.onload = function() {
         }
 
         function clearDashboardData() {
-    let loadingTxt = appLang === 'en' ? 'Loading data... 🚀' : 'กำลังดึงข้อมูลรายวิชา... รอสักครู่นะครับ 🚀';
+    let loadingTxt = appLang === 'en' ? 'Loading data... 🚀' : 'กำลังดึงข้อมูลรายวิชา... รอสักครู่นะคะ 🚀';
     
     // 🛠️ ฟังก์ชันตัวช่วย: เช็คก่อนว่ามีกล่องอยู่จริงไหม ถึงจะเปลี่ยนค่า (ป้องกัน Error สีแดง)
     const updateHTML = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
@@ -1406,7 +1406,7 @@ function showRegisterPopup() {
                 Swal.showValidationMessage('กรุณากรอกข้อมูลและเลือกปีหลักสูตรให้ครบถ้วน'); return false;
             }
             if (!email.endsWith('@rumail.ru.ac.th')) {
-                Swal.showValidationMessage('ต้องใช้อีเมล @rumail.ru.ac.th เท่านั้นครับ'); return false;
+                Swal.showValidationMessage('ต้องใช้อีเมล @rumail.ru.ac.th เท่านั้นค่ะ'); return false;
             }
             return { name, email, curriculumYear, username, password };
         }
@@ -1495,14 +1495,14 @@ function loginWithGoogle() {
                 showStudentDashboard(); // พาเข้าหน้าโครงสร้างทันที
             } else {
                 firebase.auth().signOut();
-                Swal.fire('ไม่พบข้อมูล', 'คุณยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครสมาชิกก่อนครับ', 'warning');
+                Swal.fire('ไม่พบข้อมูล', 'คุณยังไม่ได้สมัครสมาชิก กรุณากดปุ่มสมัครสมาชิกก่อนค่ะ', 'warning');
             }
         });
     }).catch((error) => {
         Swal.close();
         // ดักจับกรณีเบราว์เซอร์ในมือถือบล็อกหน้าต่างเด้ง
         if (error.code === 'auth/popup-blocked') {
-            Swal.fire('ป๊อปอัปถูกบล็อก', 'เบราว์เซอร์ของคุณบล็อกหน้าต่างล็อกอิน กรุณาเปิดสิทธิ์อนุญาตป๊อปอัป หรือลองเปิดลิงก์ในแอป Chrome/Safari โดยตรงครับ', 'warning');
+            Swal.fire('ป๊อปอัปถูกบล็อก', 'เบราว์เซอร์ของคุณบล็อกหน้าต่างล็อกอิน กรุณาเปิดสิทธิ์อนุญาตป๊อปอัป หรือลองเปิดลิงก์ในแอป Chrome/Safari โดยตรงค่ะ', 'warning');
         } else if (error.code !== 'auth/popup-closed-by-user') {
             console.error("Google Error: ", error);
             Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้: ' + error.message, 'error');
@@ -1653,7 +1653,7 @@ function showStudentDashboard() {
                     BASE_COURSES = curDoc.data().courses;
                 } else {
                     console.warn("ไม่พบเล่มหลักสูตรปี " + userYear + " ระบบจะใช้ค่าเริ่มต้นแทน");
-                    // ถ้าแอดมินยังไม่ได้สร้างแฟ้มปีนั้น มันจะใช้ข้อมูลเดิมที่ฝังในโค้ดมาเป็นเบาะรองรับไม่ให้เว็บพังครับ
+                    // ถ้าแอดมินยังไม่ได้สร้างแฟ้มปีนั้น มันจะใช้ข้อมูลเดิมที่ฝังในโค้ดมาเป็นเบาะรองรับไม่ให้เว็บพังค่ะ
                 }
 
                 // 3. ดึงเกรดของนักศึกษาคนนี้จากตู้ StudentGrades
@@ -1836,7 +1836,7 @@ function calculateStatus(totalCr) {
             document.getElementById('progressText').innerText = perc.toFixed(1) + '%';
             document.getElementById('progressBar').style.width = perc + '%';
 
-            // 🎯 เพิ่มป้ายสถานะมุมขวาบนตรงนี้ (ส่วนนี้ลงไปปล่อยไว้เหมือนเดิมเลยครับ)
+            // 🎯 เพิ่มป้ายสถานะมุมขวาบนตรงนี้ (ส่วนนี้ลงไปปล่อยไว้เหมือนเดิมเลยค่ะ)
             let badge = document.getElementById('honorsBadge');
             badge.classList.remove('hidden'); // แสดงป้ายเสมอ
 
@@ -2203,7 +2203,7 @@ async function initHonorsChart() {
                 customClass: { popup: 'rounded-[2rem]' },
                 preConfirm: (newPassword) => {
                     if (!newPassword || newPassword.trim() === '') {
-                        Swal.showValidationMessage('กรุณากรอกรหัสผ่านใหม่ครับ');
+                        Swal.showValidationMessage('กรุณากรอกรหัสผ่านใหม่ค่ะ');
                         return false;
                     }
                     return newPassword;
@@ -2286,7 +2286,7 @@ let curRef66 = db.collection("Curriculums").doc("2566");
                 let curRef68 = db.collection("Curriculums").doc("2568");
                 let curRef69 = db.collection("Curriculums").doc("2569");
 
-                // ตรงนี้ต้องเป็น COURSES_2563 นะครับ (วิชาชุดเก่า)
+                // ตรงนี้ต้องเป็น COURSES_2563 นะคะ (วิชาชุดเก่า)
 batch.set(curRef63, { year: "2563", courses: COURSES_2563 });
 batch.set(curRef64, { year: "2564", courses: COURSES_2563 });
 batch.set(curRef65, { year: "2565", courses: COURSES_2563 });
@@ -2442,7 +2442,7 @@ function forgotPassword(e) {
                 Swal.fire({
                     icon: 'info',
                     title: 'ดำเนินการแล้ว',
-                    text: 'ระบบได้ดำเนินการส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปยังอีเมล @rumail.ru.ac.th ของท่านเรียบร้อยแล้ว (เฉพาะกรณีที่รหัสนักศึกษานี้มีอยู่ในระบบ)',
+                    text: 'text: 'ระบบส่งลิงก์ตั้งรหัสผ่านใหม่ไปยังอีเมลมหาวิทยาลัยของคุณแล้ว (เฉพาะกรณีที่รหัสนักศึกษานี้มีอยู่ในระบบ) หากไม่พบอีเมลภายใน 5 นาที กรุณาตรวจกล่องจดหมายขยะ หรือติดต่อ 6704001889@rumail.ru.ac.th',',
                     confirmButtonColor: 'var(--primary-theme)',
                     customClass: { popup: 'rounded-[2rem]' }
                 });
@@ -2515,7 +2515,7 @@ function exportToExcel() {
         let link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         
-        // ตั้งชื่อไฟล์ที่จะดาวน์โหลด (จะเปลี่ยนชื่อตรงนี้ก็ได้นะครับ)
+        // ตั้งชื่อไฟล์ที่จะดาวน์โหลด (จะเปลี่ยนชื่อตรงนี้ก็ได้นะคะ)
         link.setAttribute("download", "backup_student_data.csv"); 
         
         document.body.appendChild(link);
@@ -2555,7 +2555,7 @@ function exportToExcel() {
     if (!topic) {
         Swal.fire({
             title: 'ข้อมูลไม่ครบถ้วน',
-            text: 'กรุณาระบุ "เรื่อง/หัวข้อที่จะสอน" ด้วยครับ',
+            text: 'กรุณาระบุ "เรื่อง/หัวข้อที่จะสอน" ด้วยค่ะ',
             icon: 'warning',
             confirmButtonColor: 'var(--primary-theme)',
             customClass: { popup: 'rounded-[2rem]' }
@@ -2836,7 +2836,7 @@ async function addPdfNumbers() {
     const pos = document.getElementById('pdfNumPos').value;
     const style = document.getElementById('pdfNumStyle').value;
     
-    if (!fileInput) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์ PDF ก่อนครับ', 'warning');
+    if (!fileInput) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์ PDF ก่อนค่ะ', 'warning');
 
     Swal.fire({ title: 'กำลังประทับเลขหน้า...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
