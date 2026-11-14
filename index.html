@@ -2413,17 +2413,39 @@ function calculatePrediction() {
 // 🧠 ระบบ UX/UI ใหม่ (จำรหัส, ลืมรหัส, แจ้งเตือนสีแดง)
 // ==========================================
 
-// 1. ฟังก์ชันลืมรหัสผ่าน (เด้งป๊อปอัปให้คำแนะนำ + อีเมลแอดมิน)
 function forgotPassword(e) {
-    e.preventDefault(); // ป้องกันหน้าเว็บเด้งกลับไปบนสุด
+    e.preventDefault();
     Swal.fire({
-        title: appLang === 'en' ? 'Forgot Password?' : 'ลืมรหัสผ่าน?',
-        html: appLang === 'en' 
-            ? 'Please contact the administrator to reset your password.<br><br><b class="text-theme">Email: 6704001889@rumail.ru.ac.th</b>' 
-            : 'กรุณาติดต่อผู้ดูแลระบบเพื่อขอรีเซ็ตรหัสผ่านใหม่ค่ะ<br><br><b class="text-theme text-base">Gmail : 6704001889@rumail.ru.ac.th</b>',
-        icon: 'info',
+        title: appLang === 'en' ? 'Reset Password' : 'ลืมรหัสผ่าน?',
+        input: 'text',
+        inputPlaceholder: appLang === 'en' ? 'Student ID' : 'รหัสนักศึกษา',
+        text: appLang === 'en'
+            ? 'We will send a reset link to your university email.'
+            : 'ระบบจะส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่อีเมลมหาวิทยาลัยของคุณ',
+        showCancelButton: true,
+        confirmButtonText: appLang === 'en' ? 'Send Link' : 'ส่งลิงก์',
+        cancelButtonText: appLang === 'en' ? 'Cancel' : 'ยกเลิก',
         confirmButtonColor: 'var(--primary-theme)',
-        customClass: { popup: 'rounded-[2rem]' }
+        customClass: { popup: 'rounded-[2rem]' },
+        preConfirm: (id) => {
+            id = (id || '').trim();
+            if (!id) { Swal.showValidationMessage('กรุณากรอกรหัสนักศึกษา'); return false; }
+            return id;
+        }
+    }).then((r) => {
+        if (!r.isConfirmed) return;
+        const email = `${r.value}@rumail.ru.ac.th`;
+        firebase.auth().sendPasswordResetEmail(email)
+            .catch(() => {})
+            .finally(() => {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'ดำเนินการแล้ว',
+                    text: 'หากรหัสนักศึกษานี้มีในระบบ ลิงก์ตั้งรหัสผ่านใหม่ได้ถูกส่งไปที่อีเมลมหาวิทยาลัยแล้ว (ตรวจในกล่องจดหมายขยะด้วย)',
+                    confirmButtonColor: 'var(--primary-theme)',
+                    customClass: { popup: 'rounded-[2rem]' }
+                });
+            });
     });
 }
 
