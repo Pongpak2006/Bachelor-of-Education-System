@@ -1661,12 +1661,8 @@ function showStudentDashboard() {
                 const newSnap = await db.collection("Users").doc(currentUser.id).collection("Grades").get();
                 newSnap.forEach(doc => { studentGrades[doc.id] = { ...doc.data(), courseCode: doc.id }; });
 
-                const oldSnap = await db.collection("StudentGrades").where("studentId", "==", currentUser.id).get();
-                oldSnap.forEach(doc => {
-                const g = doc.data();
-                const key = g.courseCode || doc.id.split('_').pop();
-                if (!studentGrades[key]) studentGrades[key] = { ...g, courseCode: key };
-                });
+                const newSnap = await db.collection("Users").doc(currentUser.id).collection("Grades").get();
+                newSnap.forEach(doc => { studentGrades[doc.id] = { ...doc.data(), courseCode: doc.id }; });
 
                 // 4. เอาวิชาในหลักสูตร มาชนกับเกรดที่เด็กได้
                 let fullData = BASE_COURSES.map(course => {
