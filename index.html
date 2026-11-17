@@ -2109,7 +2109,7 @@ async function loadImportantDays() {
                 ? 'bg-red-50 text-red-600'
                 : 'bg-amber-50 text-amber-600';
             return `<tr class="border-b border-slate-50">
-                <td class="py-3 px-2 font-mono">${x.date}</td>
+                <td class="py-3 px-2 font-mono">${x.label || x.date}</td>
                 <td class="py-3 px-2">${x.name}</td>
                 <td class="py-3 px-2"><span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${badge}">${x.type}</span></td>
                 <td class="py-3 px-2">${x.lead || 0} วัน</td>
@@ -2124,24 +2124,50 @@ async function loadImportantDays() {
     }
 }
 
-async function saveImportantDay() {
-    const payload = {
-        date: document.getElementById('impDate').value.trim(),
-        name: document.getElementById('impName').value.trim(),
-        type: document.getElementById('impType').value,
-        lead: document.getElementById('impLead').value
+let impSaving = false;
+
+function parseImpDate(raw) {
+    const m = (raw || '').trim().match(/^(\d{1,2})(?:\s*-\s*(\d{1,2}))?\s*\/\s*(\d{1,2})$/);
+    if (!m) return null;
+    const d1 = parseInt(m[1], 10);
+    const d2 = m[2] ? parseInt(m[2], 10) : d1;
+    const mo = parseInt(m[3], 10);
+    if (mo < 1 || mo > 12 || d1 < 1 || d2 > 31 || d2 < d1) return null;
+    const mm = String(mo).padStart(2, '0');
+    return {
+        date: `${mm}-${String(d1).padStart(2, '0')}`,
+        endDate: `${mm}-${String(d2).padStart(2, '0')}`,
+        label: m[2] ? `${d1}-${d2}/${mo}` : `${d1}/${mo}`
     };
-    if (!payload.date || !payload.name) {
-        return Swal.fire('เตือน', 'กรุณากรอกวันที่และชื่อ', 'warning');
+}
+
+async function saveImportantDay() {
+    if (impSaving) return;
+    const parsed = parseImpDate(document.getElementById('impDate').value);
+    const name = document.getElementById('impName').value.trim();
+    if (!parsed || !name) {
+        return Swal.fire('เตือน', 'รูปแบบวันที่ไม่ถูกต้อง เช่น 17-25/11 หรือ 18/11 และต้องกรอกชื่อวัน', 'warning');
     }
+    impSaving = true;
     try {
-        await fns.httpsCallable('adminSaveImportantDay')(payload);
-        ['impDate', 'impName'].forEach(id => document.getElementById(id).value = '');
+        await db.collection("ImportantDays").add({
+            date: parsed.date,
+            endDate: parsed.endDate,
+            label: parsed.label,
+            name: name,
+            type: document.getElementById('impType').value,
+            lead: parseInt(document.getElementById('impLead').value, 10) || 0,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('impDate').value = '';
+        document.getElementById('impName').value = '';
         document.getElementById('impLead').value = '0';
-        loadImportantDays();
+        await loadImportantDays();
         Toast.fire({ icon: 'success', title: 'บันทึกแล้ว' });
     } catch (e) {
         Swal.fire('ผิดพลาด', e.message, 'error');
+    } finally {
+        impSaving = false;
     }
 }
 
@@ -2149,8 +2175,8 @@ async function deleteImportantDay(id) {
     const r = await Swal.fire({ title: 'ลบรายการนี้?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
     if (!r.isConfirmed) return;
     try {
-        await fns.httpsCallable('adminDeleteImportantDay')({ id });
-        loadImportantDays();
+        await db.collection("ImportantDays").doc(id).delete();
+        await loadImportantDays();
     } catch (e) {
         Swal.fire('ผิดพลาด', e.message, 'error');
     }
