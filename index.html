@@ -490,6 +490,51 @@
                 <div id="userContainer" class="space-y-4 max-h-[600px] overflow-y-auto pr-2 flex-1"></div>
             </div>
         </div>
+      <!-- 📅 จัดการวันสำคัญ / วันหยุด และการแจ้งเตือนทาง LINE -->
+<div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-slate-100 mt-8">
+    <h3 class="text-base font-bold text-slate-800 mb-6 flex items-center">
+        <i class="fa-solid fa-calendar-star mr-2 admin-text-theme"></i> วันสำคัญ / วันหยุด
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
+        <input type="text" id="impDate" placeholder="MM-DD เช่น 01-13" class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-green-600">
+        <input type="text" id="impName" placeholder="ชื่อวัน" class="md:col-span-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-green-600">
+        <select id="impType" class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-green-600">
+            <option value="สำคัญ">สำคัญ</option>
+            <option value="หยุด">หยุด</option>
+        </select>
+        <input type="number" id="impLead" min="0" value="0" placeholder="เตือนล่วงหน้า (วัน)" class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-green-600">
+    </div>
+    <button onclick="saveImportantDay()" class="admin-bg-theme text-white px-6 py-3 rounded-xl font-bold text-sm mb-8">
+        <i class="fa-solid fa-plus mr-1"></i> เพิ่มรายการ
+    </button>
+
+    <div class="overflow-x-auto mb-8">
+        <table class="w-full text-sm text-left">
+            <thead class="text-slate-400 text-xs uppercase border-b border-slate-100">
+                <tr>
+                    <th class="py-3 px-2">วันที่</th>
+                    <th class="py-3 px-2">ชื่อ</th>
+                    <th class="py-3 px-2">ประเภท</th>
+                    <th class="py-3 px-2">เตือนล่วงหน้า</th>
+                    <th class="py-3 px-2 text-right">ลบ</th>
+                </tr>
+            </thead>
+            <tbody id="impList"></tbody>
+        </table>
+    </div>
+
+    <div class="border-t border-slate-100 pt-6 flex flex-col md:flex-row gap-3 items-start md:items-center">
+        <span class="text-sm font-bold text-slate-700">เวลาแจ้งเตือน</span>
+        <input type="number" id="notifyHour" min="0" max="23" class="w-20 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none" placeholder="ชม.">
+        <span class="text-slate-400">:</span>
+        <input type="number" id="notifyMinute" min="0" max="59" class="w-20 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none" placeholder="นาที">
+        <button onclick="saveNotifySettings()" class="admin-bg-theme text-white px-5 py-3 rounded-xl font-bold text-sm">บันทึกเวลา</button>
+        <button onclick="testNotifyToMe()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-3 rounded-xl font-bold text-sm">
+            <i class="fa-solid fa-flask mr-1"></i> ส่งทดสอบให้ฉัน (1 ข้อความ)
+        </button>
+    </div>
+</div>
     </div>
 
         <div id="studentSection" class="hidden-section max-w-6xl mx-auto p-4 md:p-8 pt-6 md:pt-10 pb-24">
@@ -2046,6 +2091,105 @@ function calculateStatus(totalCr) {
             printWin.document.close();
         }
 
+        // ==========================================
+// 📅 จัดการวันสำคัญ / วันหยุด (แอดมิน)
+// ==========================================
+async function loadImportantDays() {
+    const list = document.getElementById('impList');
+    if (!list) return;
+    try {
+        const snap = await db.collection("ImportantDays").orderBy("date").get();
+        if (snap.empty) {
+            list.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">ยังไม่มีรายการ</td></tr>';
+            return;
+        }
+        list.innerHTML = snap.docs.map(d => {
+            const x = d.data();
+            const badge = x.type === 'หยุด'
+                ? 'bg-red-50 text-red-600'
+                : 'bg-amber-50 text-amber-600';
+            return `<tr class="border-b border-slate-50">
+                <td class="py-3 px-2 font-mono">${x.date}</td>
+                <td class="py-3 px-2">${x.name}</td>
+                <td class="py-3 px-2"><span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${badge}">${x.type}</span></td>
+                <td class="py-3 px-2">${x.lead || 0} วัน</td>
+                <td class="py-3 px-2 text-right">
+                    <button onclick="deleteImportantDay('${d.id}')" class="text-slate-300 hover:text-red-500 transition"><i class="fa-solid fa-trash-can"></i></button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch (e) {
+        console.error("loadImportantDays:", e);
+        list.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500 text-xs">อ่านข้อมูลไม่สำเร็จ</td></tr>';
+    }
+}
+
+async function saveImportantDay() {
+    const payload = {
+        date: document.getElementById('impDate').value.trim(),
+        name: document.getElementById('impName').value.trim(),
+        type: document.getElementById('impType').value,
+        lead: document.getElementById('impLead').value
+    };
+    if (!payload.date || !payload.name) {
+        return Swal.fire('เตือน', 'กรุณากรอกวันที่และชื่อ', 'warning');
+    }
+    try {
+        await fns.httpsCallable('adminSaveImportantDay')(payload);
+        ['impDate', 'impName'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('impLead').value = '0';
+        loadImportantDays();
+        Toast.fire({ icon: 'success', title: 'บันทึกแล้ว' });
+    } catch (e) {
+        Swal.fire('ผิดพลาด', e.message, 'error');
+    }
+}
+
+async function deleteImportantDay(id) {
+    const r = await Swal.fire({ title: 'ลบรายการนี้?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
+    if (!r.isConfirmed) return;
+    try {
+        await fns.httpsCallable('adminDeleteImportantDay')({ id });
+        loadImportantDays();
+    } catch (e) {
+        Swal.fire('ผิดพลาด', e.message, 'error');
+    }
+}
+
+// ==========================================
+// ⏰ เวลาแจ้งเตือน / ส่งทดสอบ (แอดมิน)
+// ==========================================
+async function loadNotifySettings() {
+    try {
+        const doc = await db.collection("Settings").doc("notify").get();
+        const s = doc.exists ? doc.data() : { hour: 7, minute: 0 };
+        document.getElementById('notifyHour').value = s.hour ?? 7;
+        document.getElementById('notifyMinute').value = s.minute ?? 0;
+    } catch (e) { console.error("loadNotifySettings:", e); }
+}
+
+async function saveNotifySettings() {
+    const hour = document.getElementById('notifyHour').value;
+    const minute = document.getElementById('notifyMinute').value;
+    try {
+        await fns.httpsCallable('adminSaveNotifySettings')({ hour, minute });
+        Toast.fire({ icon: 'success', title: 'บันทึกเวลาแล้ว' });
+    } catch (e) {
+        Swal.fire('ผิดพลาด', e.message, 'error');
+    }
+}
+
+async function testNotifyToMe() {
+    const r = await Swal.fire({ title: 'ส่งทดสอบ?', text: 'ส่งเฉพาะ LINE ของแอดมิน 1 ข้อความ', icon: 'question', showCancelButton: true, confirmButtonText: 'ส่งเลย', cancelButtonText: 'ยกเลิก' });
+    if (!r.isConfirmed) return;
+    try {
+        await fns.httpsCallable('adminTestNotify')({});
+        Swal.fire('สำเร็จ', 'ส่งข้อความทดสอบแล้ว', 'success');
+    } catch (e) {
+        Swal.fire('ผิดพลาด', e.message, 'error');
+    }
+}
+
 // ==========================================
 // 📊 กราฟสถิติสถานะนักศึกษา (Honors / Status Chart)
 // ==========================================
@@ -2147,6 +2291,8 @@ async function initHonorsChart() {
 
                 document.getElementById('adminTotalUsers').innerHTML = `${count} <span class="text-sm font-medium text-slate-400">${appLang === 'en' ? 'Accounts' : 'บัญชี'}</span>`;
                 document.getElementById('userContainer').innerHTML = html || `<p class="text-center py-20 text-slate-400 text-sm">${appLang === 'en' ? 'No users found' : 'ไม่มีข้อมูลนักศึกษาในระบบ'}</p>`;
+                loadImportantDays();
+                loadNotifySettings();
                 Swal.close(); 
 
                 // เรียกกราฟแบบแยกต่างหาก ถ้ากราฟพังจะไม่กระทบการแสดงรายชื่อ
