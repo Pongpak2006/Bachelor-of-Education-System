@@ -3601,48 +3601,30 @@ async function deleteActivity(id) {
   }
 })();
 // ==========================================
-// ⚠️ ป๊อปอัปคำเตือนความปลอดภัย (ด้านล่างแบบย่อ + ป๊อปอัปใหญ่)
+// ⚠️ ป๊อปอัปคำเตือนความปลอดภัย (กลางจอ พื้นขาว)
 // ==========================================
 function showSecurityNotice(force = false) {
     if (!force && localStorage.getItem('securityNoticeAck')) return;
 
     Swal.fire({
-        position: 'bottom',
-        grow: false,
-        width: '100%',
-        html: `
-            <div class="text-left px-1 space-y-3">
-                <p class="text-base font-bold text-slate-800">ข้อควรทราบด้านความปลอดภัย</p>
-                <div class="flex items-center justify-between gap-3">
-                    <button type="button" onclick="showSecurityDetail()"
-                        class="text-sm font-bold text-theme underline">กดเพิ่มเติม</button>
-                    <button type="button" onclick="Swal.close(); forgotPassword(event);"
-                        class="text-sm font-bold text-theme underline">ลืมรหัสผ่าน</button>
-                </div>
-            </div>`,
-        showConfirmButton: true,
-        confirmButtonText: 'รับทราบ',
-        confirmButtonColor: 'var(--primary-theme)',
-        customClass: { popup: 'rounded-t-[2rem] rounded-b-none !m-0' }
-    }).then(() => {
-        localStorage.setItem('securityNoticeAck', '1');
-    });
-}
-
-// ป๊อปอัปใหญ่ แสดงรายละเอียดทั้งหมด
-function showSecurityDetail() {
-    Swal.fire({
-        title: 'ข้อควรทราบด้านความปลอดภัย',
+        title: '<span class="text-lg font-bold text-slate-800">ข้อควรทราบด้านความปลอดภัย</span>',
         html: `
             <div class="text-left text-sm text-slate-600 space-y-2">
-                <p>• ระบบนี้ใช้อีเมลมหาวิทยาลัยสำหรับเข้าสู่ระบบ</p>
-                <p>• <b>ระบบไม่ได้เก็บรหัสผ่านของคุณเป็นข้อความที่อ่านได้</b></p>
-                <p>• <b>ไม่ควรใช้รหัสที่เป็นข้อมูลส่วนตัว</b> เช่น เลขบัตรประชาชน วันเกิด หรือเบอร์โทรศัพท์</p>
-                <p>• หากลืมรหัสผ่าน ใช้เมนู "ลืมรหัสผ่าน" เพื่อตั้งรหัสใหม่</p>
+                <p>•กรุณาใช้อีเมลของมหาวิทยาลัยในการเข้าสู่ระบบ</p>
+                <p>• <b>รหัสผ่านของคุณจะถูกเข้ารหัสอย่างปลอดภัย</b>ไม่มีใครสามารถเปิดดูได้</p>
+                <p>• <b>หลีกเลี่ยงการตั้งรหัสผ่านจากข้อมูลส่วนตัว</b> เช่น เลขบัตรประชาชน วันเกิด หรือเบอร์โทรศัพท์</p>
+                <p class="pt-2 text-center">
+                    <a href="#" onclick="Swal.close(); forgotPassword(event); return false;"
+                       class="font-bold text-theme underline">ลืมรหัสผ่าน? กดที่นี่</a>
+                </p>
             </div>`,
+        background: '#ffffff',
+        backdrop: 'rgba(255,255,255,0.85)',
         confirmButtonText: 'รับทราบ',
         confirmButtonColor: 'var(--primary-theme)',
         customClass: { popup: 'rounded-[2rem]' }
+    }).then(() => {
+        localStorage.setItem('securityNoticeAck', '1');
     });
 }
 
