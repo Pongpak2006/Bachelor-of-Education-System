@@ -1448,7 +1448,7 @@ function showRegisterPopup() {
         backdrop: '#ffffff',
         customClass: {
         popup: 'min-h-[100dvh] !m-0 !rounded-none',
-        htmlContainer: '!m-0 !px-6 md:!px-12 lg:!px-24 !py-6 !w-full'
+        htmlContainer: '!m-0 !px-6 md:!px-12 lg:!px-6 !py-6 !w-full'
         },
         showCancelButton: true,
         confirmButtonText: 'ยืนยันการสมัคร',
@@ -2379,7 +2379,6 @@ async function initHonorsChart() {
                 confirmButtonText: btnText,
                 cancelButtonText: appLang === 'en' ? 'Cancel' : 'ยกเลิก',
                 confirmButtonColor: 'var(--primary-theme)',
-                customClass: { popup: 'rounded-[2rem]' },
                 preConfirm: (newPassword) => {
                     if (!newPassword || newPassword.trim() === '') {
                         Swal.showValidationMessage('กรุณากรอกรหัสผ่านใหม่ค่ะ');
@@ -2599,9 +2598,19 @@ function forgotPassword(e) {
         title: appLang === 'en' ? 'Reset Password' : 'ลืมรหัสผ่าน?',
         html: appLang === 'en'
             ? '<p class="text-sm text-slate-600 mb-3">Enter your Student ID. A reset link will be sent to your university email.</p>'
-            : '<p class="text-sm text-slate-600 mb-3">กรอกรหัสนักศึกษา ระบบจะส่งลิงก์ตั้งรหัสใหม่ไปที่อีเมลมหาวิทยาลัย</p>',
+            : `<p class="text-sm text-slate-600 mb-3">กรอกรหัสนักศึกษา ระบบจะส่งลิงก์ตั้งรหัสใหม่ไปที่อีเมลมหาวิทยาลัย</p>
+               <div class="mt-6 text-left text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                <p class="font-bold text-slate-800">คำแนะนำก่อนตั้งรหัสใหม่</p>
+                <p>• ลิงก์ตั้งรหัสใหม่จะส่งไปที่อีเมลมหาวิทยาลัยของคุณ</p>
+                <p>• หากไม่พบอีเมลภายใน 5 นาที ให้ตรวจกล่องจดหมายขยะ</p>
+                <p>• <b>หลีกเลี่ยงการตั้งรหัสผ่านจากข้อมูลส่วนตัว</b> เช่น เลขบัตรประชาชน วันเกิด หรือเบอร์โทรศัพท์</p>
+               </div>`,
         input: 'text',
         inputPlaceholder: appLang === 'en' ? 'Student ID' : 'รหัสนักศึกษา',
+        width: '100%',
+        padding: 0,
+        background: '#ffffff',
+        backdrop: '#ffffff',
         footer: '<span class="text-xs text-slate-500">ไม่ได้รับอีเมล? ตรวจกล่องจดหมายขยะ หรือสอบถาม <a href="mailto:6704001889@rumail.ru.ac.th" class="font-bold underline">6704001889@rumail.ru.ac.th</a></span>',
         showCancelButton: true,
         confirmButtonText: appLang === 'en' ? 'Send Link' : 'ส่งลิงก์',
@@ -2618,7 +2627,7 @@ function forgotPassword(e) {
         fns.httpsCallable('requestPasswordReset')({ username: r.value })
             .catch(() => {})
             .finally(() => {
-                Swal.fire({
+            Swal.fire({
                     icon: 'info',
                     title: 'ดำเนินการแล้ว',
                     text: 'ระบบส่งลิงก์ตั้งรหัสผ่านใหม่ไปยังอีเมลมหาวิทยาลัยของคุณแล้ว (เฉพาะกรณีที่รหัสนักศึกษานี้มีอยู่ในระบบ) หากไม่พบอีเมลภายใน 5 นาที กรุณาตรวจกล่องจดหมายขยะ หรือติดต่อ 6704001889@rumail.ru.ac.th',
@@ -3177,7 +3186,6 @@ function showAddActivityModal(editId = null, oldData = null) {
         confirmButtonText: isEdit ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูล',
         cancelButtonText: 'ยกเลิก',
         confirmButtonColor: 'var(--primary-theme)',
-        customClass: { popup: 'rounded-[2rem]' },
         didOpen: () => {
             const typeSelect = document.getElementById('actTypeSelect');
             const formKYS = document.getElementById('formKYS');
