@@ -3601,30 +3601,37 @@ async function deleteActivity(id) {
   }
 })();
 // ==========================================
-// ⚠️ ป๊อปอัปคำเตือนความปลอดภัยก่อนเข้าระบบ
+// ⚠️ ป๊อปอัปคำเตือนความปลอดภัย (เด้งจากด้านล่างบนมือถือ)
 // ==========================================
 function showSecurityNotice(force = false) {
-    const seen = localStorage.getItem('securityNoticeAck');
-    if (seen && !force) return;
+    if (!force && localStorage.getItem('securityNoticeAck')) return;
 
     Swal.fire({
-        icon: 'info',
-        title: 'ข้อควรทราบด้านความปลอดภัย',
+        position: 'bottom',
+        showClass: { popup: 'animate__animated animate__slideInUp' },
+        hideClass: { popup: 'animate__animated animate__slideOutDown' },
+        grow: false,
+        width: '100%',
         html: `
-            <div class="text-left text-sm text-slate-600 space-y-2">
-                <p>• ระบบนี้ใช้อีเมลมหาวิทยาลัยสำหรับการเข้าสู่ระบบ</p>
-                <p>• <b>ระบบไม่ได้เก็บรหัสผ่านของคุณ</b></p>
-                <p>• <b>ไม่ควรใช้รหัสผ่านที่เป็นข้อมูลส่วนตัว</b> เช่น เลขบัตรประชาชน วันเกิด หรือเบอร์โทรศัพท์</p>
-                <p>• หากลืมรหัสผ่าน ให้ใช้เมนู "ลืมรหัสผ่าน" เพื่อตั้งรหัสใหม่</p>
+            <div class="text-left text-sm text-slate-600 space-y-3 px-1">
+                <p class="text-base font-bold text-slate-800">ข้อควรทราบด้านความปลอดภัย</p>
+                <p>• ระบบนี้ใช้อีเมลมหาวิทยาลัยสำหรับเข้าสู่ระบบ</p>
+                <p>• <b>ระบบไม่ได้เก็บรหัสผ่านของคุณเป็นข้อความที่อ่านได้</b></p>
+                <p>• <b>ไม่ควรใช้รหัสที่เป็นข้อมูลส่วนตัว</b> เช่น เลขบัตรประชาชน วันเกิด หรือเบอร์โทรศัพท์</p>
+                <p>
+                    • ลืมรหัสผ่าน?
+                    <a href="#" onclick="Swal.close(); forgotPassword(event);"
+                       class="font-bold text-theme underline">กดที่นี่เพื่อตั้งรหัสใหม่</a>
+                </p>
             </div>`,
         confirmButtonText: 'รับทราบ',
         confirmButtonColor: 'var(--primary-theme)',
-        customClass: { popup: 'rounded-[2rem]' }
+        customClass: { popup: 'rounded-t-[2rem] rounded-b-none !m-0' }
     }).then(() => {
         localStorage.setItem('securityNoticeAck', '1');
     });
 }
-// แสดงครั้งแรกเมื่อเปิดหน้าเว็บ
+
 window.addEventListener('DOMContentLoaded', () => showSecurityNotice());
 </script>
 </body>
