@@ -3600,6 +3600,32 @@ async function deleteActivity(id) {
     Swal.fire("ลิงก์ใช้ไม่ได้", "ลิงก์ใช้ได้ครั้งเดียวและมีอายุ 5 นาที กลับไปกดปุ่มในแชท LINE อีกครั้ง หรือเข้าสู่ระบบด้วยรหัสผ่านตามปกติ", "info");
   }
 })();
+// ==========================================
+// ⚠️ ป๊อปอัปคำเตือนความปลอดภัยก่อนเข้าระบบ
+// ==========================================
+function showSecurityNotice(force = false) {
+    const seen = localStorage.getItem('securityNoticeAck');
+    if (seen && !force) return;
+
+    Swal.fire({
+        icon: 'info',
+        title: 'ข้อควรทราบด้านความปลอดภัย',
+        html: `
+            <div class="text-left text-sm text-slate-600 space-y-2">
+                <p>• ระบบนี้ใช้อีเมลมหาวิทยาลัยสำหรับการเข้าสู่ระบบ</p>
+                <p>• <b>ระบบไม่ได้เก็บรหัสผ่านของคุณ</b></p>
+                <p>• <b>ไม่ควรใช้รหัสผ่านที่เป็นข้อมูลส่วนตัว</b> เช่น เลขบัตรประชาชน วันเกิด หรือเบอร์โทรศัพท์</p>
+                <p>• หากลืมรหัสผ่าน ให้ใช้เมนู "ลืมรหัสผ่าน" เพื่อตั้งรหัสใหม่</p>
+            </div>`,
+        confirmButtonText: 'รับทราบ',
+        confirmButtonColor: 'var(--primary-theme)',
+        customClass: { popup: 'rounded-[2rem]' }
+    }).then(() => {
+        localStorage.setItem('securityNoticeAck', '1');
+    });
+}
+// แสดงครั้งแรกเมื่อเปิดหน้าเว็บ
+window.addEventListener('DOMContentLoaded', () => showSecurityNotice());
 </script>
 </body>
 </html>
