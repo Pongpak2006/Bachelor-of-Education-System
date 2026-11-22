@@ -1626,7 +1626,9 @@ function showStudentDashboard() {
     // โชว์แค่คำทักทายด้านบนสุด
     document.getElementById('greetingText').innerText = getGreeting();
     
-    document.getElementById('fbFab').classList.remove('hidden');
+    if (localStorage.getItem('fbFabHidden') !== '1') {
+        document.getElementById('fbFab').classList.remove('hidden');
+    }
     loadCourses(); 
     loadActivities();
     loadLineAccounts();
@@ -3636,7 +3638,7 @@ async function deleteActivity(id) {
             </select>
             <textarea id="fbMsg" class="swal2-textarea !m-0 !w-full" placeholder="เขียนข้อเสนอแนะของคุณ"></textarea>
             <p class="mt-3 text-xs text-slate-500">สอบถาม: <a href="mailto:6704001889@rumail.ru.ac.th" class="font-bold underline">6704001889@rumail.ru.ac.th</a></p>
-            <button type="button" onclick="Swal.close()" class="mt-3 text-xs text-slate-400 underline">ซ่อนปุ่มนี้ชั่วคราว</button>`,
+            <button type="button" onclick="hideFeedbackFab()" class="mt-3 text-xs text-slate-400 underline">ซ่อนปุ่มนี้ชั่วคราว</button>`,
         showCancelButton: true,
         confirmButtonText: 'ส่ง',
         cancelButtonText: 'ปิด',
@@ -3652,6 +3654,11 @@ async function deleteActivity(id) {
             .then(() => Swal.fire('ขอบคุณค่ะ', 'ส่งข้อเสนอแนะเรียบร้อย', 'success'))
             .catch(e => Swal.fire('ผิดพลาด', e.message, 'error'));
     });
+}
+ function hideFeedbackFab() {
+    localStorage.setItem('fbFabHidden', '1');
+    document.getElementById('fbFab').classList.add('hidden');
+    Swal.close();
 }
 </script>
   <button id="fbFab" onclick="openFeedback()"
