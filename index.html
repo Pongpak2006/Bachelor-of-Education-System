@@ -1626,6 +1626,7 @@ function showStudentDashboard() {
     // โชว์แค่คำทักทายด้านบนสุด
     document.getElementById('greetingText').innerText = getGreeting();
     
+    document.getElementById('fbFab').classList.remove('hidden');
     loadCourses(); 
     loadActivities();
     loadLineAccounts();
@@ -1646,6 +1647,7 @@ function showStudentDashboard() {
         
         function logout(s) {
             firebase.auth().signOut(); // ✅ เพิ่มบรรทัดนี้เข้าไปเพื่อเคลียร์ Session
+            document.getElementById('fbFab').classList.add('hidden');
             
             document.getElementById(s).style.display = 'none';
             document.getElementById('loginSection').style.display = 'flex';
@@ -3622,6 +3624,38 @@ async function deleteActivity(id) {
     Swal.fire("ลิงก์ใช้ไม่ได้", "ลิงก์ใช้ได้ครั้งเดียวและมีอายุ 5 นาที กลับไปกดปุ่มในแชท LINE อีกครั้ง หรือเข้าสู่ระบบด้วยรหัสผ่านตามปกติ", "info");
   }
 })();
+        function openFeedback() {
+    Swal.fire({
+        title: 'ส่งข้อเสนอแนะ',
+        html: `
+            <select id="fbCat" class="swal2-input !w-full !m-0 !mb-3">
+                <option value="ระบบ">ระบบ / การใช้งาน</option>
+                <option value="เกรด">เกรด / หลักสูตร</option>
+                <option value="LINE">บอท LINE</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+            </select>
+            <textarea id="fbMsg" class="swal2-textarea !m-0 !w-full" placeholder="เขียนข้อเสนอแนะของคุณ"></textarea>
+            <button type="button" onclick="Swal.close()" class="mt-3 text-xs text-slate-400 underline">ซ่อนปุ่มนี้ชั่วคราว</button>`,
+        showCancelButton: true,
+        confirmButtonText: 'ส่ง',
+        cancelButtonText: 'ปิด',
+        confirmButtonColor: 'var(--primary-theme)',
+        preConfirm: () => {
+            const msg = document.getElementById('fbMsg').value.trim();
+            if (!msg) { Swal.showValidationMessage('กรุณาพิมพ์ข้อความ'); return false; }
+            return { category: document.getElementById('fbCat').value, message: msg };
+        }
+    }).then((r) => {
+        if (!r.isConfirmed) return;
+        fns.httpsCallable('submitFeedback')(r.value)
+            .then(() => Swal.fire('ขอบคุณค่ะ', 'ส่งข้อเสนอแนะเรียบร้อย', 'success'))
+            .catch(e => Swal.fire('ผิดพลาด', e.message, 'error'));
+    });
+}
 </script>
+  <button id="fbFab" onclick="openFeedback()"
+  class="hidden fixed bottom-5 right-5 z-40 bg-indigo-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:opacity-90 active:scale-95">
+  <i class="fa-solid fa-comment-dots"></i>
+</button>
 </body>
 </html>
